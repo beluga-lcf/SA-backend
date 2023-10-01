@@ -1,2 +1,2 @@
 # SA-backend
-this is the backend repository of engineering analyzing 2023
+this is the backend repository of software analyzing 2023
