@@ -2,6 +2,7 @@ import psycopg2
 import requests
 import pandas as pd
 import subprocess
+import boto3
 
 DATABASE=""
 USERNAME=""
@@ -18,17 +19,25 @@ def create_schema():
     cur.close()
     conn.close()
 
+
 def download_and_run_script():
-    # only trans jsonlines to csv files, i don't write code to download jsonlines automatically(, I'll do maybe later #TODO
-    # DOWNLOAD jsonlines FIRST!!! run fllowing commands
-    # aws s3 sync "s3://openalex" "openalex-snapshot" --no-sign-request
-    # copy everything in the openalex S3 bucket to a local folder named openalex-snapshot. It'll take up roughly 300GB of disk space.
+    s3 = boto3.client('s3', config=botocore.client.Config(signature_version=botocore.UNSIGNED))
+    bucket_name = 'openalex'
+    local_directory = 'openalex-snapshot'
+    subprocess.run(['mkdir', '-p', local_directory])
+
+    for obj in s3.list_objects_v2(Bucket=bucket_name)['Contents']:
+        filename = obj['Key']
+        local_filename = f'{local_directory}/{filename}'
+        s3.download_file(bucket_name, filename, local_filename)
+
     script_url = 'https://raw.githubusercontent.com/OpenAlexOrg/openalex-schema/main/flatten-openalex-jsonl.py'
     script_content = requests.get(script_url).text
     with open('flatten-openalex-jsonl.py', 'w') as file:
         file.write(script_content)
     subprocess.run(['mkdir', '-p', 'csv-files'])
     subprocess.run(['python3', 'flatten-openalex-jsonl.py'])
+
 
 def load_csv_to_db():
     conn = psycopg2.connect(database=DATABASE, user=USERNAME, password=PASSWORD, host=HOST, port=PORT)
