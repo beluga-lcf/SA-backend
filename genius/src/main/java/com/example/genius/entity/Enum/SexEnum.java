@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.Getter;
 
 @Getter
-public enum sexEnum {
+public enum SexEnum {
 
     Unknown(0, "未知"),
     Male(1, "男"),
@@ -15,7 +15,7 @@ public enum sexEnum {
 
     private String sexName;
 
-    sexEnum(Integer sex, String sexName) {
+    SexEnum(Integer sex, String sexName) {
         this.sex = sex;
         this.sexName = sexName;
     }
