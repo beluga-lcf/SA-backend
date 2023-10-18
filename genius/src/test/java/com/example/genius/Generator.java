@@ -51,6 +51,7 @@ public class Generator {
                 .strategyConfig(builder -> {
                     builder.addInclude(tables) // 设置需要生成的表名
                             .addTablePrefix("t_", "c_"); // 设置过滤表前缀
+
                 })
 
                 .templateEngine(new FreemarkerTemplateEngine()) // 使用Freemarker引擎模板，默认的是Velocity引擎模板
