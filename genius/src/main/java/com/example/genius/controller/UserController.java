@@ -70,6 +70,9 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/sendVerifyCode", method = RequestMethod.POST)
     public Response sendVerifyCode(String email, String type){ //邮箱，类型
+        /*
+        to be done
+         */
         return getSuccessResponse("验证码已发送！");
     }
 }
