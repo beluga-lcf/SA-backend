@@ -1,10 +1,13 @@
 package com.example.genius.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.genius.entity.Mail;
 import com.example.genius.entity.Response;
 import com.example.genius.entity.User;
 import com.example.genius.mapper.UserMapper;
+import com.example.genius.service.EmailService;
 import com.example.genius.service.UserService;
+import com.example.genius.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,15 +19,19 @@ import javax.servlet.http.HttpSession;
 @Slf4j
 @RestController
 @RequestMapping("/user")
-public class UserController extends BaseController{
+public class UserController extends BaseController {
     @Autowired
-    HttpSession session;
+    private HttpSession session;
 
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
     @Autowired
-    UserService userService;
+    private UserService userService;
+
+    @Autowired
+    private EmailService emailService;
+
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public Response register(String username, String password){
         User user = new User();
@@ -59,5 +66,10 @@ public class UserController extends BaseController{
             log.info("一名用户已登录");
             return getSuccessResponse("登陆成功！");
         }
+    }
+
+    @RequestMapping(value = "/sendVerifyCode", method = RequestMethod.POST)
+    public Response sendVerifyCode(String email, String type){ //邮箱，类型
+        return getSuccessResponse("验证码已发送！");
     }
 }
