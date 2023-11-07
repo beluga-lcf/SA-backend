@@ -6,14 +6,36 @@ import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Stack;
 
 @SpringBootTest
 public class Generator {
+    public static String url = "jdbc:mysql://127.0.0.1:3306/openalex?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true";
+    public static String username = "root";
+    public static String password = "Lvchaofan";
+
+    public static ArrayList<String> tables = new ArrayList<>();
+    public void addTableName(){
+        String query = "SHOW TABLES";
+        try (Connection connection = DriverManager.getConnection(url, username, password);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+                while (resultSet.next()) {
+                    String tableName = resultSet.getString(1);
+                    tables.add(tableName);
+                }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     @Test
     public void generate() {
         FastAutoGenerator
-                .create("jdbc:mysql://127.0.0.1:3306/sa-backend?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true", "root", "Lvchaofan")
+                .create(url, username, password)
                 .globalConfig(builder -> {
                     builder
                             .author("chaofan") // 设置作者
@@ -27,8 +49,9 @@ public class Generator {
                             .pathInfo(Collections.singletonMap(OutputFile.xml, "D://Workspace//Application//SA-backend//SA-backend//genius//src//main//resources/mapper")); // 设置mapperXml生成路径
                 })
                 .strategyConfig(builder -> {
-                    builder.addInclude("user", "paper", "scholar") // 设置需要生成的表名
+                    builder.addInclude(tables) // 设置需要生成的表名
                             .addTablePrefix("t_", "c_"); // 设置过滤表前缀
+
                 })
 
                 .templateEngine(new FreemarkerTemplateEngine()) // 使用Freemarker引擎模板，默认的是Velocity引擎模板

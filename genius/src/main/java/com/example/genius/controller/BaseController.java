@@ -1,6 +1,6 @@
 package com.example.genius.controller;
 
-import com.example.genius.entity.VO.Response;
+import com.example.genius.entity.Response;
 
 public class BaseController {
 
@@ -14,6 +14,11 @@ public class BaseController {
     }
 
     protected <T> Response getErrorResponse(T t) {
-        return new Response("error",500,"服务器返回错误",t);
+        Response<T> response = new Response<>();
+        response.setStatus("error");
+        response.setCode(500);
+        response.setInfo("请求失败");
+        response.setData(t);
+        return response;
     }
 }
