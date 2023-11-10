@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.genius.entity.Mail;
 import com.example.genius.entity.Response;
 import com.example.genius.entity.User;
+import com.example.genius.enums.ErrorType;
 import com.example.genius.mapper.UserMapper;
 import com.example.genius.service.EmailService;
 import com.example.genius.service.UserService;
@@ -41,7 +42,7 @@ public class UserController extends BaseController {
         queryWrapper.eq("user_name", username);
         User check_user = userService.getOne(queryWrapper);
         if(check_user!=null){
-            return getErrorResponse("用户名已存在!");
+            return getErrorResponse(null, ErrorType.already_registerd);
         }
         else {
             userService.save(user);
@@ -56,10 +57,10 @@ public class UserController extends BaseController {
         queryWrapper.eq("user_name", username);
         User checkuser = userService.getOne(queryWrapper);
         if(checkuser == null) {
-            return getErrorResponse("用户名不存在!");
+            return getSimpleError(); // Errortype to be done
         }
         if(checkuser.getPassword().equalsIgnoreCase(password)){
-            return getErrorResponse("密码错误!");
+            return getSimpleError() ; // Errortype to be done
         }
         else {
             session.setAttribute("userId",checkuser.getUserId());

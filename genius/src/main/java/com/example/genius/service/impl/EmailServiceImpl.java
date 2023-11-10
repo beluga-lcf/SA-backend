@@ -35,21 +35,15 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendLoginVerifyMail(Mail mail) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        checkMailNotNull(mail);
-        //邮件发件人
-        message.setFrom(sendMailer);
-        //邮件收件人 1或多个
-        message.setTo(mail.getSendTo().split(","));
-        //邮件主题
-        message.setSubject(mail.getSubject());
-        //邮件内容
-        message.setText(mail.getText());
-        //邮件发送时间
-        message.setSentDate(new Date());
-        javaMailSender.send(message);
-        log.info("发送邮件成功:{}->{}",sendMailer,mail.getSendTo());
+    public void sendRegisterVerifyMail(String customMail, String verifyCode) {
+        SimpleMailMessage simpleMail = new SimpleMailMessage();
+        simpleMail.setFrom(sendMailer);
+        simpleMail.setTo(customMail);
+        simpleMail.setSubject("注册验证");
+        simpleMail.setText("您的验证码是："+verifyCode);
+        simpleMail.setSentDate(new Date());
+        javaMailSender.send(simpleMail);
+        log.info("发送注册验证邮件成功:{}->{}",sendMailer,simpleMail.getTo());
     }
 
     @Override

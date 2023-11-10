@@ -7,5 +7,5 @@ public interface EmailService {
 
     public void sendHtmlMail(Mail mail);
 
-    public void sendLoginVerifyMail(Mail mail);
+    public void sendRegisterVerifyMail(String customMail, String verifyCode);
 }
