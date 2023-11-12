@@ -1,10 +1,10 @@
 server:
-  port: 6060
+  port: 8080
 
 spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://121.36.111.128:5432/postgres?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true
     username: root
     password: "@Genius2023"

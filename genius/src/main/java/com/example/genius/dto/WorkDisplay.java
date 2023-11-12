@@ -1,5 +1,9 @@
 package com.example.genius.dto;
 
+import com.example.genius.dto.work.AuthorOfWork;
+import com.example.genius.dto.work.ConceptOfWork;
+import com.example.genius.dto.work.LocationOfWork;
+import com.example.genius.dto.work.SourceOfWork;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,14 +19,15 @@ public class WorkDisplay {
     public String type; //论文类型
     public String title; //论文标题
     public List<AuthorOfWork> authors; //论文作者
-    public String[] keywords; //论文关键词
+    public List<ConceptOfWork> keywords; //论文关键词
     public String abstracts; //论文摘要
     public Integer citationCount; //论文被引用次数
-    public String publisher; //论文出版商
+    public SourceOfWork source; // 论文来源(期刊或数据库)
     public String publicationDate; //论文出版日期
+    public LocationOfWork location;
 
     @Builder
-    public WorkDisplay(String workId, String type, String title, List<AuthorOfWork> authors, String[] keywords, String abstracts, Integer citationCount, String publisher, String publicationDate) {
+    public WorkDisplay(String workId, String type, String title, List<AuthorOfWork> authors, List<ConceptOfWork> keywords, String abstracts, Integer citationCount, SourceOfWork source, String publicationDate, LocationOfWork location) {
         this.workId = workId;
         this.type = type;
         this.title = title;
@@ -30,7 +35,10 @@ public class WorkDisplay {
         this.keywords = keywords;
         this.abstracts = abstracts;
         this.citationCount = citationCount;
-        this.publisher = publisher;
+        this.source = source;
         this.publicationDate = publicationDate;
+        this.location = location;
     }
+
+
 }

@@ -50,7 +50,8 @@ public class Generator {
                 })
                 .strategyConfig(builder -> {
                     builder.addInclude(tables) // 设置需要生成的表名
-                            .addTablePrefix("t_", "c_"); // 设置过滤表前缀
+                            .addTablePrefix("t_", "c_")// 设置过滤表前缀
+                            .enableSchema(); // 设置支持数据库表的schema ? 未使用
 
                 })
 

@@ -2,6 +2,8 @@ package com.example.generated.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -14,6 +16,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @since 2023-11-11
  */
 @ApiModel(value = "Sources对象", description = "")
+@TableName("openalex.sources")
 public class Sources implements Serializable {
 
     private static final long serialVersionUID = 1L;

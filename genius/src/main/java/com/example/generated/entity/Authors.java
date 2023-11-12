@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -16,11 +17,12 @@ import io.swagger.annotations.ApiModelProperty;
  * @since 2023-11-11
  */
 @ApiModel(value = "Authors对象", description = "")
+@TableName("openalex.authors")
 public class Authors implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId
+    @TableId("id")
     private String id;
 
     private String orcid;
