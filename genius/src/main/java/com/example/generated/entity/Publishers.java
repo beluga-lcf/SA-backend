@@ -2,6 +2,8 @@ package com.example.generated.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -13,6 +15,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @author chaofan
  * @since 2023-11-11
  */
+@TableName("openalex.publishers")
 @ApiModel(value = "Publishers对象", description = "")
 public class Publishers implements Serializable {
 

@@ -1,22 +1,19 @@
 package com.example.genius.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.example.generated.entity.Authors;
-import com.example.generated.entity.Works;
-import com.example.generated.entity.WorksAuthorships;
-import com.example.generated.mapper.AuthorsMapper;
-import com.example.generated.mapper.WorksAuthorshipsMapper;
-import com.example.generated.mapper.WorksMapper;
-import com.example.genius.dto.AuthorOfWork;
+import com.example.generated.entity.*;
+import com.example.generated.mapper.*;
 import com.example.genius.dto.WorkDisplay;
+import com.example.genius.dto.work.AuthorOfWork;
+import com.example.genius.dto.work.ConceptOfWork;
+import com.example.genius.dto.work.LocationOfWork;
+import com.example.genius.dto.work.SourceOfWork;
 import com.example.genius.service.WorkService;
-import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class WorkServiceImpl implements WorkService {
@@ -27,35 +24,75 @@ public class WorkServiceImpl implements WorkService {
     private WorksAuthorshipsMapper worksAuthorshipsMapper;
     @Autowired
     private AuthorsMapper authorsMapper;
+    @Autowired
+    private WorksConceptsMapper worksConceptsMapper;
+    @Autowired
+    private ConceptsMapper conceptsMapper;
+    @Autowired
+    private WorksBestOaLocationsMapper worksBestOaLocationsMapper;
+    @Autowired
+    private SourcesMapper sourcesMapper;
+    @Autowired
+    private WorksLocationsMapper worksLocationsMapper;
+    @Autowired
+    private WorksPrimaryLocationsMapper worksPrimaryLocationsMapper;
 
 
     @Override
     public WorkDisplay getWorkDisplayById(String workId) {
-        Works workInDatabase = worksMapper.selectById(workId);
+        Works workInDatabase = worksMapper.selectOne(new QueryWrapper<Works>().eq("id", workId));
         // 作者
-        QueryWrapper<WorksAuthorships> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("work_id", workId);
-        List<WorksAuthorships> worksAuthorshipsList = worksAuthorshipsMapper.selectList(queryWrapper);
+        List<WorksAuthorships> worksAuthorshipsList = worksAuthorshipsMapper.selectList(new QueryWrapper<WorksAuthorships>().eq("work_id", workId));
         List<AuthorOfWork> authors = new ArrayList<>();
         for(WorksAuthorships worksAuthorships : worksAuthorshipsList) {
-            Authors author= authorsMapper.selectById(worksAuthorships.getAuthorId());
-            AuthorOfWork authorOfWork = new AuthorOfWork();
-            authorOfWork.setAuthorId(worksAuthorships.getAuthorId());
-            authorOfWork.setAuthorName(author.getDisplayName());
+            Authors author= authorsMapper.selectOne(new QueryWrapper<Authors>().eq("id", worksAuthorships.getAuthorId()));
+            AuthorOfWork authorOfWork = new AuthorOfWork(true,author.getId(), author.getDisplayName());
             authors.add(authorOfWork);
         }
         // 关键词
-
+        List<WorksConcepts> worksConceptsList = worksConceptsMapper.selectList(new QueryWrapper<WorksConcepts>().eq("work_id", workId));
+        List<ConceptOfWork> concepts = new ArrayList<>();
+        for(WorksConcepts worksConcepts : worksConceptsList) {
+            Concepts concept = conceptsMapper.selectOne(new QueryWrapper<Concepts>().eq("id", worksConcepts.getConceptId()));
+            ConceptOfWork conceptOfWork = new ConceptOfWork(true,concept.getId(), concept.getDisplayName());
+            concepts.add(conceptOfWork);
+        }
+        // 内容 & 来源
+        // 优先级：best_oa_locations >= primary_locations >= locations
+        SourceOfWork sourceOfWork = new SourceOfWork(false, null, null);
+        LocationOfWork locationOfWork = new LocationOfWork(false, null);
+        WorksBestOaLocations worksBestOaLocations = worksBestOaLocationsMapper.selectOne(new QueryWrapper<WorksBestOaLocations>().eq("work_id", workId));
+        if(worksBestOaLocations != null) {
+            Sources sources = sourcesMapper.selectOne(new QueryWrapper<Sources>().eq("id", worksBestOaLocations.getSourceId()));
+            sourceOfWork = new SourceOfWork(true, sources.getId(), sources.getDisplayName());
+            locationOfWork = new LocationOfWork(true, worksBestOaLocations.getPdfUrl());
+        }
+        else {
+            WorksPrimaryLocations worksPrimaryLocations = worksPrimaryLocationsMapper.selectOne(new QueryWrapper<WorksPrimaryLocations>().eq("work_id", workId));
+            if(worksPrimaryLocations != null) {
+                Sources sources = sourcesMapper.selectOne(new QueryWrapper<Sources>().eq("id", worksPrimaryLocations.getSourceId()));
+                sourceOfWork = new SourceOfWork(true, sources.getId(), sources.getDisplayName());
+                locationOfWork = new LocationOfWork(true, worksPrimaryLocations.getPdfUrl());
+            }
+            else {
+                WorksLocations worksLocations = worksLocationsMapper.selectOne(new QueryWrapper<WorksLocations>().eq("work_id", workId));
+                if(worksLocations != null) {
+                    Sources sources = sourcesMapper.selectOne(new QueryWrapper<Sources>().eq("id", worksLocations.getSourceId()));
+                    sourceOfWork = new SourceOfWork(true, sources.getId(), sources.getDisplayName());
+                    locationOfWork = new LocationOfWork(true, worksLocations.getPdfUrl());
+                }
+            }
+        }
         WorkDisplay workDisplay = WorkDisplay.builder()
                 .workId(workInDatabase.getId())
                 .type(workInDatabase.getType())
                 .title(workInDatabase.getTitle())
                 .authors(authors)
-//                .keywords(workInDatabase.getKeywords())
-//                .abstracts(workInDatabase.getAbstracts())
-//                .citationCount(workInDatabase.getCitationCount())
-//                .publisher(workInDatabase.)
+                .keywords(concepts)
+                .citationCount(workInDatabase.getCitedByCount())
                 .publicationDate(workInDatabase.getPublicationDate())
+                .source(sourceOfWork)
+                .location(locationOfWork)
                 .build();
         return workDisplay;
     }

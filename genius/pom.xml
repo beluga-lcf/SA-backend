@@ -62,12 +62,6 @@
             <artifactId>springfox-boot-starter</artifactId>
             <version>3.0.0</version>
         </dependency>
-        <!--        Mysql连接驱动   -->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.28</version>
-        </dependency>
         <!--         Lombok插件     -->
         <dependency>
             <groupId>org.projectlombok</groupId>

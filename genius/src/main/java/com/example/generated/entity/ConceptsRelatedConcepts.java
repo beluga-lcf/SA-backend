@@ -13,7 +13,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @author chaofan
  * @since 2023-11-11
  */
-@TableName("concepts_related_concepts")
+@TableName("openalex.concepts_related_concepts")
 @ApiModel(value = "ConceptsRelatedConcepts对象", description = "")
 public class ConceptsRelatedConcepts implements Serializable {
 

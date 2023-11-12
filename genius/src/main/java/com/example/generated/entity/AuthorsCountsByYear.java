@@ -13,7 +13,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @author chaofan
  * @since 2023-11-11
  */
-@TableName("authors_counts_by_year")
+@TableName("openalex.authors_counts_by_year")
 @ApiModel(value = "AuthorsCountsByYear对象", description = "")
 public class AuthorsCountsByYear implements Serializable {
 
