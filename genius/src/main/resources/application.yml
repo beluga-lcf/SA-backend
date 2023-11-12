@@ -5,9 +5,12 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/openAlex?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true
+    url: jdbc:postgresql://121.36.111.128:5432/postgres?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true
     username: root
-    password: Lvchaofan
+    password: "@Genius2023"
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
   #邮箱基本配置
   mail:
     #配置smtp服务主机地址

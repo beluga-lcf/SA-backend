@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
-@MapperScan("com.example.genius.mapper")
+@MapperScan({"com.example.genius.mapper","com.example.generated.mapper"})
 public class MybatisConfig {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor(){

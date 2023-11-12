@@ -4,7 +4,6 @@ use `sa-backend`;
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
 		 `user_id` bigint NOT NULL COMMENT '用户ID',# mybatis-plus使用雪花算法生成id，需要使用bigint
-
 	     `nick_name` varchar(255) DEFAULT NULL COMMENT '昵称',
 	     `email` varchar(255) DEFAULT NULL COMMENT '邮箱',
 	     `password` varchar(255) DEFAULT NULL COMMENT '密码',
