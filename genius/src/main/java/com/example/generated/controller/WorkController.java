@@ -16,16 +16,16 @@ public class WorkController {
     @Autowired
     private WorksServiceImpl workService;
 
-    @GetMapping("/type-counts")
-    public Map<String, Object> getTypeCounts() {
-        List<Map<String, Object>> typeCounts = workService.getTypeCounts();
-        return Map.of("group_by", typeCounts);
-    }
-
-
-    @GetMapping("/details")
-    public ResponseEntity<?> getWorkDetails(@RequestParam String type) {
-        Object details = workService.getWorkDetails(type);
-        return ResponseEntity.ok(details);
-    }
+//    @GetMapping("/type-counts")
+//    public Map<String, Object> getTypeCounts() {
+//        List<Map<String, Object>> typeCounts = workService.getTypeCounts();
+//        return Map.of("group_by", typeCounts);
+//    }
+//
+//
+//    @GetMapping("/details")
+//    public ResponseEntity<?> getWorkDetails(@RequestParam String type) {
+//        Object details = workService.getWorkDetails(type);
+//        return ResponseEntity.ok(details);
+//    }
 }

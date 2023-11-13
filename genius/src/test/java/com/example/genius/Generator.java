@@ -41,12 +41,12 @@ public class Generator {
                             .author("chaofan") // 设置作者
                             .enableSwagger() // 开启 swagger 模式
                             .fileOverride() // 覆盖已生成文件
-                            .outputDir("D://Workspace//Application//SA-backend//SA-backend//genius//src//main//java"); // 指定输出目录
+                            .outputDir("D://MyFiles//0CS course//springboot//projects//software_analysis//SA-backend//genius//src//main//java"); // 指定输出目录
                 })
                 .packageConfig(builder -> {
                     builder.parent("com.example") // 设置父包名
                             .moduleName("generated") // 设置父包模块名
-                            .pathInfo(Collections.singletonMap(OutputFile.xml, "D://Workspace//Application//SA-backend//SA-backend//genius//src//main//resources/mapper")); // 设置mapperXml生成路径
+                            .pathInfo(Collections.singletonMap(OutputFile.xml, "D://MyFiles//0CS course//springboot//projects//software_analysis//SA-backend//genius//src//main//resources/mapper")); // 设置mapperXml生成路径
                 })
                 .strategyConfig(builder -> {
                     builder.addInclude(tables) // 设置需要生成的表名
