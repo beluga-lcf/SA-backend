@@ -9,12 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Map;
 
-@RestController
-@RequestMapping("/api/works")
-public class WorkController {
-
-    @Autowired
-    private WorksServiceImpl workService;
+//@RestController
+//@RequestMapping("/api/works")
+//public class WorkController {
+//
+//    @Autowired
+//    private WorksServiceImpl workService;
 
 //    @GetMapping("/type-counts")
 //    public Map<String, Object> getTypeCounts() {
@@ -28,4 +28,4 @@ public class WorkController {
 //        Object details = workService.getWorkDetails(type);
 //        return ResponseEntity.ok(details);
 //    }
-}
+//}

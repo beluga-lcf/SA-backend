@@ -3,6 +3,10 @@ package com.example.genius.controller;
 import com.example.generated.entity.Authors;
 import com.example.generated.entity.Concepts;
 import com.example.generated.entity.Works;
+import com.example.generated.service.IAuthorsService;
+import com.example.generated.service.IConceptsService;
+import com.example.generated.service.IWorksService;
+import com.example.genius.service.IWorkssService;
 import com.example.genius.service.impl.WorksServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,17 +25,17 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/works")
 public class WorksController {
+    @Autowired
+    private IWorkssService worksService;
+    @Autowired
+    private IWorksService workService;
 
     @Autowired
-    private IService<Works> workService;
+    private IConceptsService conceptService;
 
     @Autowired
-    private IService<Concepts> conceptService;
+    private IAuthorsService authorService;
 
-    @Autowired
-    private IService<Authors> authorService;
-    @Autowired
-    private WorksServiceImpl worksService;
 
     @GetMapping("/type-counts")
     public Map<String, Object> getTypeCounts() {
