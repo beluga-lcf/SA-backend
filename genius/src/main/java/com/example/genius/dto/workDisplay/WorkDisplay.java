@@ -1,16 +1,13 @@
-package com.example.genius.dto;
+package com.example.genius.dto.workDisplay;
 
-import com.example.genius.dto.work.AuthorOfWork;
-import com.example.genius.dto.work.LocationOfWork;
-import com.example.genius.dto.work.SourceOfWork;
+import com.example.genius.dto.workDisplay.AuthorOfWork;
+import com.example.genius.dto.workDisplay.LocationOfWork;
+import com.example.genius.dto.workDisplay.SourceOfWork;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 //论文主页的展示内容
 @Data

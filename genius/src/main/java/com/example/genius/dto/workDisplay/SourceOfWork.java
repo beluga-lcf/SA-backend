@@ -1,4 +1,4 @@
-package com.example.genius.dto.work;
+package com.example.genius.dto.workDisplay;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SourceOfWork {
-    @JsonProperty("id")
     public String soureId;
-    @JsonProperty("display_name")
     public String sourceName;
 }

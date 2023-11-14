@@ -13,7 +13,16 @@ public class StringUtil {
             char randomChar = (char) (random.nextInt(26) + 'A');
             code.append(randomChar);
         }
-
         return code.toString();
+    }
+    public static String removePrefix(String input, String prefix) {
+        if (input.startsWith(prefix)) {
+            return input.substring(prefix.length());
+        }
+        return input;
+    }
+
+    public static String removePrefix(String input){
+        return input.substring("https://openalex.org/".length());
     }
 }

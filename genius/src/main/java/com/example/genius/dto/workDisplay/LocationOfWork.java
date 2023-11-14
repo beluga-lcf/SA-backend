@@ -1,4 +1,4 @@
-package com.example.genius.dto.work;
+package com.example.genius.dto.workDisplay;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,11 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class AuthorOfWork {
-
-    @JsonProperty("id")
-    public String authorId;
-    @JsonProperty("display_name")
-    public String authorName;
+public class LocationOfWork {
+    public boolean accessable;
+    public String pdf_url;
 }
