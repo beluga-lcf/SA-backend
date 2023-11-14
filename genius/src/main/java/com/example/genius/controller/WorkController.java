@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/work")
+@RequestMapping("/api/work")
 public class WorkController extends BaseController{
     private WorkService workService;
     @Autowired

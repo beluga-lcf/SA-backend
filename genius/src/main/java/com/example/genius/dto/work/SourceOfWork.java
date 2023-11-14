@@ -1,12 +1,18 @@
 package com.example.genius.dto.work;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SourceOfWork {
-    public boolean isAccessable;
+    @JsonProperty("id")
     public String soureId;
+    @JsonProperty("display_name")
     public String sourceName;
 }
