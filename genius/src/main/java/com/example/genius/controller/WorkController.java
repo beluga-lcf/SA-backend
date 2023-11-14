@@ -5,9 +5,8 @@ import com.example.genius.entity.Response;
 import com.example.genius.service.WorkService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -20,16 +19,17 @@ public class WorkController extends BaseController{
     }
 
     @GetMapping("/displayWorkHomePage")
-    public Response displayWorkHomePage(String workId) {
+    public Response<Object> displayWorkHomePage(String workId) {
         try {
             return getSuccessResponse(workService.getWorkDisplayById(workId));
         } catch (Exception e) {
+            e.printStackTrace();
             log.error(e.getMessage());
             return getSimpleError();
         }
     }
-    @GetMapping("/getReferenceById")
-    public Response getReferenceById(String workId){
+    @GetMapping("/getReferenceById}")
+    public Response<Object> getReferenceById(String workId){
         try {
             return getSuccessResponse(workService.getReferenceByWorkId(workId));
         }
