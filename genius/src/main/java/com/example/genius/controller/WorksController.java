@@ -41,7 +41,7 @@ public class WorksController {
 
         // 获取学科数据
         String subjects = JsonParser.buildSubjectsJson(response);
-
+//        System.out.println(subjects);
         response=openAlexService.getYear();
         // 获取发表年度数据
         String years = JsonParser.buildYearsJson(response);
@@ -50,9 +50,9 @@ public class WorksController {
         response=openAlexService.getAuthor();
         String authors = JsonParser.buildAuthorJson(response);
         JSONArray array=new JSONArray();
-        array.put(subjects);
-        array.put(years);
-        array.put(authors);
+        array.put(new JSONObject(subjects));
+        array.put(new JSONObject(years));
+        array.put(new JSONObject(authors));
         return array.toString();
     }
 }
@@ -81,13 +81,13 @@ class JsonParser {
             JSONObject selectItem = new JSONObject();
             selectItem.put("id", i + 1);
             selectItem.put("value", displayName);
-            Random random = new Random();
-            //little trick (
-            int randomInt = random.nextInt(10000000);
-            boolean randomBoolean = random.nextBoolean();
-            if (randomBoolean)worksCount+=randomInt;
-            else worksCount-=randomInt;
-            if(worksCount<0)worksCount=-worksCount;
+//            Random random = new Random();
+//            //little trick (
+//            int randomInt = random.nextInt(10000000);
+//            boolean randomBoolean = random.nextBoolean();
+//            if (randomBoolean)worksCount+=randomInt;
+//            else worksCount-=randomInt;
+//            if(worksCount<0)worksCount=-worksCount;
             selectItem.put("num", worksCount);
 
             // 将新的select项添加到select的JSONArray中
@@ -123,13 +123,13 @@ class JsonParser {
             JSONObject selectItem = new JSONObject();
             selectItem.put("id", i + 1);
             selectItem.put("value", displayName);
-            Random random = new Random();
-            //little trick (
-            int randomInt = random.nextInt(1000000);
-            boolean randomBoolean = random.nextBoolean();
-            if (randomBoolean)worksCount+=randomInt;
-            else worksCount-=randomInt;
-            if(worksCount<0)worksCount=-worksCount;
+//            Random random = new Random();
+//            //little trick (
+//            int randomInt = random.nextInt(1000000);
+//            boolean randomBoolean = random.nextBoolean();
+//            if (randomBoolean)worksCount+=randomInt;
+//            else worksCount-=randomInt;
+//            if(worksCount<0)worksCount=-worksCount;
             selectItem.put("num", worksCount);
 
             // 将新的select项添加到select的JSONArray中
@@ -151,8 +151,8 @@ class JsonParser {
 
         // 创建新的JSON对象
         JSONObject newJson = new JSONObject();
-        newJson.put("id", 1);
-        newJson.put("title", "学科");
+        newJson.put("id", 3);
+        newJson.put("title", "作者");
 
         // 创建select的JSONArray
         JSONArray select = new JSONArray();
@@ -165,13 +165,13 @@ class JsonParser {
             JSONObject selectItem = new JSONObject();
             selectItem.put("id", i + 1);
             selectItem.put("value", displayName);
-            Random random = new Random();
+//            Random random = new Random();
             //little trick (
-            int randomInt = random.nextInt(1000);
-            boolean randomBoolean = random.nextBoolean();
-            if (randomBoolean)worksCount+=randomInt;
-            else worksCount-=randomInt;
-            if(worksCount<0)worksCount=-worksCount;
+//            int randomInt = random.nextInt(1000);
+//            boolean randomBoolean = random.nextBoolean();
+//            if (randomBoolean)worksCount+=randomInt;
+//            else worksCount-=randomInt;
+//            if(worksCount<0)worksCount=-worksCount;
             selectItem.put("num", worksCount);
 
             // 将新的select项添加到select的JSONArray中
