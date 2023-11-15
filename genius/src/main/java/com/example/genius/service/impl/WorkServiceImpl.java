@@ -3,23 +3,19 @@ package com.example.genius.service.impl;
 import com.example.generated.mapper.*;
 import com.example.genius.dto.referenceWork.ReferenceWork;
 import com.example.genius.dto.workDisplay.WorkDisplay;
-import com.example.genius.dto.workDisplay.AuthorOfWork;
-import com.example.genius.dto.workDisplay.LocationOfWork;
-import com.example.genius.dto.workDisplay.SourceOfWork;
+import com.example.genius.dto.workDisplay.InnerAuthor;
+import com.example.genius.dto.workDisplay.InnerLocation;
+import com.example.genius.dto.workDisplay.InnerSource;
 import com.example.genius.service.WorkService;
 import com.example.genius.util.ApiUtil;
 import com.example.genius.util.StringUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.jdbc.Work;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import springfox.documentation.spring.web.json.Json;
 
-import java.sql.Ref;
 import java.util.ArrayList;
 
 @Slf4j
@@ -66,14 +62,14 @@ public class WorkServiceImpl implements WorkService {
         JsonNode jsonNode = objectMapper.readTree(result);
         // 作者
         JsonNode authorships = jsonNode.get("authorships");
-        ArrayList<AuthorOfWork> authorList = new ArrayList<>();
+        ArrayList<InnerAuthor> authorList = new ArrayList<>();
         assert authorships.isArray();
         for(JsonNode node : authorships){
             node = node.get("author");
-            AuthorOfWork authorOfWork = new AuthorOfWork();
-            authorOfWork.setAuthorId(node.get("id").asText());
-            authorOfWork.setAuthorName(node.get("display_name").asText());
-            authorList.add(authorOfWork);
+            InnerAuthor innerAuthor = new InnerAuthor();
+            innerAuthor.setAuthorId(node.get("id").asText());
+            innerAuthor.setAuthorName(node.get("display_name").asText());
+            authorList.add(innerAuthor);
         }
         // 关键词
         JsonNode keywords = jsonNode.get("keywords");
@@ -84,12 +80,12 @@ public class WorkServiceImpl implements WorkService {
         }
         // 来源
         JsonNode sourcNode = jsonNode.get("primary_location").get("source");
-        SourceOfWork sourceOfWork = new SourceOfWork();
-        sourceOfWork.setSoureId(sourcNode.get("id").asText());
-        sourceOfWork.setSourceName(sourcNode.get("display_name").asText());
+        InnerSource innerSource = new InnerSource();
+        innerSource.setSoureId(sourcNode.get("id").asText());
+        innerSource.setSourceName(sourcNode.get("display_name").asText());
         // location
         JsonNode locationNode = jsonNode.get("primary_location");
-        LocationOfWork location = new LocationOfWork();
+        InnerLocation location = new InnerLocation();
         location.setAccessable(locationNode.get("is_oa").asBoolean());
         location.setPdf_url(locationNode.get("pdf_url").asText());
         // build
@@ -100,7 +96,7 @@ public class WorkServiceImpl implements WorkService {
                 .authors(authorList)
                 .keywords(keywordList)
                 .citedByCount(jsonNode.get("cited_by_count").asInt())
-                .source(sourceOfWork)
+                .source(innerSource)
                 .publicationDate(jsonNode.get("publication_date").asText())
                 .location(location)
                 .build();
@@ -119,7 +115,10 @@ public class WorkServiceImpl implements WorkService {
         JsonNode jsonNode = objectMapper.readTree(result);
         jsonNode = jsonNode.get("referenced_works");
         ArrayList<ReferenceWork> referenceWorks = new ArrayList<>();
+        // 为了性能，只展示6个
+        int count = 0;
         for(JsonNode node : jsonNode){
+            if(count == 6) break;
             ReferenceWork referenceWork = new ReferenceWork();
             String singleId = node.asText();
             String pureId = StringUtil.removePrefix(singleId);
@@ -137,6 +136,7 @@ public class WorkServiceImpl implements WorkService {
                 referenceWork.setSourceName("null");
             }
             referenceWorks.add(referenceWork);
+            count++;
         }
         return referenceWorks;
     }

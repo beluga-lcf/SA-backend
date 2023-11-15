@@ -1,6 +1,5 @@
 package com.example.genius.service.impl;
 
-import com.example.genius.dto.workDisplay.AuthorOfWork;
 import com.example.genius.service.AuthorService;
 import com.example.genius.util.ApiUtil;
 import com.example.genius.util.StringUtil;

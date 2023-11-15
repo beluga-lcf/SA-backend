@@ -30,7 +30,7 @@ public class WorksServiceImpl extends ServiceImpl<WorksMapper, Works> implements
                         "key_display_name", map.get("type"),
                         "count", map.get("count")))
                 .collect(Collectors.toList());
-    }
 
+    }
 }
 
