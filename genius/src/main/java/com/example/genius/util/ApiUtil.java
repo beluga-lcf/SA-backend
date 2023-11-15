@@ -1,5 +1,7 @@
 package com.example.genius.util;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
@@ -114,5 +116,18 @@ public class ApiUtil {
             }
         }
         return result;
+    }
+
+    /*
+     发送论文的DOI得到摘要
+     */
+    public static String getAbstract(String DOI) throws Exception{
+        String url = "https://api.crossref.org/works/"+DOI;
+        String param = "";
+        String result = ApiUtil.get(url,param);
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(result);
+        JsonNode abstractNode = jsonNode.get("message").get("abstract");
+        return abstractNode.asText();
     }
 }

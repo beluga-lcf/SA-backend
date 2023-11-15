@@ -19,6 +19,10 @@ public class SearchController extends BaseController {
         this.searchService = searchService;
     }
 
+    /*
+    type: article, book-chapter, dissertation, book, dataset, paratext,
+          other, reference-entry, report, peer-review, standard, editorial, erratum, grant, letter
+     */
     @GetMapping("/filter")
     public Response<Object> filterSearch(String type, String conceptId){
         try {
