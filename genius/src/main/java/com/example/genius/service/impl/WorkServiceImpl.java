@@ -53,7 +53,7 @@ public class WorkServiceImpl implements WorkService {
     public LocationOfWork location;
      */
     @Override
-    public WorkDisplay getWorkDisplayById(String workId) throws JsonProcessingException {
+    public WorkDisplay getWorkDisplayById(String workId) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         String id = StringUtil.removePrefix(workId);
         String url = "https://api.openalex.org/works/"+ id;
@@ -88,6 +88,9 @@ public class WorkServiceImpl implements WorkService {
         InnerLocation location = new InnerLocation();
         location.setAccessable(locationNode.get("is_oa").asBoolean());
         location.setPdf_url(locationNode.get("pdf_url").asText());
+        // abstract
+        String DOI = jsonNode.get("doi").asText();
+        String abstractContent = ApiUtil.getAbstract(DOI);
         // build
         WorkDisplay workDisplay = WorkDisplay.builder()
                 .workId(jsonNode.get("id").asText())
@@ -99,6 +102,7 @@ public class WorkServiceImpl implements WorkService {
                 .source(innerSource)
                 .publicationDate(jsonNode.get("publication_date").asText())
                 .location(location)
+                .abstractContent(abstractContent)
                 .build();
 
         return workDisplay;
@@ -113,11 +117,17 @@ public class WorkServiceImpl implements WorkService {
         String param = "";
         String result = ApiUtil.get(url,param);
         JsonNode jsonNode = objectMapper.readTree(result);
-        jsonNode = jsonNode.get("referenced_works");
-        ArrayList<ReferenceWork> referenceWorks = new ArrayList<>();
+        String DOI = jsonNode.get("doi").asText();
+        String cross_url = "https://api.crossref.org/works/" + DOI;
+        String cross_result = ApiUtil.get(cross_url, "");
+        JsonNode crossAllNode = objectMapper.readTree(cross_result);
+        JsonNode CrossNode = crossAllNode.get("message").get("reference");
+        JsonNode OpenNode = jsonNode.get("referenced_works");
+        JsonNode RefNode = CrossNode == null ? OpenNode : CrossNode;
         // 为了性能，只展示6个
+        ArrayList<ReferenceWork> referenceWorks = new ArrayList<>();
         int count = 0;
-        for(JsonNode node : jsonNode){
+        for(JsonNode node : RefNode) {
             if(count == 6) break;
             ReferenceWork referenceWork = new ReferenceWork();
             String singleId = node.asText();

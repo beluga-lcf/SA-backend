@@ -1,6 +1,10 @@
 package com.example.genius.util;
 
+import com.example.genius.dto.searchResult.LanguageEnum;
+
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.StringJoiner;
 
 public class StringUtil {
     public static String generateRandomCode() {
@@ -25,4 +29,19 @@ public class StringUtil {
     public static String removePrefix(String input){
         return input.substring("https://openalex.org/".length());
     }
+
+    public static String Or(ArrayList<String> types) {
+        // 使用StringJoiner连接每个字符串
+        StringJoiner joiner = new StringJoiner("|");
+
+        // 遍历ArrayList，将每个字符串加入StringJoiner
+        for (String type : types) {
+            joiner.add(type);
+        }
+
+        // 返回连接后的字符串
+        return joiner.toString();
+    }
+
+
 }

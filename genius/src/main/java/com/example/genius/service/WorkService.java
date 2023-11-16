@@ -7,6 +7,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.ArrayList;
 
 public interface WorkService {
-    public WorkDisplay getWorkDisplayById(String workId) throws JsonProcessingException;
+    public WorkDisplay getWorkDisplayById(String workId) throws Exception;
     public ArrayList<ReferenceWork> getReferenceByWorkId(String workId) throws Exception;
 }

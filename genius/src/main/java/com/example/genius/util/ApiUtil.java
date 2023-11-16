@@ -120,14 +120,27 @@ public class ApiUtil {
 
     /*
      发送论文的DOI得到摘要
+
      */
-    public static String getAbstract(String DOI) throws Exception{
-        String url = "https://api.crossref.org/works/"+DOI;
-        String param = "";
-        String result = ApiUtil.get(url,param);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(result);
-        JsonNode abstractNode = jsonNode.get("message").get("abstract");
-        return abstractNode.asText();
+    public static String getAbstract(String DOI) {
+        try {
+            String url = "https://api.crossref.org/works/" + DOI;
+            String param = "";
+            String result = ApiUtil.get(url, param);
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(result);
+            JsonNode abstractNode = jsonNode.get("message").get("abstract");
+//        if(abstractNode == null){
+//            String url2 = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
+//            String param2 = "db=pubmed&id="+DOI;
+//        }
+            if (abstractNode != null)
+                return abstractNode.asText();
+            else return "temporary empty";
+        } catch (Exception e) {
+            return "temporary empty";
+        }
     }
+
+
 }

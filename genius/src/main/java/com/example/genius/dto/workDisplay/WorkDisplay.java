@@ -19,6 +19,6 @@ public class WorkDisplay {
     public Integer citedByCount; //论文被引用次数
     public InnerSource source; // 论文来源(期刊或数据库)
     public String publicationDate; //论文出版日期
-    public InnerLocation location;
-
+    public InnerLocation location; // 位置信息
+    public String abstractContent;//论文摘要
 }
