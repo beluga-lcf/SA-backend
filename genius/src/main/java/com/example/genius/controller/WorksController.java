@@ -80,7 +80,7 @@ public class WorksController extends BaseController{
             return getSimpleError();
         }
     }
-    @GetMapping("/getReferenceById}")
+    @GetMapping("/getReferenceById")
     public Response<Object> getReferenceById(String workId){
         try {
             return getSuccessResponse(workService.getReferenceByWorkId(workId));
