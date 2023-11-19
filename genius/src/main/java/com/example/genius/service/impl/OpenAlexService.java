@@ -2,6 +2,7 @@ package com.example.genius.service.impl;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import springfox.documentation.spring.web.json.Json;
 
 @Service
 public class OpenAlexService {
@@ -27,6 +28,11 @@ public class OpenAlexService {
     public String getAuthor(){
         String url="https://api.openalex.org/authors";
         return restTemplate.getForObject(url,String.class);
+    }
+    public String getWorksByUser(String openalexUserID){
+        String url = "https://api.openalex.org/works?select=id,title,publication_date,concepts&per_page=200&filter=authorships.author.id:"+openalexUserID;
+        return restTemplate.getForObject(url, String.class);
+
     }
 }
 
