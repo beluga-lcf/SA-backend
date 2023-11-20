@@ -3,9 +3,14 @@ package com.example.genius.controller;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.genius.entity.Mail;
 import com.example.genius.entity.Response;
 import com.example.genius.entity.User;
+import com.example.genius.enums.ErrorType;
+import com.example.genius.mapper.UserMapper;
+import com.example.genius.service.EmailService;
 import com.example.genius.service.UserService;
+import com.example.genius.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,15 +26,18 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/user")
-public class UserController extends BaseController{
+public class UserController extends BaseController {
     @Autowired
-    HttpSession session;
-
-//    @Autowired
-//    UserMapper userMapper;
+    private HttpSession session;
 
     @Autowired
-    UserService userService;
+    private UserMapper userMapper;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private EmailService emailService;
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public Response register(String email, String password, String captcha){
@@ -40,7 +48,7 @@ public class UserController extends BaseController{
         queryWrapper.eq("email", email);
         User check_user = userService.getOne(queryWrapper);
         if(check_user!=null){
-            return getErrorResponse(405, "邮箱已被注册");
+            return getErrorResponse(null, ErrorType.already_registerd);
         }
 //        else if (captcha != /*本地验证码*/) {
 //            return getErrorResponse(401, "验证码错误");
@@ -48,7 +56,7 @@ public class UserController extends BaseController{
         else {
             userService.save(user);
             log.info("There is a new user! " + user.getNickName());
-            return getSuccessResponse(200, "注册成功", null);
+            return getSuccessResponse(null);
         }
     }
 
@@ -58,16 +66,16 @@ public class UserController extends BaseController{
         queryWrapper.eq("email", email);
         User checkUser = userService.getOne(queryWrapper);
         if(checkUser == null) {
-            return getErrorResponse(404, "用户名不存在!");
+            return getErrorResponse(null, ErrorType.invalid_email);
         }
         if(checkUser.getPassword().equalsIgnoreCase(password)){
-            return getErrorResponse(401, "密码错误!");
+            return getErrorResponse(null, ErrorType.wrong_pwd);
         }
         else {
             String token = contextLoads(email, Math.toIntExact(checkUser.getUserId()));
             session.setAttribute("userId",checkUser.getUserId());
             log.info("一名用户已登录");
-            return getSuccessResponse(200, "登陆成功！", token);
+            return getSuccessResponse(token);
         }
     }
 
@@ -88,17 +96,12 @@ public class UserController extends BaseController{
                 .sign(Algorithm.HMAC256("Wunderkinder"));//签名
         return token;
     }
-//    @RequestMapping(value = "/name", method = RequestMethod.GET)
-//    public Response getNikName(String email) {
-//        QueryWrapper<User> queryWrapper = new QueryWrapper();
-//        queryWrapper.eq("email", email);
-//        User checkUser = userService.getOne(queryWrapper);
-//        if (checkUser == null) {
-//            return getErrorResponse(404, "用户名不存在!");
-//        }
-//        else {
-//            log.info("查询昵称" + checkUser.getUserId());
-//            return getSuccessResponse(200, "查询成功！", checkUser.getNickName());
-//        }
-//    }
+
+    @RequestMapping(value = "/sendVerifyCode", method = RequestMethod.POST)
+    public Response sendVerifyCode(String email, String type){ //邮箱，类型
+        /*
+        to be done
+         */
+        return getSuccessResponse("验证码已发送！");
+    }
 }

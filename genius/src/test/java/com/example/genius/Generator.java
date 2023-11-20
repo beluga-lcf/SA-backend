@@ -14,20 +14,20 @@ import java.util.Stack;
 
 @SpringBootTest
 public class Generator {
-    public static String url = "jdbc:mysql://127.0.0.1:3306/openalex?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true";
+    public static String url = "jdbc:postgresql://121.36.111.128:5432/postgres?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true";
     public static String username = "root";
-    public static String password = "Lvchaofan";
+    public static String password = "@Genius2023";
 
     public static ArrayList<String> tables = new ArrayList<>();
     public void addTableName(){
-        String query = "SHOW TABLES";
+        String query = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'openalex';";
         try (Connection connection = DriverManager.getConnection(url, username, password);
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
-                while (resultSet.next()) {
-                    String tableName = resultSet.getString(1);
-                    tables.add(tableName);
-                }
+            while (resultSet.next()) {
+                String tableName = resultSet.getString(1);
+                tables.add(tableName);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -41,16 +41,17 @@ public class Generator {
                             .author("chaofan") // 设置作者
                             .enableSwagger() // 开启 swagger 模式
                             .fileOverride() // 覆盖已生成文件
-                            .outputDir("D://Workspace//Application//SA-backend//SA-backend//genius//src//main//java"); // 指定输出目录
+                            .outputDir("D://MyFiles//0CS course//springboot//projects//software_analysis//SA-backend//genius//src//main//java"); // 指定输出目录
                 })
                 .packageConfig(builder -> {
                     builder.parent("com.example") // 设置父包名
-                            .moduleName("genius") // 设置父包模块名
-                            .pathInfo(Collections.singletonMap(OutputFile.xml, "D://Workspace//Application//SA-backend//SA-backend//genius//src//main//resources/mapper")); // 设置mapperXml生成路径
+                            .moduleName("generated") // 设置父包模块名
+                            .pathInfo(Collections.singletonMap(OutputFile.xml, "D://MyFiles//0CS course//springboot//projects//software_analysis//SA-backend//genius//src//main//resources/mapper")); // 设置mapperXml生成路径
                 })
                 .strategyConfig(builder -> {
                     builder.addInclude(tables) // 设置需要生成的表名
-                            .addTablePrefix("t_", "c_"); // 设置过滤表前缀
+                            .addTablePrefix("t_", "c_")// 设置过滤表前缀
+                            .enableSchema(); // 设置支持数据库表的schema ? 未使用
 
                 })
 

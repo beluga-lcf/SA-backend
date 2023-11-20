@@ -7,11 +7,13 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.apache.ibatis.logging.Log;
+import org.apache.ibatis.logging.LogFactory;
 
 
 
 @Configuration
-@MapperScan("com.example.genius.mapper")
+@MapperScan({"com.example.genius.mapper","com.example.generated.mapper"})
 public class MybatisConfig {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor(){

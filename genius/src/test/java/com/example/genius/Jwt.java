@@ -50,7 +50,7 @@ public class Jwt {
     @GetMapping("/greeting")
     public ResponseEntity<String> getToken(@RequestHeader(value = "Authorization", required = false) String language) {
         // code that uses the language variable
-        return new ResponseEntity<String>(greeting, HttpStatus.OK);
+        return null;
     }
 
 
