@@ -16,16 +16,21 @@ import java.util.HashMap;
 public class Jwt {
     @Test
     void contextLoads(/*String email*/) {
+
         HashMap<String, Object> map = new HashMap<>();
+
         Calendar instance = Calendar.getInstance();
         // 3600秒后令牌token失效
         instance.add(Calendar.SECOND,3600);
+
         String token = JWT.create()
-                .withHeader(map) 
+                .withHeader(map) // header可以不写，因为默认值就是它
+//                .withClaim("email", email)  //payload
                 .withClaim("email", "2505293361@qq.com")
                 .withClaim("user_id", 1)
                 .withExpiresAt(instance.getTime()) // 指定令牌的过期时间
                 .sign(Algorithm.HMAC256("Wunderkinder"));//签名
+
         System.out.println(token);
     }
 

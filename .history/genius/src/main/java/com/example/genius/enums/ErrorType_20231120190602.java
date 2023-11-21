@@ -3,10 +3,13 @@ package com.example.genius.enums;
 public enum ErrorType {
     already_registerd(1001, "用户已存在"),
     invalid_email(1002, "无效的邮箱"),
-    wrong_pwd(1003, "用户名或密码错误"),
+<<<<<<< HEAD
+    wrong_pwd(1003, "用户名或密码错误");
+=======
     not_login(1003,"未登录");
 
 
+>>>>>>> dev
     public Integer code;
     public String message;
 

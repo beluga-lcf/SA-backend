@@ -55,7 +55,7 @@ public class UserController extends BaseController {
     @Autowired
     private OpenAlexService openAlexService;
 
-    @RequestMapping(value = "/api/register", method = RequestMethod.POST)
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
     public Response register(String email, String password, String captcha){
         User user = new User();
         user.setEmail(email);
@@ -63,12 +63,8 @@ public class UserController extends BaseController {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("email", email);
         User check_user = userService.getOne(queryWrapper);
-        JSONObject jsonObject = new JSONObject();
         if(check_user!=null){
-            jsonObject.put("code", 201);
-            jsonObject.put("message", "邮箱已被注册");
-            String json = jsonObject.toJSONString();
-            return getErrorResponse(json);
+            return getErrorResponse(null, ErrorType.already_registerd);
         }
 //        else if (captcha != /*本地验证码*/) {
 //            return getErrorResponse(401, "验证码错误");
@@ -76,10 +72,7 @@ public class UserController extends BaseController {
         else {
             userService.save(user);
             log.info("There is a new user! " + user.getNickName());
-            jsonObject.put("code", 200);
-            jsonObject.put("message", "注册成功");
-            String json = jsonObject.toJSONString();
-            return getSuccessResponse(json);
+            return getSuccessResponse(null);
         }
     }
 
@@ -88,28 +81,17 @@ public class UserController extends BaseController {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("email", email);
         User checkUser = userService.getOne(queryWrapper);
-        JSONObject jsonObject = new JSONObject();
         if(checkUser == null) {
-            jsonObject.put("code", 202);
-            jsonObject.put("message", "邮箱未注册");
-            String json = jsonObject.toJSONString();
-            return getErrorResponse(json);
+            return getErrorResponse(null, ErrorType.invalid_email);
         }
         if(checkUser.getPassword().equalsIgnoreCase(password)){
-            jsonObject.put("code", 203);
-            jsonObject.put("message", "用户名或密码错误");
-            String json = jsonObject.toJSONString();
-            return getErrorResponse(json);
+            return getErrorResponse(null, ErrorType.wrong_pwd);
         }
         else {
             String token = contextLoads(email, Math.toIntExact(checkUser.getUserId()));
             session.setAttribute("userId",checkUser.getUserId());
-            jsonObject.put("code", 200);
-            jsonObject.put("token", token);
-            jsonObject.put("message", "登陆成功");
-            String json = jsonObject.toJSONString();
-            log.info("一名用户已登录,id:" + checkUser.getUserId());
-            return getSuccessResponse(json);
+            log.info("一名用户已登录");
+            return getSuccessResponse(token);
         }
     }
 
@@ -200,5 +182,6 @@ public class UserController extends BaseController {
         String output = jsonArray.toJSONString();
         return getSuccessResponse(output);
     }
+
 
 }

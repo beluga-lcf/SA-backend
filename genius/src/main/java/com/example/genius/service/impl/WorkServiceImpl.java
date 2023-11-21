@@ -3,23 +3,19 @@ package com.example.genius.service.impl;
 import com.example.generated.mapper.*;
 import com.example.genius.dto.referenceWork.ReferenceWork;
 import com.example.genius.dto.workDisplay.WorkDisplay;
-import com.example.genius.dto.workDisplay.AuthorOfWork;
-import com.example.genius.dto.workDisplay.LocationOfWork;
-import com.example.genius.dto.workDisplay.SourceOfWork;
+import com.example.genius.dto.workDisplay.InnerAuthor;
+import com.example.genius.dto.workDisplay.InnerLocation;
+import com.example.genius.dto.workDisplay.InnerSource;
 import com.example.genius.service.WorkService;
 import com.example.genius.util.ApiUtil;
 import com.example.genius.util.StringUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.jdbc.Work;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import springfox.documentation.spring.web.json.Json;
 
-import java.sql.Ref;
 import java.util.ArrayList;
 
 @Slf4j
@@ -57,7 +53,7 @@ public class WorkServiceImpl implements WorkService {
     public LocationOfWork location;
      */
     @Override
-    public WorkDisplay getWorkDisplayById(String workId) throws JsonProcessingException {
+    public WorkDisplay getWorkDisplayById(String workId) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         String id = StringUtil.removePrefix(workId);
         String url = "https://api.openalex.org/works/"+ id;
@@ -66,14 +62,14 @@ public class WorkServiceImpl implements WorkService {
         JsonNode jsonNode = objectMapper.readTree(result);
         // 作者
         JsonNode authorships = jsonNode.get("authorships");
-        ArrayList<AuthorOfWork> authorList = new ArrayList<>();
+        ArrayList<InnerAuthor> authorList = new ArrayList<>();
         assert authorships.isArray();
         for(JsonNode node : authorships){
             node = node.get("author");
-            AuthorOfWork authorOfWork = new AuthorOfWork();
-            authorOfWork.setAuthorId(node.get("id").asText());
-            authorOfWork.setAuthorName(node.get("display_name").asText());
-            authorList.add(authorOfWork);
+            InnerAuthor innerAuthor = new InnerAuthor();
+            innerAuthor.setAuthorId(node.get("id").asText());
+            innerAuthor.setAuthorName(node.get("display_name").asText());
+            authorList.add(innerAuthor);
         }
         // 关键词
         JsonNode keywords = jsonNode.get("keywords");
@@ -84,14 +80,17 @@ public class WorkServiceImpl implements WorkService {
         }
         // 来源
         JsonNode sourcNode = jsonNode.get("primary_location").get("source");
-        SourceOfWork sourceOfWork = new SourceOfWork();
-        sourceOfWork.setSoureId(sourcNode.get("id").asText());
-        sourceOfWork.setSourceName(sourcNode.get("display_name").asText());
+        InnerSource innerSource = new InnerSource();
+        innerSource.setSoureId(sourcNode.get("id").asText());
+        innerSource.setSourceName(sourcNode.get("display_name").asText());
         // location
         JsonNode locationNode = jsonNode.get("primary_location");
-        LocationOfWork location = new LocationOfWork();
+        InnerLocation location = new InnerLocation();
         location.setAccessable(locationNode.get("is_oa").asBoolean());
         location.setPdf_url(locationNode.get("pdf_url").asText());
+        // abstract
+        String DOI = jsonNode.get("doi").asText();
+        String abstractContent = ApiUtil.getAbstract(DOI);
         // build
         WorkDisplay workDisplay = WorkDisplay.builder()
                 .workId(jsonNode.get("id").asText())
@@ -100,9 +99,10 @@ public class WorkServiceImpl implements WorkService {
                 .authors(authorList)
                 .keywords(keywordList)
                 .citedByCount(jsonNode.get("cited_by_count").asInt())
-                .source(sourceOfWork)
+                .source(innerSource)
                 .publicationDate(jsonNode.get("publication_date").asText())
                 .location(location)
+                .abstractContent(abstractContent)
                 .build();
 
         return workDisplay;
@@ -110,34 +110,43 @@ public class WorkServiceImpl implements WorkService {
 
 
     @Override
-    public ArrayList<ReferenceWork> getReferenceByWorkId(String workId) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String id = StringUtil.removePrefix(workId);
-        String url = "https://api.openalex.org/works/"+ id;
-        String param = "";
-        String result = ApiUtil.get(url,param);
-        JsonNode jsonNode = objectMapper.readTree(result);
-        jsonNode = jsonNode.get("referenced_works");
-        ArrayList<ReferenceWork> referenceWorks = new ArrayList<>();
-        for(JsonNode node : jsonNode){
-            ReferenceWork referenceWork = new ReferenceWork();
-            String singleId = node.asText();
-            String pureId = StringUtil.removePrefix(singleId);
-            JsonNode workSelf = objectMapper.readTree(ApiUtil.get("https://api.openalex.org/works/"+ pureId, ""));
-            referenceWork.setWorkId(workSelf.get("id").asText());
-            referenceWork.setWorkName(workSelf.get("display_name").asText());
-            referenceWork.setPublicationYear(workSelf.get("publication_year").asText());
-            JsonNode sourceNode = workSelf.get("primary_location").get("source");
-            JsonNode locationNode;
-            if((locationNode = sourceNode.get("best_oa_location")) != null){
-                referenceWork.setSourceName(locationNode.get("display_name").asText());
-            } else if((locationNode = sourceNode.get("primary_location"))!=null){
-                referenceWork.setSourceName(locationNode.get("display_name").asText());
-            } else {
-                referenceWork.setSourceName("null");
+    public ArrayList<ReferenceWork> getReferenceByWorkId(String workId){
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String entity_id = StringUtil.removePrefix(workId);
+            String open_url = "https://api.openalex.org/works/" + entity_id;
+            String result = ApiUtil.get(open_url, "");
+            JsonNode jsonNode = objectMapper.readTree(result);
+            String DOI = jsonNode.get("doi").asText();
+            JsonNode RefNode = jsonNode.get("referenced_works");
+            // 为了性能，只展示6个z
+            ArrayList<ReferenceWork> referenceWorks = new ArrayList<>();
+            int count = 0;
+            for (JsonNode node : RefNode) {
+                if (count == 6) break;
+                ReferenceWork referenceWork = new ReferenceWork();
+                String singleId = node.asText();
+                System.out.println(singleId);
+                String pureId = StringUtil.removePrefix(singleId);
+                JsonNode workSelf = objectMapper.readTree(ApiUtil.get("https://api.openalex.org/works/" + pureId, ""));
+                referenceWork.setWorkId(workSelf.get("id").asText());
+                referenceWork.workName = (workSelf.get("display_name")!=null) ? workSelf.get("display_name").asText() : "null";
+                referenceWork.publicationYear = (workSelf.get("publication_year")!=null) ? workSelf.get("publication_year").asText() : "null";
+                if (workSelf.get("primary_location") != null && workSelf.get("primary_location").get("source")!=null) {
+                    referenceWork.setSourceName(workSelf.get("primary_location").get("source").get("display_name").asText());
+                } else if (workSelf.get("best_oa_location") != null && workSelf.get("best_oa_location").get("source")!=null) {
+                    referenceWork.setSourceName(workSelf.get("best_oa_location").get("source").get("display_name").asText());
+                } else{
+                    referenceWork.setSourceName("null");
+                }
+                referenceWorks.add(referenceWork);
+                count++;
             }
-            referenceWorks.add(referenceWork);
+            return referenceWorks;
         }
-        return referenceWorks;
+        catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 }

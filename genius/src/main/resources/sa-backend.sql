@@ -12,5 +12,4 @@ CREATE TABLE `user` (
 	     `join_time` datetime DEFAULT NULL COMMENT '注册时间',
 	     PRIMARY KEY (`user_id`),
 	     UNIQUE KEY `key_email` (`email`),
-	     UNIQUE KEY `key_nick_name` (`nick_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户信息';

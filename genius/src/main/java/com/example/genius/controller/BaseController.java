@@ -30,6 +30,14 @@ public class BaseController {
         return response;
     }
 
+    protected <T> Response<T> getErrorResponse(T t) {
+        Response<T> response = new Response<>();
+        response.setStatus("error");
+        response.setCode(201);
+        response.setInfo("请求错误");
+        response.setData(t);
+        return response;
+    }
     protected <T> Response<T> getErrorResponse(T t, ErrorType errorType) {
         Response<T> response = new Response<>();
         response.setStatus("error");

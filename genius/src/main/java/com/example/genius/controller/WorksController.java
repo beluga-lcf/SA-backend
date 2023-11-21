@@ -6,14 +6,17 @@ import com.example.generated.entity.Works;
 import com.example.generated.service.IAuthorsService;
 import com.example.generated.service.IConceptsService;
 import com.example.generated.service.IWorksService;
+import com.example.genius.dto.searchResult.SearchRequest;
+import com.example.genius.dto.searchResult.SearchResult;
+import com.example.genius.entity.Response;
 import com.example.genius.service.IWorkssService;
+import com.example.genius.service.SearchService;
+import com.example.genius.service.WorkService;
 import com.example.genius.service.impl.OpenAlexService;
 import com.example.genius.service.impl.WorksServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import java.util.Random;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -25,11 +28,22 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.json.JSONArray;
 import org.json.JSONObject;
+@Slf4j
 @RestController
 @RequestMapping("/api/works")
-public class WorksController {
+public class WorksController extends BaseController{
     @Autowired
     private OpenAlexService openAlexService;
+    private WorkService workService;
+    private SearchService searchService;
+    @Autowired
+    public void setWorkService(WorkService workService) {
+        this.workService = workService;
+    }
+    @Autowired
+    public void setSearchService(SearchService searchService){
+        this.searchService = searchService;
+    }
 
     @GetMapping("/type-counts")
     public String getTypeCounts() {
@@ -55,6 +69,58 @@ public class WorksController {
         array.put(new JSONObject(authors));
         return array.toString();
     }
+
+    @GetMapping("/displayWorkHomePage")
+    public Response<Object> displayWorkHomePage(String workId) {
+        try {
+            return getSuccessResponse(workService.getWorkDisplayById(workId));
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return getSimpleError();
+        }
+    }
+    @GetMapping("/getReferenceById")
+    public Response<Object> getReferenceById(String workId){
+        try {
+            return getSuccessResponse(workService.getReferenceByWorkId(workId));
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return getSimpleError();
+        }
+    }
+
+    /*
+    type: article, book-chapter, dissertation, book, dataset, paratext,
+          other, reference-entry, report, peer-review, standard, editorial, erratum, grant, letter
+     */
+    @GetMapping("/filter")
+    public Response<Object> filterSearch(String type, String concept){
+        try {
+            SearchResult result = searchService.FilterSearch(concept, type);
+            return getSuccessResponse(result);
+        }
+        catch (Exception e) {
+            log.error("here is an error!");
+            return getSimpleError();
+        }
+    }
+
+    @GetMapping("/search")
+    public Response<Object> search(@RequestBody SearchRequest searchRequest){//可选，语言
+        try {
+            SearchResult result = searchService.ComplexSearch(searchRequest);
+            return getSuccessResponse(result);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            log.error("here is an error!");
+            return getSimpleError();
+        }
+    }
+
 }
 
 class JsonParser {

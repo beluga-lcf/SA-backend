@@ -1,5 +1,7 @@
 package com.example.genius.util;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
@@ -31,7 +33,7 @@ public class ApiUtil {
             connection.setRequestProperty("Content-type", "application/json; charset=UTF-8");
             // 建立实际的连接
             connection.connect();
-            // 定义 BufferedReader输入流来读取URL的响应
+            // 定义 BufferedReader输入流来读取 URL的响应
             in = new BufferedReader(new InputStreamReader(
                     connection.getInputStream()));
             String line;
@@ -115,4 +117,30 @@ public class ApiUtil {
         }
         return result;
     }
+
+    /*
+     发送论文的DOI得到摘要
+
+     */
+    public static String getAbstract(String DOI) {
+        try {
+            String url = "https://api.crossref.org/works/" + DOI;
+            String param = "";
+            String result = ApiUtil.get(url, param);
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(result);
+            JsonNode abstractNode = jsonNode.get("message").get("abstract");
+//        if(abstractNode == null){
+//            String url2 = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
+//            String param2 = "db=pubmed&id="+DOI;
+//        }
+            if (abstractNode != null)
+                return abstractNode.asText();
+            else return "temporary empty";
+        } catch (Exception e) {
+            return "temporary empty";
+        }
+    }
+
+
 }
