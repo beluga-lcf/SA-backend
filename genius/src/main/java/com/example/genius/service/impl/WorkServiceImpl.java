@@ -50,7 +50,7 @@ public class WorkServiceImpl implements WorkService {
     public Integer citationCount; //论文被引用次数
     public SourceOfWork source; // 论文来源(期刊或数据库)
     public String publicationDate; //论文出版日期
-    public LocationOfWork location;
+    public LocationOfWork location; //论文下载地址
      */
     @Override
     public WorkDisplay getWorkDisplayById(String workId) throws Exception {
