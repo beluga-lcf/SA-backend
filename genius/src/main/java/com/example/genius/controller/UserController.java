@@ -21,10 +21,8 @@ import com.example.genius.service.impl.OpenAlexService;
 import com.example.genius.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpSession;
 import java.util.Calendar;
 import java.util.Date;
@@ -201,4 +199,71 @@ public class UserController extends BaseController {
         return getSuccessResponse(output);
     }
 
+    /*
+    修改个人信息
+     */
+    @RequestMapping(value = "/api/update", method = RequestMethod.POST)
+    public Response updateUserInform(@RequestHeader(value = "Authorization") String token, String nick_name, Integer sex, String person_description) {
+        JSONObject jsonObject = new JSONObject();
+        // jwt解出id
+        int user_id = getIdByJwt(token);
+        if (user_id >= 0) {
+            // 获取用户
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("user_id", user_id);
+            User checkUser = userService.getOne(queryWrapper);
+            // 更新信息 updateById
+            if (nick_name != null) {
+                checkUser.setNickName(nick_name);
+            }
+            if (sex != null && sex != 0) {
+                checkUser.setSex(sex);
+            }
+            if (person_description != null) {
+                checkUser.setPersonDescription(person_description);
+            }
+            userService.updateById(checkUser);
+            jsonObject.put("code", 200);
+            jsonObject.put("nick_name", checkUser.getNickName());
+            jsonObject.put("sex", checkUser.getSex());
+            jsonObject.put("person_description", checkUser.getPersonDescription());
+            jsonObject.put("message", "更新成功");
+            String json = jsonObject.toJSONString();
+            getSuccessResponse(json);
+            return null;
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "/api/changepw", method = RequestMethod.POST)
+    public Response changePassword(@RequestHeader(value = "Authorization") String token, String oldPw, String newPw) {
+        JSONObject jsonObject = new JSONObject();
+        // jwt解出id
+        int user_id = getIdByJwt(token);
+        if (user_id >= 0) {
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("user_id", user_id);
+            User user = userService.getOne(queryWrapper);
+            // 验证旧密码正确
+            if (oldPw.equals(user.getPassword())) {
+                user.setPassword(newPw);
+                userService.updateById(user);
+                log.info("已修改密码");
+                jsonObject.put("code", 200);
+                jsonObject.put("message", "修改密码成功");
+                String json = jsonObject.toJSONString();
+                getSuccessResponse(json);
+                return null;
+            }
+            else {
+                log.info("密码错误");
+                jsonObject.put("code", 206);
+                jsonObject.put("message", "密码错误");
+                String json = jsonObject.toJSONString();
+                getErrorResponse(json);
+                return null;
+            }
+        }
+        return null;
+    }
 }

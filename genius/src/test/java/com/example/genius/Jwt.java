@@ -3,6 +3,8 @@ package com.example.genius;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -19,7 +21,7 @@ public class Jwt {
         HashMap<String, Object> map = new HashMap<>();
         Calendar instance = Calendar.getInstance();
         // 3600秒后令牌token失效
-        instance.add(Calendar.SECOND,3600);
+        instance.add(Calendar.SECOND,1);
         String token = JWT.create()
                 .withHeader(map) 
                 .withClaim("email", "2505293361@qq.com")
@@ -30,15 +32,24 @@ public class Jwt {
     }
 
     @Test
-    public void test(){
-        // 通过签名生成验证对象
-        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256("Wunderkinder")).build();
-
-        DecodedJWT verify = jwtVerifier.verify("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2OTk0MzczMjYsImVtYWlsIjoiMjUwNTI5MzM2MUBxcS5jb20ifQ.-KdZv81UH27961UVYcmTaTd4cMXimIDcsjZO_spXhZ8");
-        System.out.println(verify.getClaim("email"));
-        System.out.println(verify.getClaim("user_id"));
-        System.out.println("令牌过期时间："+verify.getExpiresAt());
-
+    public String getIdByJwt(/*String token*/){
+        try {
+            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256("Wunderkinder")).build();
+            DecodedJWT verify = jwtVerifier.verify("CpqK_Dg2yn4xHzMfGZpIBGAE");
+            System.out.println(verify.getClaim("email"));
+            System.out.println(verify.getClaim("user_id"));
+            System.out.println("令牌过期时间：" + verify.getExpiresAt());
+            return String.valueOf(verify.getClaim("user_id"));
+        } catch (TokenExpiredException e) {
+            // 处理令牌过期异常
+            System.out.println("令牌已过期");
+            // 可以选择刷新令牌或者要求用户重新登录
+        } catch (JWTVerificationException e) {
+            // 处理非法令牌异常
+            System.out.println("非法令牌");
+            // 可以记录异常并拒绝访问或要求用户重新登录
+        }
+        return null; // 或者返回一个特殊值，表示令牌无效
     }
 
     @Test
