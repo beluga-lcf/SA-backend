@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class PatentAggregation {
+public class PatentsAggregation {
     @JsonProperty("applicant_country")
     private String applicantCountry;
 

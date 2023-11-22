@@ -2,10 +2,8 @@ package com.example.genius.dto.aggregation;
 
 import lombok.Data;
 
-import java.util.ArrayList;
-
 @Data
-public class ArticleAggregation{
+public class ArticlesAggregation {
     String type ;
     String subject ;
     String year ;

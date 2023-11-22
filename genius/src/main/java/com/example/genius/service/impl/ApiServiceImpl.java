@@ -1,5 +1,6 @@
 package com.example.genius.service.impl;
 
+import com.example.genius.config.Properties;
 import com.example.genius.dto.payload.*;
 import com.example.genius.service.ApiService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +37,7 @@ public class ApiServiceImpl implements ApiService{
         // 使用Jackson库将对象转换为JSON字符串
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(payload);
-        System.out.println("Request: " + requestBody);
+        if(Properties.isDebug) System.out.println("Request: " + requestBody);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, getHeaders());
 
         // 使用RestTemplate发起POST请求
@@ -49,7 +50,7 @@ public class ApiServiceImpl implements ApiService{
         // 处理响应
         if (response.getStatusCode().is2xxSuccessful()) {
             responseBody = response.getBody();
-            System.out.println("Response: " + responseBody);
+            if(Properties.isDebug) System.out.println("Response: " + responseBody);
             return responseBody;
         } else {
             System.out.println("Request failed with status code: " + response.getStatusCodeValue());
@@ -59,6 +60,7 @@ public class ApiServiceImpl implements ApiService{
     public String getBooks(BooksPayload payload, int type) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(payload);
+        if(Properties.isDebug) System.out.println("Request: " + requestBody);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, getHeaders());
         // 使用RestTemplate发起POST请求
         String apiUrl = "";
@@ -69,7 +71,7 @@ public class ApiServiceImpl implements ApiService{
         // 处理响应
         if (response.getStatusCode().is2xxSuccessful()) {
             responseBody = response.getBody();
-            System.out.println("Response: " + responseBody);
+            if(Properties.isDebug) System.out.println("Response: " + responseBody);
             return responseBody;
         } else {
             System.out.println("Request failed with status code: " + response.getStatusCodeValue());
@@ -79,17 +81,18 @@ public class ApiServiceImpl implements ApiService{
     public String getBulletins(BulletinsPayload payload, int type) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(payload);
+        if(Properties.isDebug) System.out.println("Request: " + requestBody);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, getHeaders());
         // 使用RestTemplate发起POST请求
         String apiUrl = "";
         if(type == 1) apiUrl = "https://pubscholar.cn/hky/open/resources/api/v1/bulletins";
-        else if(type == 2) apiUrl = "https://pubscholar.cn/hky/open/resources/api/v1/bulletins/aggregations";
+        else if(type == 2) apiUrl = "https://pubscholar.cn/hky/open/resources/api/v1/bulletin/aggregations";
         ResponseEntity<String> response = new RestTemplate().exchange(apiUrl, HttpMethod.POST, entity, String.class);
         String responseBody;
         // 处理响应
         if (response.getStatusCode().is2xxSuccessful()) {
             responseBody = response.getBody();
-            System.out.println("Response: " + responseBody);
+            if(Properties.isDebug) System.out.println("Response: " + responseBody);
             return responseBody;
         } else {
             System.out.println("Request failed with status code: " + response.getStatusCodeValue());
@@ -100,6 +103,7 @@ public class ApiServiceImpl implements ApiService{
     public String getPatents(PatentsPayload payload, int type) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(payload);
+        if(Properties.isDebug) System.out.println("Request: " + requestBody);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, getHeaders());
         // 使用RestTemplate发起POST请求
         String apiUrl = "";
@@ -110,7 +114,7 @@ public class ApiServiceImpl implements ApiService{
         // 处理响应
         if (response.getStatusCode().is2xxSuccessful()) {
             responseBody = response.getBody();
-            System.out.println("Response: " + responseBody);
+            if(Properties.isDebug) System.out.println("Response: " + responseBody);
             return responseBody;
         } else {
             System.out.println("Request failed with status code: " + response.getStatusCodeValue());
@@ -121,6 +125,7 @@ public class ApiServiceImpl implements ApiService{
     public String getReports(ReportsPayload payload, int type) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(payload);
+        if(Properties.isDebug) System.out.println("Request: " + requestBody);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, getHeaders());
         // 使用RestTemplate发起POST请求
         String apiUrl = "";
@@ -131,7 +136,7 @@ public class ApiServiceImpl implements ApiService{
         // 处理响应
         if (response.getStatusCode().is2xxSuccessful()) {
             responseBody = response.getBody();
-            System.out.println("Response: " + responseBody);
+            if(Properties.isDebug) System.out.println("Response: " + responseBody);
             return responseBody;
         } else {
             System.out.println("Request failed with status code: " + response.getStatusCodeValue());
@@ -142,6 +147,7 @@ public class ApiServiceImpl implements ApiService{
     public String getSciencedata(SciencedataPayload payload, int type) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(payload);
+        if(Properties.isDebug) System.out.println("Request: " + requestBody);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, getHeaders());
         // 使用RestTemplate发起POST请求
         String apiUrl = "";
@@ -152,7 +158,7 @@ public class ApiServiceImpl implements ApiService{
         // 处理响应
         if (response.getStatusCode().is2xxSuccessful()) {
             responseBody = response.getBody();
-            System.out.println("Response: " + responseBody);
+            if(Properties.isDebug) System.out.println("Response: " + responseBody);
             return responseBody;
         } else {
             System.out.println("Request failed with status code: " + response.getStatusCodeValue());

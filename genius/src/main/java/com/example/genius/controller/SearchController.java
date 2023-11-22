@@ -101,7 +101,8 @@ public class SearchController extends BaseController {
             return apiService.getReports(payload,1);
         }
         catch (Exception e){
-            return "error";
+            e.printStackTrace();
+            return "error !!!";
         }
     }
 
@@ -120,7 +121,8 @@ public class SearchController extends BaseController {
             return apiService.getSciencedata(payload, 1);
         }
         catch (Exception e){
-            return "error";
+            e.printStackTrace();
+            return "error !!!";
         }
     }
 
