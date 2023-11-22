@@ -3,7 +3,10 @@ package com.example.genius.service.impl;
 import com.example.genius.config.Properties;
 import com.example.genius.dto.payload.*;
 import com.example.genius.service.ApiService;
+import com.example.genius.util.ApiUtil;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -32,7 +35,7 @@ public class ApiServiceImpl implements ApiService{
         return headers;
     }
 
-    public String getArticles(ArticlesPayload payload, int type) throws Exception{
+    public String getArticles(ArticlesPayload payload, int type) throws Exception {
         // 样例：{"page":1,"size":10,"order_field":"date","order_direction":"desc","user_id":"3b9547dd87904c44923d675711729962","aggregations":{"type":"","subject":"","year":"","source":"","collection":"","lang":"","funding":"","institution":"","license":""}}
         // 使用Jackson库将对象转换为JSON字符串
         ObjectMapper objectMapper = new ObjectMapper();
@@ -159,6 +162,46 @@ public class ApiServiceImpl implements ApiService{
         if (response.getStatusCode().is2xxSuccessful()) {
             responseBody = response.getBody();
             if(Properties.isDebug) System.out.println("Response: " + responseBody);
+            return responseBody;
+        } else {
+            System.out.println("Request failed with status code: " + response.getStatusCodeValue());
+            return "error";
+        }
+    }
+    public String getItems(JsonNode payload, String type) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(SerializationFeature.INDENT_OUTPUT, false);
+        String requestBody = objectMapper.writeValueAsString(payload);
+        if (Properties.isDebug) System.out.println("Request: " + requestBody);
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, getHeaders());
+        // 使用RestTemplate发起POST请求
+        String apiUrl = ApiUtil.getScholarUrl(type);
+        ResponseEntity<String> response = new RestTemplate().exchange(apiUrl, HttpMethod.POST, entity, String.class);
+        String responseBody;
+        // 处理响应
+        if (response.getStatusCode().is2xxSuccessful()) {
+            responseBody = response.getBody();
+            if (Properties.isDebug) System.out.println("Response: " + responseBody);
+            return responseBody;
+        } else {
+            System.out.println("Request failed with status code: " + response.getStatusCodeValue());
+            return "error";
+        }
+    }
+    public String getAggregations(JsonNode payload, String type) throws Exception{
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(SerializationFeature.INDENT_OUTPUT, false);
+        String requestBody = objectMapper.writeValueAsString(payload);
+        if (Properties.isDebug) System.out.println("Request: " + requestBody);
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, getHeaders());
+        // 使用RestTemplate发起POST请求
+        String apiUrl = ApiUtil.getScholarUrl(type) + "/aggregations";
+        ResponseEntity<String> response = new RestTemplate().exchange(apiUrl, HttpMethod.POST, entity, String.class);
+        String responseBody;
+        // 处理响应
+        if (response.getStatusCode().is2xxSuccessful()) {
+            responseBody = response.getBody();
+            if (Properties.isDebug) System.out.println("Response: " + responseBody);
             return responseBody;
         } else {
             System.out.println("Request failed with status code: " + response.getStatusCodeValue());

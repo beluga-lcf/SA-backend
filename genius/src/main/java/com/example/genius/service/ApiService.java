@@ -1,6 +1,7 @@
 package com.example.genius.service;
 
 import com.example.genius.dto.payload.*;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public interface ApiService {
     public String getArticles(ArticlesPayload payload, int type) throws Exception;
@@ -9,4 +10,7 @@ public interface ApiService {
     public String getBulletins(BulletinsPayload payload, int type) throws Exception;
     public String getReports(ReportsPayload payload, int type) throws Exception;
     public String getSciencedata(SciencedataPayload payload, int type) throws Exception;
+    public String getItems(JsonNode payload, String type) throws Exception ;
+    public String getAggregations(JsonNode payload, String type) throws Exception;
+
 }

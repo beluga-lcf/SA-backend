@@ -2,11 +2,10 @@ package com.example.genius.controller;
 
 import com.example.genius.dto.payload.*;
 import com.example.genius.service.ApiService;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import springfox.documentation.spring.web.json.Json;
 
 @RestController
 @RequestMapping("/api/search")
@@ -17,88 +16,40 @@ public class SearchController extends BaseController {
         this.apiService = apiService;
     }
 
-    @GetMapping("/article")
-    public String getArticle(@RequestBody ArticlesPayload payload){
+    @PostMapping("/articles")
+    public String getArticle(@RequestBody JsonNode requestBody){
         try {
-            return apiService.getArticles(payload,1);
+            return apiService.getItems(requestBody,"articles");
         }
         catch (Exception e){
             return "error";
         }
     }
 
-    @GetMapping("/article/classifyTag")
-    public String getArticleAggregation(@RequestBody ArticlesPayload payload){
+    @PostMapping("/articles/aggregations")
+    public String getArticleAggregations(@RequestBody JsonNode requestBody){
         try {
-            return apiService.getArticles(payload,2);
+            return apiService.getAggregations(requestBody,"articles");
         }
         catch (Exception e){
             return "error";
         }
     }
 
-    @GetMapping("/patent")
-    public String getPatent(@RequestBody PatentsPayload payload){
+    @PostMapping("/patents")
+    public String getPatents(@RequestBody JsonNode requestBody){
         try {
-            return apiService.getPatents(payload,1);
+            return apiService.getItems(requestBody,"patents");
         }
         catch (Exception e){
             return "error";
         }
     }
 
-    @GetMapping("/patent/classifyTag")
-    public String getPatentAggregation(@RequestBody PatentsPayload payload){
+    @PostMapping("/patents/aggregations")
+    public String getPatentAggregations(@RequestBody JsonNode requestBody){
         try {
-            return apiService.getPatents(payload,2);
-        }
-        catch (Exception e){
-            return "error";
-        }
-    }
-
-    @GetMapping("/book")
-    public String getPatent(@RequestBody BooksPayload payload){
-        try {
-            return apiService.getBooks(payload,1);
-        }
-        catch (Exception e){
-            return "error";
-        }
-    }
-
-    @GetMapping("/book/classifyTag")
-    public String getPatentAggregation(@RequestBody BooksPayload payload){
-        try {
-            return apiService.getBooks(payload,2);
-        }
-        catch (Exception e){
-            return "error";
-        }
-    }
-    @GetMapping("/bulletin")
-    public String getPatent(@RequestBody BulletinsPayload payload){
-        try {
-            return apiService.getBulletins(payload,1);
-        }
-        catch (Exception e){
-            return "error";
-        }
-    }
-
-    @GetMapping("/bulletin/classifyTag")
-    public String getPatentAggregation(@RequestBody BulletinsPayload payload){
-        try {
-            return apiService.getBulletins(payload,2);
-        }
-        catch (Exception e){
-            return "error";
-        }
-    }
-    @GetMapping("/report")
-    public String getPatent(@RequestBody ReportsPayload payload){
-        try {
-            return apiService.getReports(payload,1);
+            return apiService.getAggregations(requestBody,"patents");
         }
         catch (Exception e){
             e.printStackTrace();
@@ -106,19 +57,48 @@ public class SearchController extends BaseController {
         }
     }
 
-    @GetMapping("/report/classifyTag")
-    public String getPatentAggregation(@RequestBody ReportsPayload payload){
+    @PostMapping("/books")
+    public String getBooks(@RequestBody JsonNode requestBody){
         try {
-            return apiService.getReports(payload,2);
+            return apiService.getItems(requestBody, "books");
         }
         catch (Exception e){
             return "error";
         }
     }
-    @GetMapping("/sciencedata")
-    public String getPatent(@RequestBody SciencedataPayload payload){
+
+    @PostMapping("/books/aggregations")
+    public String getBookAggregations(@RequestBody JsonNode requestBody){
         try {
-            return apiService.getSciencedata(payload, 1);
+            return apiService.getAggregations(requestBody,"books");
+        }
+        catch (Exception e){
+            return "error";
+        }
+    }
+    @PostMapping("/bulletins")
+    public String getBulletins(@RequestBody JsonNode requestBody){
+        try {
+            return apiService.getItems(requestBody, "bulletins");
+        }
+        catch (Exception e){
+            return "error";
+        }
+    }
+
+    @PostMapping("/bulletins/aggregations")
+    public String getBulletinAggregation(@RequestBody JsonNode requestBody){
+        try {
+            return apiService.getAggregations(requestBody,"bulletin");
+        }
+        catch (Exception e){
+            return "error";
+        }
+    }
+    @PostMapping("/reports")
+    public String getReports(@RequestBody JsonNode requestBody){
+        try {
+            return apiService.getItems(requestBody, "reports");
         }
         catch (Exception e){
             e.printStackTrace();
@@ -126,15 +106,36 @@ public class SearchController extends BaseController {
         }
     }
 
-    @GetMapping("/sciencedata/classifyTag")
-    public String getPatentAggregation(@RequestBody SciencedataPayload payload){
+    @PostMapping("/reports/aggregations")
+    public String getPatentAggregation(@RequestBody JsonNode requestBody){
         try {
-            return apiService.getSciencedata(payload,2);
+            return apiService.getAggregations(requestBody,"reports");
         }
         catch (Exception e){
             return "error";
         }
     }
+    @PostMapping("/sciencedata")
+    public String getSciencedata(@RequestBody JsonNode requestBody){
+        try {
+            return apiService.getItems(requestBody, "sciencedata");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return "error !!!";
+        }
+    }
+
+    @PostMapping("/sciencedata/aggregations")
+    public String getSciencedataAggregations(@RequestBody JsonNode requestBody){
+        try {
+            return apiService.getAggregations(requestBody,"sciencedata");
+        }
+        catch (Exception e){
+            return "error";
+        }
+    }
+
 
 
 }
