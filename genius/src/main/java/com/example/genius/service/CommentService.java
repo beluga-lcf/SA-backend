@@ -10,4 +10,6 @@ public interface CommentService extends IService<Comment> {
     boolean createComment(Comment comment);
     boolean deleteComment(Integer commentId);
     Integer getLikeCount(Integer commentId);
+
+
 }
