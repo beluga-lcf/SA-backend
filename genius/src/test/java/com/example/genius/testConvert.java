@@ -1,9 +1,12 @@
 package com.example.genius;
 
-import com.example.genius.dto.aggregation.Payload;
+import com.example.genius.util.ApiUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -13,12 +16,10 @@ public class testConvert {
     @Test
     public void test(){
         try {
-            Payload payload = new Payload();
-            // 使用Jackson库将对象转换为JSON字符串
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.setSerializationInclusion(JsonInclude.Include.ALWAYS);
-            String requestBody = objectMapper.writeValueAsString(payload);
-            System.out.println("Request: " + requestBody);
+            String institutionName = "Carolinas Medical Center";
+            String url = "https://api.openalex.org/institutions?search=Carolinas%Medical%Center";
+            String result = ApiUtil.get(url, "");
+            System.out.println(result);
         }
         catch (Exception e){
             e.printStackTrace();
@@ -32,4 +33,8 @@ public class testConvert {
         String requestBody = originalJson.replace("\\", "");
         System.out.println(requestBody);
     }
+
+
+
+
 }

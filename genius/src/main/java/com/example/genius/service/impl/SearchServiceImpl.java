@@ -61,7 +61,7 @@ public class SearchServiceImpl implements SearchService {
             // 来源
             JsonNode sourcNode = item.get("primary_location").get("source");
             InnerSource innerSource = new InnerSource();
-            innerSource.setSoureId(sourcNode.get("id").asText());
+            innerSource.setSourceId(sourcNode.get("id").asText());
             innerSource.setSourceName(sourcNode.get("display_name").asText());
             // location
             InnerLocation location = new InnerLocation();
@@ -214,26 +214,26 @@ public class SearchServiceImpl implements SearchService {
             if(primaryNode!=null && primaryNode.get("is_oa")!=null && primaryNode.get("is_oa").asBoolean()){
                 locationNode = primaryNode;
                 sourcNode = locationNode.get("source");
-                source.setSoureId(sourcNode.get("id").asText());
+                source.setSourceId(sourcNode.get("id").asText());
                 source.setSourceName(sourcNode.get("display_name").asText());
                 location.setAccessable(true);
                 location.setPdf_url(locationNode.get("pdf_url").asText());
             } else if(bestNode!=null && bestNode.get("is_oa")!=null && bestNode.get("is_oa").asBoolean()){
                 locationNode = bestNode;
                 sourcNode = locationNode.get("source");
-                source.setSoureId(sourcNode.get("id").asText());
+                source.setSourceId(sourcNode.get("id").asText());
                 source.setSourceName(sourcNode.get("display_name").asText());
                 location.setAccessable(true);
                 location.setPdf_url(locationNode.get("pdf_url").asText());
             } else if(locationsNode!=null && locationsNode.get(0).get("is_oa")!=null && locationsNode.get(0).get("is_oa").asBoolean()){
                 locationNode = locationsNode.get(0);
                 sourcNode = locationNode.get("source");
-                source.setSoureId(sourcNode.get("id").asText());
+                source.setSourceId(sourcNode.get("id").asText());
                 source.setSourceName(sourcNode.get("display_name").asText());
                 location.setAccessable(true);
                 location.setPdf_url(locationNode.get("pdf_url").asText());
             } else {
-                source.setSoureId("null");
+                source.setSourceId("null");
                 source.setSourceName("null");
                 location.setAccessable(false);
                 location.setPdf_url("null");

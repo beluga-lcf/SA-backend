@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class InnerSource {
-    public String soureId;
+    public String sourceId;
     public String sourceName;
 }

@@ -1,12 +1,13 @@
 package com.example.genius.entity.comment;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
 @Data
-@Table(name = "comment", schema = "customer")
+@TableName("customer.comment")
 public class Comment {
 
     @Id
