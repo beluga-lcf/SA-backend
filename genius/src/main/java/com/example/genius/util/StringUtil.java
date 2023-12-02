@@ -43,5 +43,8 @@ public class StringUtil {
         return joiner.toString();
     }
 
+    public static String spaceReplace(String input){
+        return input.replace(" ", "%20");
+    }
 
 }

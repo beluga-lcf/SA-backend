@@ -73,7 +73,7 @@ public class WorksController extends BaseController{
     @GetMapping("/displayWorkHomePage")
     public Response<Object> displayWorkHomePage(String workId) {
         try {
-            return getSuccessResponse(workService.getWorkDisplayById(workId));
+            return getSuccessResponse(workService.getWorkHomePage(workId));
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
