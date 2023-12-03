@@ -34,6 +34,11 @@ public class OpenAlexService {
         return restTemplate.getForObject(url, String.class);
 
     }
+    public String getFunderByWork(String workID){
+        String url = "https://api.openalex.org/works/"+workID+"?select=grants";
+        return restTemplate.getForObject(url, String.class);
+    }
+
 }
 
 
