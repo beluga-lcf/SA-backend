@@ -3,6 +3,7 @@ package com.example.genius.controller;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.genius.dto.Disrecord.Disrecord;
 import com.example.genius.entity.Record;
 import com.example.genius.entity.Response;
 import com.alibaba.fastjson2.JSONArray;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -33,20 +35,19 @@ public class RecordController extends BaseController{
         QueryWrapper<Record> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("search_userid", id);
         List<Record> records = recordService.list(queryWrapper);
-        JSONArray array = new JSONArray();
+        ArrayList<Disrecord> disrecords = new ArrayList<>();
         if(records.isEmpty()){
-            String json = array.toJSONString();
-            return getSuccessResponse(json);
+            return getSuccessResponse(disrecords);
         }else{
             for(Record record : records){
-                JSONObject j = new JSONObject();
-                j.put("content",record.getRecordText());
-                j.put("time",record.getSearchTime());
-                j.put("id",record.getId());
-                array.add(j);
+//                JSONObject j = new JSONObject();
+//                j.put("content",record.getRecordText());
+//                j.put("time",record.getSearchTime());
+//                j.put("id",record.getId());
+//                array.add(j);
+                disrecords.add(new Disrecord(record.getRecordText(),record.getSearchTime(),record.getId()));
             }
-            String json = array.toJSONString();
-            return getSuccessResponse(json);
+            return getSuccessResponse(disrecords);
         }
 
     }

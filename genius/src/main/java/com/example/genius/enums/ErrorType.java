@@ -3,7 +3,8 @@ package com.example.genius.enums;
 public enum ErrorType {
     already_registerd(1001, "用户已存在"),
     invalid_email(1002, "无效的邮箱"),
-    not_login(1003,"未登录");
+    not_login(1003,"未登录"),
+    already_send_email(1005, "已发送邮件");
 
 
     public Integer code;
