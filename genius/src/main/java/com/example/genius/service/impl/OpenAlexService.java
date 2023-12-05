@@ -1,6 +1,10 @@
 package com.example.genius.service.impl;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.example.genius.controller.BaseController;
+import com.example.genius.dto.mywork.ConceptDis;
+import com.example.genius.dto.mywork.MyWorkDis;
 import com.example.genius.dto.userPackage.ScholarInform;
 import com.example.genius.entity.User;
 import org.json.JSONException;
@@ -68,14 +72,37 @@ public class OpenAlexService {
         catch (JSONException e) {
             achievementsNum = null;
         }
+        MyWorkDis myWorkDis = getWorks(authorId);
         return new ScholarInform(
                 name, // name
 //                // identity
                 organization, // organization
                 interests, // interests
                 citationsNum, // citationsNum
-                achievementsNum // achievements
+                achievementsNum, // achievements
+                myWorkDis
         );
+    }
+    public MyWorkDis getWorks(String openalexId) {//依据用户ID获取学术成果
+        System.out.println(openalexId);
+
+        String jsons = getWorksByUser(openalexId);
+        com.alibaba.fastjson2.JSONObject json = com.alibaba.fastjson2.JSONObject.parseObject(jsons);
+        String resJson = json.getString("results");
+        JSONArray resArray = JSON.parseArray(resJson);
+//        JSONArray jsonArray = new JSONArray();
+        MyWorkDis myWorkDis = new MyWorkDis();
+        for (int i = 0; i < resArray.size(); i++) {
+            com.alibaba.fastjson2.JSONObject j = resArray.getJSONObject(i);
+            myWorkDis.setId(j.getString("id"));
+            myWorkDis.setTitle(j.getString("title"));
+            myWorkDis.setDate(j.getString("publication_date"));
+            JSONArray j2 = j.getJSONArray("concepts");
+            for (int k = 0; k < j2.size(); k++) {
+                myWorkDis.getConceptDis().add(new ConceptDis(j2.getJSONObject(k).getString("display_name")));
+            }
+        }
+        return myWorkDis;
     }
     public String getWorksByUser(String openalexUserID){
         String url = "https://api.openalex.org/works?select=id,title,publication_date,concepts&per_page=200&filter=authorships.author.id:"+openalexUserID;

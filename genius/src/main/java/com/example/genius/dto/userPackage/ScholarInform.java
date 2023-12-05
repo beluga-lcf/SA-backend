@@ -1,5 +1,6 @@
 package com.example.genius.dto.userPackage;
 
+import com.example.genius.dto.mywork.MyWorkDis;
 import com.example.genius.entity.User;
 
 public class ScholarInform {
@@ -19,13 +20,16 @@ public class ScholarInform {
     public String citationsNum;
     // 学术成果数量
     public String achievementsNum;
+    // 学术成果
+    public MyWorkDis myWorkDis;
 
-    public ScholarInform(String name, String organization, String[] interests, String citationsNum, String achievementsNum) {
+    public ScholarInform(String name, String organization, String[] interests, String citationsNum, String achievementsNum, MyWorkDis myWorkDis) {
         this.name = name;
         this.organization = organization;
         this.interests = interests;
         this.citationsNum = citationsNum;
         this.achievementsNum = achievementsNum;
+        this.myWorkDis = myWorkDis;
     }
 
     public void setEmail(String email) {
@@ -34,5 +38,9 @@ public class ScholarInform {
 
     public void setIntroduction(String introduction) {
         this.introduction = introduction;
+    }
+
+    public void setMyWorkDis(MyWorkDis myWorkDis) {
+        this.myWorkDis = myWorkDis;
     }
 }
