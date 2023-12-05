@@ -1,6 +1,5 @@
 package com.example.genius.controller;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -10,6 +9,11 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.genius.entity.Response;
 import com.example.genius.enums.ErrorType;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 
@@ -94,4 +98,18 @@ public class BaseController {
         }
     }
 
+    public static String[] readJsonArray(JSONArray jsonArray, String key) {
+        // 创建一个列表来存储 display_name 的值
+        List<String> displayNameList = new ArrayList<>();
+
+        // 遍历数组并获取 display_name 属性
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject conceptObject = jsonArray.getJSONObject(i);
+            String displayName = conceptObject.getString(key);
+            displayNameList.add(displayName);
+        }
+
+        // 将列表转换为 String 数组
+        return displayNameList.toArray(new String[0]);
+    }
 }

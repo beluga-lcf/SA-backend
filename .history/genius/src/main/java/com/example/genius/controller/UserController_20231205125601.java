@@ -6,7 +6,6 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.genius.dto.userPackage.OpenalexInform;
-import com.example.genius.dto.userPackage.ScholarInform;
 import com.example.genius.dto.userPackage.Token;
 import com.example.genius.dto.userPackage.UserInform;
 import com.example.genius.dto.mywork.ConceptDis;
@@ -81,9 +80,6 @@ public class UserController extends BaseController {
         user.setNickName(nick_name);
         user.setEmail(email);
         user.setPassword(password);
-        if (captcha != null) {
-            user.setPersonDescription(captcha);
-        }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("email", email);
         User check_user = userService.getOne(queryWrapper);
@@ -344,8 +340,9 @@ public class UserController extends BaseController {
         return null;
     }
 
-    @RequestMapping(value = "/getScholarInfoSelf", method = RequestMethod.GET)
-    public Response getScholarInfoSelf(@RequestHeader(value = "Authorization") String token) {
+    @RequestMapping(value = "/getScholarInfo", method = RequestMethod.GET)
+    public Response getScholarInfo(@RequestHeader(value = "Authorization") String token) {
+        JSONObject jsonObject = new JSONObject();
         // jwt解出id
         int user_id = getIdByJwt(token);
         if (user_id >= 0) {
@@ -359,11 +356,11 @@ public class UserController extends BaseController {
                 return getErrorResponse(ErrorType.not_scholar);
             }
             else {
-                ScholarInform scholarInform = openAlexService.getAuthorSingle(searchUser.getOpenalexid());
-                User user = userService.getById(user_id);
-                scholarInform.setEmail(user.getEmail());
-                scholarInform.setIntroduction(user.getPersonDescription());
-                return getSuccessResponse(scholarInform);
+                QueryWrapper<User> queryWrapperUser = new QueryWrapper<>();
+                queryWrapperUser.eq("userid", user_id);
+                User user = userService.getOne(queryWrapperUser);
+                OpenalexInform openalexInform = new OpenalexInform();
+                return getSuccessResponse(new ScholarInform(user, searchUser));
             }
         }
         else if (user_id == -1) {
@@ -373,25 +370,5 @@ public class UserController extends BaseController {
             return getErrorResponse(ErrorType.jwt_illegal);
         }
         return null;
-    }
-
-    @RequestMapping(value = "/getScholarInfo", method = RequestMethod.GET)
-    public Response getScholarInfo(int user_id) {
-        // 查关联表
-        QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", user_id);
-        UseridRelatedOpenalexid searchUser = uroService.getOne(queryWrapper);
-        if (searchUser == null) {
-            // 未查到对应的openalex id, 可能是openalex没收录或不是认证学者
-            // 根据认证来源判断一定是没认证
-            return getErrorResponse(ErrorType.not_scholar);
-        }
-        else {
-            ScholarInform scholarInform = openAlexService.getAuthorSingle(searchUser.getOpenalexid());
-            User user = userService.getById(user_id);
-            scholarInform.setEmail(user.getEmail());
-            scholarInform.setIntroduction(user.getPersonDescription());
-            return getSuccessResponse(scholarInform);
-        }
     }
 }
