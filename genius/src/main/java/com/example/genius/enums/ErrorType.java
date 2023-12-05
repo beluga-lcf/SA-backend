@@ -9,7 +9,8 @@ public enum ErrorType {
     login_timeout(1006, "登录过期，请重新登录"),
     jwt_illegal(1007, "非法令牌"),
     not_scholar(1008, "该用户不是认证学者"),
-    already_send_email(1005, "已发送邮件");
+    already_send_email(1009, "已发送邮件"),
+    wrong_captcha(1010, "验证码错误");
 
 
     public Integer code;

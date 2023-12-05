@@ -87,53 +87,35 @@ public class UserController extends BaseController {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("email", email);
         User check_user = userService.getOne(queryWrapper);
-//        JSONObject jsonObject = new JSONObject();
         if(check_user!=null){
-//            jsonObject.put("code", 201);
-//            jsonObject.put("message", "邮箱已被注册");
-//            String json = jsonObject.toJSONString();
             return getErrorResponse(null, ErrorType.already_registerd);
         }
-//        else if (captcha != /*本地验证码*/) {
-//            return getErrorResponse(401, "验证码错误");
+//        else if (!Objects.equals(captcha, redisUtils.get(email))) {
+//            return getErrorResponse(ErrorType.wrong_captcha);
 //        }
         else {
             userService.save(user);
             log.info("There is a new user! " + user.getNickName());
-//            jsonObject.put("code", 200);
-//            jsonObject.put("message", "注册成功");
-//            String json = jsonObject.toJSONString();
             return getSuccessResponse(null);
         }
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public Response login(String email, String password){
+    public Response login(@RequestBody JSONObject loginInform){
+        String email = loginInform.getString("email");
+        String password = loginInform.getString("password");
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("email", email);
         User checkUser = userService.getOne(queryWrapper);
-//        JSONObject jsonObject = new JSONObject();
         if(checkUser == null) {
-//            jsonObject.put("code", 202);
-//            jsonObject.put("token", 0);
-//            jsonObject.put("message", "邮箱未注册");
-//            String json = jsonObject.toJSONString();
             return getErrorResponse(null, ErrorType.without_register);
         }
         if(!checkUser.getPassword().equalsIgnoreCase(password)){
-//            jsonObject.put("code", 203);
-//            jsonObject.put("token", 0);
-//            jsonObject.put("message", "用户名或密码错误");
-//            String json = jsonObject.toJSONString();
             return getErrorResponse(null, ErrorType.wrong_pwd);
         }
         else {
             String token = contextLoads(email, Math.toIntExact(checkUser.getUserId()));
             session.setAttribute("userId",checkUser.getUserId());
-//            jsonObject.put("code", 200);
-//            jsonObject.put("token", token);
-//            jsonObject.put("message", "登陆成功");
-//            String json = jsonObject.toJSONString();
             log.info("一名用户已登录,id:" + checkUser.getUserId());
             Token atoken = new Token(token);
             return getSuccessResponse(atoken);
@@ -246,8 +228,10 @@ public class UserController extends BaseController {
     修改个人信息
      */
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public Response updateUserInform(@RequestHeader(value = "Authorization") String token, String nick_name, Integer sex, String person_description) {
-        JSONObject jsonObject = new JSONObject();
+    public Response updateUserInform(@RequestHeader(value = "Authorization") String token, @RequestBody JSONObject updateSelfInform) {
+        String nick_name = updateSelfInform.getString("nick_name");
+        Integer sex = updateSelfInform.getInteger("sex");
+        String person_description = updateSelfInform.getString("person_description");
         // jwt解出id
         int userid = getIdByJwt(token);
         if (userid >= 0) {
@@ -266,16 +250,10 @@ public class UserController extends BaseController {
                 checkUser.setPersonDescription(person_description);
             }
             userService.updateById(checkUser);
-//            jsonObject.put("code", 200);
             String aemail = checkUser.getEmail();
-//            jsonObject.put("nick_name", checkUser.getNickName());
             String anick_name = checkUser.getNickName();
-//            jsonObject.put("sex", checkUser.getSex());
             Integer asex = checkUser.getSex();
-//            jsonObject.put("person_description", checkUser.getPersonDescription());
             String aperson_description = checkUser.getPersonDescription();
-//            jsonObject.put("message", "更新成功");
-//            String json = jsonObject.toJSONString();
             return getSuccessResponse(new UserInform(aemail, anick_name, aperson_description, asex));
         }
         else if (userid == -1) {
@@ -309,8 +287,9 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/changepw", method = RequestMethod.POST)
-    public Response changePassword(@RequestHeader(value = "Authorization") String token, String oldPw, String newPw) {
-//        JSONObject jsonObject = new JSONObject();
+    public Response changePassword(@RequestHeader(value = "Authorization") String token, @RequestBody JSONObject passwdInform) {
+        String oldPw = passwdInform.getString("oldPw");
+        String newPw = passwdInform.getString("newPw");
         // jwt解出id
         int userid = getIdByJwt(token);
         if (userid >= 0) {
