@@ -3,10 +3,12 @@ package com.example.genius.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
@@ -142,5 +144,70 @@ public class ApiUtil {
         }
     }
 
+    /*
+    url of scholar.cn
+     */
+    public static String getScholarUrl(String type) {
+        return "https://pubscholar.cn/hky/open/resources/api/v1/" + type;
+    }
+
+    public static HttpHeaders getHeaders(){
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/json, text/plain, */*");
+        headers.set("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
+        headers.set("Connection", "keep-alive");
+        headers.set("Content-Type", "application/json;charset=UTF-8");
+        headers.set("Cookie", "XSRF-TOKEN=e01d46ee-1f94-4e60-ad16-3eed506b263b");
+        headers.set("Origin", "https://pubscholar.cn");
+        headers.set("Sec-Fetch-Dest", "empty");
+        headers.set("Sec-Fetch-Mode", "cors");
+        headers.set("Sec-Fetch-Site", "same-origin");
+        headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0");
+        headers.set("X-XSRF-TOKEN", "e01d46ee-1f94-4e60-ad16-3eed506b263b");
+        headers.set("sec-ch-ua", "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"");
+        headers.set("sec-ch-ua-mobile", "?0");
+        headers.set("sec-ch-ua-platform", "\"Windows\"");
+        return headers;
+    }
+
+    public static String getConnection(String path) throws Exception{
+        // 打开连接
+        URL url = new URL(path);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        // 设置请求方法
+        connection.setRequestMethod("GET");
+        // 设置请求头
+        connection.setRequestProperty("Accept", "application/json, text/plain, */*");
+        connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
+        connection.setRequestProperty("Connection", "keep-alive");
+        connection.setRequestProperty("Cookie", "XSRF-TOKEN=0023e620-b52e-4ede-98f4-455d5363fddd");
+        connection.setRequestProperty("Sec-Fetch-Dest", "empty");
+        connection.setRequestProperty("Sec-Fetch-Mode", "cors");
+        connection.setRequestProperty("Sec-Fetch-Site", "same-origin");
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0");
+        connection.setRequestProperty("X-XSRF-TOKEN", "0023e620-b52e-4ede-98f4-455d5363fddd");
+        connection.setRequestProperty("sec-ch-ua", "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"");
+        connection.setRequestProperty("sec-ch-ua-mobile", "?0");
+        connection.setRequestProperty("sec-ch-ua-platform", "\"Windows\"");
+        // 获取响应代码
+        int responseCode = connection.getResponseCode();
+        // 读取响应内容
+        BufferedReader reader;
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        } else {
+            reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+        }
+        // 打印响应内容
+        String line;
+        StringBuilder response = new StringBuilder();
+        while ((line = reader.readLine()) != null) {
+            response.append(line);
+        }
+        reader.close();
+        // 关闭连接
+        connection.disconnect();
+        return response.toString();
+    }
 
 }

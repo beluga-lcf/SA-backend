@@ -10,4 +10,5 @@ public class ReferenceWork {
     public String workName;
     public String sourceName;
     public String publicationYear;
+
 }
