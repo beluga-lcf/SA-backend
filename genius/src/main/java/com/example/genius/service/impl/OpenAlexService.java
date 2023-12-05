@@ -86,8 +86,23 @@ public class OpenAlexService {
         String url = "https://api.openalex.org/works/"+workID+"?select=grants";
         return restTemplate.getForObject(url, String.class);
     }
+    public String getConceptByUser(String userID){
+        String url = "https://api.openalex.org/authors/"+userID+"?select=x_concepts";
+        return restTemplate.getForObject(url, String.class);
+    }
+    public String getWorkidByWorkname(String username){//通过作品名字获取作品ID
+        String url = "https://api.openalex.org/works?filter=title.search:"+username;
+        return restTemplate.getForObject(url, String.class);
+    }
+    public String getAuthorIDByWorkID(String workid){//通过作品ID获取作品作者的ID,直接传入以HTTP为头的ID
+        workid = workid.substring(20);
+        String url = "https://api.openalex.org/works/"+workid+"?select=authorships";
+        return restTemplate.getForObject(url, String.class);
+    }
+    
 
 }
+
 
 
 
