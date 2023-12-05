@@ -5,13 +5,9 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.example.genius.dto.userPackage.OpenalexInform;
-import com.example.genius.dto.userPackage.ScholarInform;
-import com.example.genius.dto.userPackage.Token;
-import com.example.genius.dto.userPackage.UserInform;
+import com.example.genius.dto.userPackage.*;
 import com.example.genius.dto.mywork.ConceptDis;
 import com.example.genius.dto.mywork.MyWorkDis;
-import com.example.genius.entity.Mail;
 import com.alibaba.fastjson2.JSON;
 import com.example.genius.entity.Response;
 import com.example.genius.entity.User;
@@ -19,23 +15,17 @@ import com.example.genius.entity.UseridRelatedOpenalexid;
 import com.example.genius.enums.ErrorType;
 import com.example.genius.mapper.UseridRelatedOpenalexidMapper;
 import com.example.genius.mapper.UserMapper;
-import com.example.genius.service.EmailService;
-import com.example.genius.service.UseridRelatedOpenalexService;
-import com.example.genius.service.UserService;
+import com.example.genius.service.*;
 import com.example.genius.service.UseridRelatedOpenalexService;
 import com.example.genius.service.impl.OpenAlexService;
 import com.example.genius.util.RedisUtils;
-import com.example.genius.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -59,15 +49,20 @@ public class UserController extends BaseController {
     private UseridRelatedOpenalexidMapper uroMapper;
 
     @Autowired
+    private UserId2PSTIdService userId2PSTIdService;
+    @Autowired
+    private UserId2PSPIdService userId2PSPIdService;
+
+    @Autowired
     private EmailService emailService;
     @Autowired
     private OpenAlexService openAlexService;
     @Autowired
     private RedisUtils redisUtils;
 
-    public boolean checkVrCode(String email,String code){
-        if(redisUtils.get(email) != null){
-            if(code.equals(redisUtils.get(email))){
+    public boolean checkVrCode(String email, String code) {
+        if (redisUtils.get(email) != null) {
+            if (code.equals(redisUtils.get(email))) {
                 return true;
             }
         }
@@ -76,24 +71,24 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.GET)
-    public Response register(String nick_name, String email, String password, String captcha){
+    public Response register(String nick_name, String email, String password, String captcha) {
         User user = new User();
         user.setNickName(nick_name);
         user.setEmail(email);
         user.setPassword(password);
-        if (captcha != null) {
-            user.setPersonDescription(captcha);
-        }
+//        if (captcha != null) {
+//            user.setPersonDescription(captcha);
+//        }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("email", email);
         User check_user = userService.getOne(queryWrapper);
-        if(check_user!=null){
+        if (check_user != null) {
             return getErrorResponse(null, ErrorType.already_registerd);
-        }
-//        else if (!Objects.equals(captcha, redisUtils.get(email))) {
-//            return getErrorResponse(ErrorType.wrong_captcha);
-//        }
-        else {
+        } else if (!checkVrCode(email, captcha)) {
+            log.info(captcha);
+            log.info(redisUtils.get(email));
+            return getErrorResponse(null, ErrorType.wrong_captcha);
+        } else {
             userService.save(user);
             log.info("There is a new user! " + user.getNickName());
             return getSuccessResponse(null);
@@ -101,21 +96,20 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public Response login(@RequestBody JSONObject loginInform){
+    public Response login(@RequestBody JSONObject loginInform) {
         String email = loginInform.getString("email");
         String password = loginInform.getString("password");
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("email", email);
         User checkUser = userService.getOne(queryWrapper);
-        if(checkUser == null) {
+        if (checkUser == null) {
             return getErrorResponse(null, ErrorType.without_register);
         }
-        if(!checkUser.getPassword().equalsIgnoreCase(password)){
+        if (!checkUser.getPassword().equalsIgnoreCase(password)) {
             return getErrorResponse(null, ErrorType.wrong_pwd);
-        }
-        else {
+        } else {
             String token = contextLoads(email, Math.toIntExact(checkUser.getUserId()));
-            session.setAttribute("userId",checkUser.getUserId());
+            session.setAttribute("userId", checkUser.getUserId());
             log.info("一名用户已登录,id:" + checkUser.getUserId());
             Token atoken = new Token(token);
             return getSuccessResponse(atoken);
@@ -128,7 +122,7 @@ public class UserController extends BaseController {
 
         Calendar instance = Calendar.getInstance();
         // 3600秒后令牌token失效
-        instance.add(Calendar.SECOND,3600);
+        instance.add(Calendar.SECOND, 3600 * 5);
 
         String token = JWT.create()
                 .withHeader(map) // header可以不写，因为默认值就是它
@@ -141,21 +135,19 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/sendVerifyCode", method = RequestMethod.POST)
-    public Response sendVerifyCode(String email, String type){ //邮箱，类型
-        if(redisUtils.get(email) != null){
-            return getErrorResponse(null,ErrorType.already_send_email);
+    public Response sendVerifyCode(String email) { //邮箱，类型
+        if (redisUtils.get(email) != null) {
+            return getErrorResponse(null, ErrorType.already_send_email);
         }
         Random random = new Random();
-        if(type.equals("register")){
-            int vrcode = random.nextInt(9000)+1000;
-            redisUtils.set(email,String.valueOf(vrcode), 60L, TimeUnit.SECONDS);
-            emailService.sendRegisterVerifyMail(email,String.valueOf(vrcode));
-        }
+        int vrcode = random.nextInt(9000) + 1000;
+        redisUtils.set(email, String.valueOf(vrcode), 60L, TimeUnit.SECONDS);
+        emailService.sendRegisterVerifyMail(email, String.valueOf(vrcode));
         return getSuccessResponse("验证码已发送！");
     }
 
     @RequestMapping(value = "/relateOpenalex", method = RequestMethod.GET)
-    public Response relateOpenalex(String openalexId){// 依据openalexID与Userid进行连接
+    public Response relateOpenalex(String openalexId) {// 依据openalexID与Userid进行连接
         System.out.println("11");
 //        Integer userid = (Integer) session.getAttribute("userId");
         UseridRelatedOpenalexid a = new UseridRelatedOpenalexid();
@@ -166,62 +158,15 @@ public class UserController extends BaseController {
         a.setOpenalexid(openalexId);
         QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", 1);
-        List<UseridRelatedOpenalexid> userids =uroMapper.selectList(queryWrapper);
-        if(!userids.isEmpty()){
+        List<UseridRelatedOpenalexid> userids = uroMapper.selectList(queryWrapper);
+        if (!userids.isEmpty()) {
             return getErrorResponse(null, ErrorType.already_registerd);
-        }
-        else {
+        } else {
             uroService.save(a);
-            log.info("There is a new expert!"+1);
+            log.info("There is a new expert!" + 1);
             return getSuccessResponse("学者认证成功！");
         }
 
-    }
-
-    @GetMapping(value = "/getWorks")
-    public Response getWorks() {//依据用户ID获取学术成果
-        System.out.println("12");
-        //int userid = (int)session.getAttribute("userId");
-        int userid = 1;
-        QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", userid);
-        UseridRelatedOpenalexid a = uroService.getOne(queryWrapper);
-        if (a == null) {
-            return getSimpleError(); // Errortype to be done
-        }
-        String openalexId = a.getOpenalexid();
-        System.out.println(openalexId);
-        String jsons = openAlexService.getWorksByUser(openalexId);
-        JSONObject json = JSONObject.parseObject(jsons);
-        String resJson = json.getString("results");
-        JSONArray resArray = JSON.parseArray(resJson);
-//        JSONArray jsonArray = new JSONArray();
-        MyWorkDis myWorkDis = new MyWorkDis();
-        for (int i = 0; i < resArray.size(); i++) {
-            JSONObject j = resArray.getJSONObject(i);
-            myWorkDis.setId(j.getString("id"));
-            myWorkDis.setTitle(j.getString("title"));
-            myWorkDis.setDate(j.getString("publication_date"));
-            JSONArray j2 = j.getJSONArray("concepts");
-            for (int k = 0; k < j2.size(); k++) {
-                myWorkDis.getConceptDis().add(new ConceptDis(j2.getJSONObject(k).getString("display_name")));
-            }
-//            JSONObject o1 = new JSONObject();
-//            o1.put("id", j.getString("id"));
-//            o1.put("title", j.getString("title"));
-//            o1.put("date", j.getString("publication_date"));
-//            JSONArray j3 = new JSONArray();
-//            JSONArray j2 = j.getJSONArray("concepts");
-//            for(int k = 0; k < j2.size(); k++) {
-//                JSONObject k2 = new JSONObject();
-//                k2.put("name",j2.getJSONObject(k).getString("display_name"));
-//                j3.add(k2);
-//            }
-//            o1.put("concepts",j3);
-//            jsonArray.add(o1);
-//        }
-        }
-        return getSuccessResponse(myWorkDis);
     }
 
     /*
@@ -254,13 +199,22 @@ public class UserController extends BaseController {
             String anick_name = checkUser.getNickName();
             Integer asex = checkUser.getSex();
             String aperson_description = checkUser.getPersonDescription();
-            return getSuccessResponse(new UserInform(aemail, anick_name, aperson_description, asex));
-        }
-        else if (userid == -1) {
-            return getErrorResponse(ErrorType.login_timeout);
-        }
-        else if (userid == -2) {
-            return getErrorResponse(ErrorType.jwt_illegal);
+            QueryWrapper<UseridRelatedOpenalexid> queryWrapperUro = new QueryWrapper<>();
+            queryWrapperUro.eq("user_id", userid);
+            UseridRelatedOpenalexid searchUser = uroService.getOne(queryWrapperUro);
+            boolean isAuthor;
+            if (searchUser == null) {
+                // 未查到对应的openalex id, 可能是openalex没收录或不是认证学者
+                // 根据认证来源判断一定是没认证
+                isAuthor = false;
+            } else {
+                isAuthor = true;
+            }
+            return getSuccessResponse(new UserInform(aemail, anick_name, aperson_description, asex, isAuthor));
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
         }
         return null;
     }
@@ -275,13 +229,22 @@ public class UserController extends BaseController {
             QueryWrapper<User> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("userid", userid);
             User checkUser = userService.getOne(queryWrapper);
-            return getSuccessResponse(new UserInform(checkUser.getEmail(), checkUser.getNickName(), checkUser.getPersonDescription(), checkUser.getSex()));
-        }
-        else if (userid == -1) {
-            return getErrorResponse(ErrorType.login_timeout);
-        }
-        else if (userid == -2) {
-            return getErrorResponse(ErrorType.jwt_illegal);
+            QueryWrapper<UseridRelatedOpenalexid> queryWrapperUro = new QueryWrapper<>();
+            queryWrapperUro.eq("user_id", userid);
+            UseridRelatedOpenalexid searchUser = uroService.getOne(queryWrapperUro);
+            boolean isAuthor;
+            if (searchUser == null) {
+                // 未查到对应的openalex id, 可能是openalex没收录或不是认证学者
+                // 根据认证来源判断一定是没认证
+                isAuthor = false;
+            } else {
+                isAuthor = true;
+            }
+            return getSuccessResponse(new UserInform(checkUser.getEmail(), checkUser.getNickName(), checkUser.getPersonDescription(), checkUser.getSex(), isAuthor));
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
         }
         return null;
     }
@@ -305,20 +268,17 @@ public class UserController extends BaseController {
 //                jsonObject.put("message", "修改密码成功");
 //                String json = jsonObject.toJSONString();
                 return getSuccessResponse(null);
-            }
-            else {
+            } else {
                 log.info("密码错误");
 //                jsonObject.put("code", 206);
 //                jsonObject.put("message", "密码错误");
 //                String json = jsonObject.toJSONString();
-                return getErrorResponse(ErrorType.wrong_pwd);
+                return getErrorResponse(null, ErrorType.wrong_pwd);
             }
-        }
-        else if (userid == -1) {
-            return getErrorResponse(ErrorType.login_timeout);
-        }
-        else if (userid == -2) {
-            return getErrorResponse(ErrorType.jwt_illegal);
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
         }
         return null;
     }
@@ -335,21 +295,18 @@ public class UserController extends BaseController {
             if (searchUser == null) {
                 // 未查到对应的openalex id, 可能是openalex没收录或不是认证学者
                 // 根据认证来源判断一定是没认证
-                return getErrorResponse(ErrorType.not_scholar);
-            }
-            else {
+                return getErrorResponse(null, ErrorType.not_scholar);
+            } else {
                 ScholarInform scholarInform = openAlexService.getAuthorSingle(searchUser.getOpenalexid());
                 User user = userService.getById(user_id);
                 scholarInform.setEmail(user.getEmail());
                 scholarInform.setIntroduction(user.getPersonDescription());
                 return getSuccessResponse(scholarInform);
             }
-        }
-        else if (user_id == -1) {
-            return getErrorResponse(ErrorType.login_timeout);
-        }
-        else if (user_id == -2) {
-            return getErrorResponse(ErrorType.jwt_illegal);
+        } else if (user_id == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (user_id == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
         }
         return null;
     }
@@ -363,9 +320,8 @@ public class UserController extends BaseController {
         if (searchUser == null) {
             // 未查到对应的openalex id, 可能是openalex没收录或不是认证学者
             // 根据认证来源判断一定是没认证
-            return getErrorResponse(ErrorType.not_scholar);
-        }
-        else {
+            return getErrorResponse(null, ErrorType.not_scholar);
+        } else {
             ScholarInform scholarInform = openAlexService.getAuthorSingle(searchUser.getOpenalexid());
             User user = userService.getById(user_id);
             scholarInform.setEmail(user.getEmail());
@@ -373,4 +329,139 @@ public class UserController extends BaseController {
             return getSuccessResponse(scholarInform);
         }
     }
+
+    @RequestMapping(value = "/disregister", method = RequestMethod.POST)
+    public Response disRegister(@RequestHeader(value = "Authorization") String token) {
+        // jwt解出id
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("userid", userid);
+            userService.remove(queryWrapper);
+            getSuccessResponse(null);
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
+        }
+        return null;
+    }
+
+    // TODO: 收藏论文
+    @RequestMapping(value = "/collectThesis", method = RequestMethod.POST)
+    public Response collectThesis(@RequestHeader(value = "Authorization") String token, @RequestBody ThesisRequest thesisRequest) {
+        // jwt解出id
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
+            try {
+                ThesisResult result = userId2PSTIdService.collectT(userid, thesisRequest);
+                if (result.getCode() == 200) {
+                    return getSuccessResponse(result);
+                }
+                else if (result.getCode() == 1011){
+                    return getErrorResponse(null, ErrorType.collect_T_duplicate);
+                }
+                else {
+                    return getSimpleError();
+                }
+            }
+            catch (Exception e) {
+                return getSimpleError();
+            }
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
+        }
+        return null;
+    }
+
+    // TODO: 收藏专利
+    @RequestMapping(value = "/collectPatent", method = RequestMethod.POST)
+    public Response collectPatent(@RequestHeader(value = "Authorization") String token, @RequestBody RePatentRequest patentRequest) {
+        // jwt解出id
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
+            try {
+                RePatentResult result = userId2PSPIdService.collectP(userid, patentRequest);
+                if (result.getCode() == 200) {
+                    return getSuccessResponse(result);
+                }
+                else if (result.getCode() == 1013) {
+                    return getErrorResponse(null, ErrorType.collect_P_duplicate);
+                }
+            }
+            catch (Exception e) {
+                return getSimpleError();
+            }
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
+        }
+        return null;
+    }
+
+    // TODO: 删除收藏论文
+    @RequestMapping(value = "/deleteThesis", method = RequestMethod.POST)
+    public Response deleteThesis(@RequestHeader(value = "Authorization") String token, @RequestBody ThesisRequest thesisRequest) {
+        // jwt解出id
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
+            try {
+                ThesisResult result = userId2PSTIdService.deleteT(userid, thesisRequest);
+                if (result.getCode() == 200) {
+                    return getSuccessResponse(result);
+                }
+                else if (result.getCode() == 1012) {
+                    return getErrorResponse(null, ErrorType.collect_T_not_found);
+                }
+                else {
+                    return getSimpleError();
+                }
+            }
+            catch (Exception e) {
+                return getSimpleError();
+            }
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
+        }
+        return null;
+    }
+
+    // TODO: 删除收藏专利
+    @RequestMapping(value = "/deletePatent", method = RequestMethod.POST)
+    public Response deletePatent(@RequestHeader(value = "Authorization") String token, @RequestBody RePatentRequest rePatentRequest) {
+        // jwt解出id
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
+            try {
+                RePatentResult result = userId2PSPIdService.deleteP(userid, rePatentRequest);
+                if (result.getCode() == 200) {
+                    return getSuccessResponse(result);
+                }
+                else if (result.getCode() == 1012) {
+                    return getErrorResponse(null, ErrorType.collect_P_not_found);
+                }
+                else {
+                    return getSimpleError();
+                }
+            }
+            catch (Exception e) {
+                return getSimpleError();
+            }
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
+        }
+        return null;
+    }
+
+    // TODO: 搜索收藏论文
+    // TODO: 搜索收藏专利
+    // TODO: 收否收藏指定ID论文
+    // TODO: 收否收藏指定ID专利
 }
