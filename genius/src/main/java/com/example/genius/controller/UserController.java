@@ -5,6 +5,9 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.genius.dto.userPackage.OpenalexInform;
+import com.example.genius.dto.userPackage.Token;
+import com.example.genius.dto.userPackage.UserInform;
 import com.example.genius.entity.Mail;
 import com.alibaba.fastjson2.JSON;
 import com.example.genius.entity.Response;
@@ -53,20 +56,21 @@ public class UserController extends BaseController {
     @Autowired
     private OpenAlexService openAlexService;
 
-    @RequestMapping(value = "/api/register", method = RequestMethod.POST)
-    public Response register(String email, String password, String captcha){
+    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    public Response register(String nick_name, String email, String password, String captcha){
         User user = new User();
+        user.setNickName(nick_name);
         user.setEmail(email);
         user.setPassword(password);
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("email", email);
         User check_user = userService.getOne(queryWrapper);
-        JSONObject jsonObject = new JSONObject();
+//        JSONObject jsonObject = new JSONObject();
         if(check_user!=null){
-            jsonObject.put("code", 201);
-            jsonObject.put("message", "邮箱已被注册");
-            String json = jsonObject.toJSONString();
-            return getErrorResponse(json);
+//            jsonObject.put("code", 201);
+//            jsonObject.put("message", "邮箱已被注册");
+//            String json = jsonObject.toJSONString();
+            return getErrorResponse(null, ErrorType.already_registerd);
         }
 //        else if (captcha != /*本地验证码*/) {
 //            return getErrorResponse(401, "验证码错误");
@@ -74,10 +78,10 @@ public class UserController extends BaseController {
         else {
             userService.save(user);
             log.info("There is a new user! " + user.getNickName());
-            jsonObject.put("code", 200);
-            jsonObject.put("message", "注册成功");
-            String json = jsonObject.toJSONString();
-            return getSuccessResponse(json);
+//            jsonObject.put("code", 200);
+//            jsonObject.put("message", "注册成功");
+//            String json = jsonObject.toJSONString();
+            return getSuccessResponse(null);
         }
     }
 
@@ -86,28 +90,31 @@ public class UserController extends BaseController {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("email", email);
         User checkUser = userService.getOne(queryWrapper);
-        JSONObject jsonObject = new JSONObject();
+//        JSONObject jsonObject = new JSONObject();
         if(checkUser == null) {
-            jsonObject.put("code", 202);
-            jsonObject.put("message", "邮箱未注册");
-            String json = jsonObject.toJSONString();
-            return getErrorResponse(json);
+//            jsonObject.put("code", 202);
+//            jsonObject.put("token", 0);
+//            jsonObject.put("message", "邮箱未注册");
+//            String json = jsonObject.toJSONString();
+            return getErrorResponse(null, ErrorType.without_register);
         }
-        if(checkUser.getPassword().equalsIgnoreCase(password)){
-            jsonObject.put("code", 203);
-            jsonObject.put("message", "用户名或密码错误");
-            String json = jsonObject.toJSONString();
-            return getErrorResponse(json);
+        if(!checkUser.getPassword().equalsIgnoreCase(password)){
+//            jsonObject.put("code", 203);
+//            jsonObject.put("token", 0);
+//            jsonObject.put("message", "用户名或密码错误");
+//            String json = jsonObject.toJSONString();
+            return getErrorResponse(null, ErrorType.wrong_pwd);
         }
         else {
             String token = contextLoads(email, Math.toIntExact(checkUser.getUserId()));
             session.setAttribute("userId",checkUser.getUserId());
-            jsonObject.put("code", 200);
-            jsonObject.put("token", token);
-            jsonObject.put("message", "登陆成功");
-            String json = jsonObject.toJSONString();
+//            jsonObject.put("code", 200);
+//            jsonObject.put("token", token);
+//            jsonObject.put("message", "登陆成功");
+//            String json = jsonObject.toJSONString();
             log.info("一名用户已登录,id:" + checkUser.getUserId());
-            return getSuccessResponse(json);
+            Token atoken = new Token(token);
+            return getSuccessResponse(atoken);
         }
     }
 
@@ -123,7 +130,7 @@ public class UserController extends BaseController {
                 .withHeader(map) // header可以不写，因为默认值就是它
                 .withClaim("email", email)  //payload
 //                .withClaim("email", "2505293361@qq.com")
-                .withClaim("user_id", id)
+                .withClaim("userid", id)
                 .withExpiresAt(instance.getTime()) // 指定令牌的过期时间
                 .sign(Algorithm.HMAC256("Wunderkinder"));//签名
         return token;
@@ -137,7 +144,7 @@ public class UserController extends BaseController {
         return getSuccessResponse("验证码已发送！");
     }
 
-    @RequestMapping(value = "/relateOpenalex",method = RequestMethod.GET)
+    @RequestMapping(value = "/relateOpenalex", method = RequestMethod.GET)
     public Response relateOpenalex(String openalexId){// 依据openalexID与Userid进行连接
         System.out.println("11");
 //        Integer userid = (Integer) session.getAttribute("userId");
@@ -202,15 +209,15 @@ public class UserController extends BaseController {
     /*
     修改个人信息
      */
-    @RequestMapping(value = "/api/update", method = RequestMethod.POST)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     public Response updateUserInform(@RequestHeader(value = "Authorization") String token, String nick_name, Integer sex, String person_description) {
         JSONObject jsonObject = new JSONObject();
         // jwt解出id
-        int user_id = getIdByJwt(token);
-        if (user_id >= 0) {
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
             // 获取用户
             QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("user_id", user_id);
+            queryWrapper.eq("userid", userid);
             User checkUser = userService.getOne(queryWrapper);
             // 更新信息 updateById
             if (nick_name != null) {
@@ -223,46 +230,112 @@ public class UserController extends BaseController {
                 checkUser.setPersonDescription(person_description);
             }
             userService.updateById(checkUser);
-            jsonObject.put("code", 200);
-            jsonObject.put("nick_name", checkUser.getNickName());
-            jsonObject.put("sex", checkUser.getSex());
-            jsonObject.put("person_description", checkUser.getPersonDescription());
-            jsonObject.put("message", "更新成功");
-            String json = jsonObject.toJSONString();
-            getSuccessResponse(json);
-            return null;
+//            jsonObject.put("code", 200);
+            String aemail = checkUser.getEmail();
+//            jsonObject.put("nick_name", checkUser.getNickName());
+            String anick_name = checkUser.getNickName();
+//            jsonObject.put("sex", checkUser.getSex());
+            Integer asex = checkUser.getSex();
+//            jsonObject.put("person_description", checkUser.getPersonDescription());
+            String aperson_description = checkUser.getPersonDescription();
+//            jsonObject.put("message", "更新成功");
+//            String json = jsonObject.toJSONString();
+            return getSuccessResponse(new UserInform(aemail, anick_name, aperson_description, asex));
+        }
+        else if (userid == -1) {
+            return getErrorResponse(ErrorType.login_timeout);
+        }
+        else if (userid == -2) {
+            return getErrorResponse(ErrorType.jwt_illegal);
         }
         return null;
     }
 
-    @RequestMapping(value = "/api/changepw", method = RequestMethod.POST)
-    public Response changePassword(@RequestHeader(value = "Authorization") String token, String oldPw, String newPw) {
+    @RequestMapping(value = "/getinform", method = RequestMethod.GET)
+    public Response getUserInform(@RequestHeader(value = "Authorization") String token) {
         JSONObject jsonObject = new JSONObject();
         // jwt解出id
-        int user_id = getIdByJwt(token);
-        if (user_id >= 0) {
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
+            // 获取用户
             QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("user_id", user_id);
+            queryWrapper.eq("userid", userid);
+            User checkUser = userService.getOne(queryWrapper);
+            return getSuccessResponse(new UserInform(checkUser.getEmail(), checkUser.getNickName(), checkUser.getPersonDescription(), checkUser.getSex()));
+        }
+        else if (userid == -1) {
+            return getErrorResponse(ErrorType.login_timeout);
+        }
+        else if (userid == -2) {
+            return getErrorResponse(ErrorType.jwt_illegal);
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "/changepw", method = RequestMethod.POST)
+    public Response changePassword(@RequestHeader(value = "Authorization") String token, String oldPw, String newPw) {
+//        JSONObject jsonObject = new JSONObject();
+        // jwt解出id
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("userid", userid);
             User user = userService.getOne(queryWrapper);
             // 验证旧密码正确
             if (oldPw.equals(user.getPassword())) {
                 user.setPassword(newPw);
                 userService.updateById(user);
                 log.info("已修改密码");
-                jsonObject.put("code", 200);
-                jsonObject.put("message", "修改密码成功");
-                String json = jsonObject.toJSONString();
-                getSuccessResponse(json);
-                return null;
+//                jsonObject.put("code", 200);
+//                jsonObject.put("message", "修改密码成功");
+//                String json = jsonObject.toJSONString();
+                return getSuccessResponse(null);
             }
             else {
                 log.info("密码错误");
-                jsonObject.put("code", 206);
-                jsonObject.put("message", "密码错误");
-                String json = jsonObject.toJSONString();
-                getErrorResponse(json);
-                return null;
+//                jsonObject.put("code", 206);
+//                jsonObject.put("message", "密码错误");
+//                String json = jsonObject.toJSONString();
+                return getErrorResponse(ErrorType.wrong_pwd);
             }
+        }
+        else if (userid == -1) {
+            return getErrorResponse(ErrorType.login_timeout);
+        }
+        else if (userid == -2) {
+            return getErrorResponse(ErrorType.jwt_illegal);
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "/getScholarInfo", method = RequestMethod.GET)
+    public Response getScholarInfo(@RequestHeader(value = "Authorization") String token) {
+        JSONObject jsonObject = new JSONObject();
+        // jwt解出id
+        int user_id = getIdByJwt(token);
+        if (user_id >= 0) {
+            // 查关联表
+            QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("user_id", user_id);
+            UseridRelatedOpenalexid searchUser = uroService.getOne(queryWrapper);
+            if (searchUser == null) {
+                // 未查到对应的openalex id, 可能是openalex没收录或不是认证学者
+                // 根据认证来源判断一定是没认证
+                return getErrorResponse(ErrorType.not_scholar);
+            }
+            else {
+                QueryWrapper<User> queryWrapperUser = new QueryWrapper<>();
+                queryWrapperUser.eq("userid", user_id);
+                User user = userService.getOne(queryWrapperUser);
+                OpenalexInform openalexInform = new OpenalexInform();
+                return getSuccessResponse(new ScholarInform(user, searchUser));
+            }
+        }
+        else if (user_id == -1) {
+            return getErrorResponse(ErrorType.login_timeout);
+        }
+        else if (user_id == -2) {
+            return getErrorResponse(ErrorType.jwt_illegal);
         }
         return null;
     }

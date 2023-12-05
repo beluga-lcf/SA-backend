@@ -68,28 +68,28 @@ public class BaseController {
         try {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256("Wunderkinder")).build();
             DecodedJWT verify = jwtVerifier.verify(token);
-            log.info(String.valueOf(verify.getClaim("email")));
-            log.info(String.valueOf(verify.getClaim("user_id")));
+            log.info("邮箱" + String.valueOf(verify.getClaim("email")));
+            log.info("序号" + String.valueOf(verify.getClaim("userid")));
             log.info("令牌过期时间：" + verify.getExpiresAt());
-            return Integer.parseInt(String.valueOf(verify.getClaim("user_id")));
+            return Integer.parseInt(String.valueOf(verify.getClaim("userid")));
         } catch (TokenExpiredException e) {
             // 处理令牌过期异常
             log.info("令牌已过期");
-            JSONObject jsonObject = new JSONObject();
+//            JSONObject jsonObject = new JSONObject();
             int user_id = getIdByJwt(token);
-            jsonObject.put("code", 204);
-            jsonObject.put("message", "登录过期，请重新登陆");
-            String json = jsonObject.toJSONString();
-            getErrorResponse(json);
+//            jsonObject.put("code", 204);
+//            jsonObject.put("message", "登录过期，请重新登陆");
+//            String json = jsonObject.toJSONString();
+//            getErrorResponse(ErrorType.login_timeout);
             return -1;
         } catch (JWTVerificationException e) {
             // 处理非法令牌异常
             log.info("非法令牌");
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("code", 203);
-            jsonObject.put("message", "请先登录");
-            String json = jsonObject.toJSONString();
-            getErrorResponse(json);
+//            JSONObject jsonObject = new JSONObject();
+//            jsonObject.put("code", 203);
+//            jsonObject.put("message", "请先登录");
+//            String json = jsonObject.toJSONString();
+//            getErrorResponse(ErrorType.jwt_illegal);
             return -2;
         }
     }
