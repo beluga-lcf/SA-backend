@@ -14,7 +14,10 @@ public enum ErrorType {
     collect_T_duplicate(1011, "重复收藏论文"),
     collect_T_not_found(1012, "未收藏论文"),
     collect_P_duplicate(1013, "重复收藏专利"),
-    collect_P_not_found(1014, "未收藏专利");
+    collect_P_not_found(1014, "未收藏专利"),
+    select_T_not_found(1015, "未查询到收藏论文"),
+    select_P_not_found(1016, "未查询到收藏专利"),
+    select_mod_unknown(1017, "未知的查询模式");
 
     public Integer code;
     public String message;

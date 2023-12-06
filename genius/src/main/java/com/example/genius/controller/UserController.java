@@ -13,6 +13,7 @@ import com.example.genius.entity.Response;
 import com.example.genius.entity.User;
 import com.example.genius.entity.UseridRelatedOpenalexid;
 import com.example.genius.enums.ErrorType;
+import com.example.genius.enums.SelectCollectMod;
 import com.example.genius.mapper.UseridRelatedOpenalexidMapper;
 import com.example.genius.mapper.UserMapper;
 import com.example.genius.service.*;
@@ -347,7 +348,6 @@ public class UserController extends BaseController {
         return null;
     }
 
-    // TODO: 收藏论文
     @RequestMapping(value = "/collectThesis", method = RequestMethod.POST)
     public Response collectThesis(@RequestHeader(value = "Authorization") String token, @RequestBody ThesisRequest thesisRequest) {
         // jwt解出id
@@ -356,7 +356,7 @@ public class UserController extends BaseController {
             try {
                 ThesisResult result = userId2PSTIdService.collectT(userid, thesisRequest);
                 if (result.getCode() == 200) {
-                    return getSuccessResponse(result);
+                    return getSuccessResponse(result.getThesisList());
                 }
                 else if (result.getCode() == 1011){
                     return getErrorResponse(null, ErrorType.collect_T_duplicate);
@@ -366,6 +366,8 @@ public class UserController extends BaseController {
                 }
             }
             catch (Exception e) {
+                log.info("    请求失败");
+                log.error(String.valueOf(e));
                 return getSimpleError();
             }
         } else if (userid == -1) {
@@ -376,7 +378,6 @@ public class UserController extends BaseController {
         return null;
     }
 
-    // TODO: 收藏专利
     @RequestMapping(value = "/collectPatent", method = RequestMethod.POST)
     public Response collectPatent(@RequestHeader(value = "Authorization") String token, @RequestBody RePatentRequest patentRequest) {
         // jwt解出id
@@ -385,7 +386,7 @@ public class UserController extends BaseController {
             try {
                 RePatentResult result = userId2PSPIdService.collectP(userid, patentRequest);
                 if (result.getCode() == 200) {
-                    return getSuccessResponse(result);
+                    return getSuccessResponse(result.getPatentList());
                 }
                 else if (result.getCode() == 1013) {
                     return getErrorResponse(null, ErrorType.collect_P_duplicate);
@@ -402,7 +403,6 @@ public class UserController extends BaseController {
         return null;
     }
 
-    // TODO: 删除收藏论文
     @RequestMapping(value = "/deleteThesis", method = RequestMethod.POST)
     public Response deleteThesis(@RequestHeader(value = "Authorization") String token, @RequestBody ThesisRequest thesisRequest) {
         // jwt解出id
@@ -411,7 +411,7 @@ public class UserController extends BaseController {
             try {
                 ThesisResult result = userId2PSTIdService.deleteT(userid, thesisRequest);
                 if (result.getCode() == 200) {
-                    return getSuccessResponse(result);
+                    return getSuccessResponse(result.getThesisList());
                 }
                 else if (result.getCode() == 1012) {
                     return getErrorResponse(null, ErrorType.collect_T_not_found);
@@ -431,7 +431,6 @@ public class UserController extends BaseController {
         return null;
     }
 
-    // TODO: 删除收藏专利
     @RequestMapping(value = "/deletePatent", method = RequestMethod.POST)
     public Response deletePatent(@RequestHeader(value = "Authorization") String token, @RequestBody RePatentRequest rePatentRequest) {
         // jwt解出id
@@ -440,7 +439,7 @@ public class UserController extends BaseController {
             try {
                 RePatentResult result = userId2PSPIdService.deleteP(userid, rePatentRequest);
                 if (result.getCode() == 200) {
-                    return getSuccessResponse(result);
+                    return getSuccessResponse(result.getPatentList());
                 }
                 else if (result.getCode() == 1012) {
                     return getErrorResponse(null, ErrorType.collect_P_not_found);
@@ -460,8 +459,146 @@ public class UserController extends BaseController {
         return null;
     }
 
-    // TODO: 搜索收藏论文
+    @RequestMapping(value = "/selectCT", method = RequestMethod.GET)
+    public Response selectCT(@RequestHeader(value = "Authorization") String token, String selectTName, String mod) {
+        // jwt解出id
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
+            SelectCollectMod sMod;
+            switch (mod) {
+                case "full": {
+                    sMod = SelectCollectMod.contain_full;
+                    break;
+                }
+                case "fragment": {
+                    sMod = SelectCollectMod.contain_fragment;
+                    break;
+                }
+                default: {
+                    sMod = null;
+                }
+            }
+            try {
+                ThesisResult result = userId2PSTIdService.selectT(userid, selectTName, sMod);
+                if (result.getCode() == 200) {
+                    return getSuccessResponse(result.getThesisList());
+                }
+                else if (result.getCode() == 1015) {
+                    return getErrorResponse(null, ErrorType.select_T_not_found);
+                }
+                else if (result.getCode() == 1017) {
+                    return getErrorResponse(null, ErrorType.select_mod_unknown);
+                }
+                else {
+                    return getSimpleError();
+                }
+            }
+            catch (Exception e) {
+                return getSimpleError();
+            }
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
+        }
+        return null;
+    }
+
     // TODO: 搜索收藏专利
-    // TODO: 收否收藏指定ID论文
-    // TODO: 收否收藏指定ID专利
+    @RequestMapping(value = "/selectCP", method = RequestMethod.GET)
+    public Response selectCP(@RequestHeader(value = "Authorization") String token, String selectPName, String mod) {
+        // jwt解出id
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
+            SelectCollectMod sMod;
+            switch (mod) {
+                case "full": {
+                    sMod = SelectCollectMod.contain_full;
+                    break;
+                }
+                case "fragment": {
+                    sMod = SelectCollectMod.contain_fragment;
+                    break;
+                }
+                default: {
+                    sMod = null;
+                }
+            }
+            try {
+                RePatentResult result = userId2PSPIdService.selectP(userid, selectPName, sMod);
+                if (result.getCode() == 200) {
+                    return getSuccessResponse(result.getPatentList());
+                }
+                else if (result.getCode() == 1016) {
+                    return getErrorResponse(null, ErrorType.select_P_not_found);
+                }
+                else if (result.getCode() == 1017) {
+                    return getErrorResponse(null, ErrorType.select_mod_unknown);
+                }
+                else {
+                    return getSimpleError();
+                }
+            }
+            catch (Exception e) {
+                return getSimpleError();
+            }
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "/checkcollcetT", method = RequestMethod.GET)
+    public Response checkCollectThesis(@RequestHeader(value = "Authorization") String token, String thesisId) {
+        // jwt解出id
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
+            try {
+                ThesisResult result = userId2PSTIdService.checkT(userid, thesisId);
+                if (result.getCode() == 200) {
+                    return getSuccessResponse(result.getThesisList());
+                }
+                else {
+                    return getSimpleError();
+                }
+            }
+            catch (Exception e) {
+                return getSimpleError();
+            }
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "/checkcollectP", method = RequestMethod.GET)
+    public Response checkCollectPatent(@RequestHeader(value = "Authorization") String token, String rePatentId) {
+        // jwt解出id
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
+            try {
+//                log.info("    " + userid);
+//                log.info("    " + rePatentId);
+                RePatentResult result = userId2PSPIdService.checkP(userid, rePatentId);
+                if (result.getCode() == 200) {
+                    return getSuccessResponse(result.getPatentList());
+                }
+                else {
+                    return getSimpleError();
+                }
+            }
+            catch (Exception e) {
+                return getSimpleError();
+            }
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
+        }
+        return null;
+    }
 }
