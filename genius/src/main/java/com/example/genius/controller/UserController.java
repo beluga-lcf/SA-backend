@@ -6,6 +6,11 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.genius.dto.userPackage.*;
+import com.example.genius.dto.Approval.approvalRelateReturn;
+import com.example.genius.dto.userPackage.OpenalexInform;
+import com.example.genius.dto.userPackage.ScholarInform;
+import com.example.genius.dto.userPackage.Token;
+import com.example.genius.dto.userPackage.UserInform;
 import com.example.genius.dto.mywork.ConceptDis;
 import com.example.genius.dto.mywork.MyWorkDis;
 import com.alibaba.fastjson2.JSON;
@@ -19,16 +24,14 @@ import com.example.genius.service.*;
 import com.example.genius.service.UseridRelatedOpenalexService;
 import com.example.genius.service.impl.OpenAlexService;
 import com.example.genius.util.RedisUtils;
+import com.example.genius.util.StringUtil;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -147,26 +150,99 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/relateOpenalex", method = RequestMethod.GET)
-    public Response relateOpenalex(String openalexId) {// 依据openalexID与Userid进行连接
+    public Response relateOpenalex(String openalexId, @RequestHeader(value = "Authorization") String token){// 依据openalexID与Userid进行连接
         System.out.println("11");
-//        Integer userid = (Integer) session.getAttribute("userId");
+        Integer userid = getIdByJwt(token);
         UseridRelatedOpenalexid a = new UseridRelatedOpenalexid();
-//        if(userid == null){
-//            return getErrorResponse(null,ErrorType.not_login);
-//        }
-        a.setUserId(1);
+        a.setUserId(userid);
         a.setOpenalexid(openalexId);
+        a.setIscheck(0);
         QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", 1);
-        List<UseridRelatedOpenalexid> userids = uroMapper.selectList(queryWrapper);
-        if (!userids.isEmpty()) {
-            return getErrorResponse(null, ErrorType.already_registerd);
-        } else {
+        queryWrapper.eq("user_id", userid);
+        List<UseridRelatedOpenalexid> userids =uroMapper.selectList(queryWrapper);
+        if(!userids.isEmpty()){
+            return getErrorResponse(null, ErrorType.not_registerd);
+        }
+        else {
             uroService.save(a);
-            log.info("There is a new expert!" + 1);
-            return getSuccessResponse("学者认证成功！");
+            log.info("There is a new expert!"+1);
+            return getSuccessResponse("学者认证申请已发送！");
         }
 
+    }
+    @RequestMapping(value = "approvalRelate",method = RequestMethod.GET)
+    public Response approvalRelate(){
+        List<UseridRelatedOpenalexid> list = uroService.list();
+        ArrayList<approvalRelateReturn> list1 = new ArrayList<approvalRelateReturn>();
+        approvalRelateReturn approval = new approvalRelateReturn();
+        for(UseridRelatedOpenalexid u : list){
+            approval.setId(u.getUserId());
+            approval.setOpenalexID(u.getOpenalexid());
+            approval.setIscheck(u.getIscheck());
+            list1.add(approval);
+        }
+        return getSuccessResponse(list1);
+    }
+    @RequestMapping(value = "/agreeRelate",method = RequestMethod.GET)
+    public Response agreeRelate(int userid,int isAgree){
+
+        QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userid);
+        UseridRelatedOpenalexid a = uroService.getOne(queryWrapper);
+        if(a == null){
+            return getErrorResponse(null,ErrorType.no_relate);
+        }
+        if(isAgree!=1&&isAgree!=-1){
+            return getErrorResponse(null,ErrorType.invalid_check);
+        }
+        a.setIscheck(isAgree);
+        uroService.saveOrUpdate(a);
+        return getSuccessResponse("审批成功！");
+    }
+    @GetMapping(value = "/getWorks")
+    public Response getWorks() {//依据用户ID获取学术成果
+        System.out.println("12");
+        //int userid = (int)session.getAttribute("userId");
+        int userid = 1;
+        QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userid);
+        UseridRelatedOpenalexid a = uroService.getOne(queryWrapper);
+        if (a == null) {
+            return getSimpleError(); // Errortype to be done
+        }
+        String openalexId = a.getOpenalexid();
+        System.out.println(openalexId);
+        String jsons = openAlexService.getWorksByUser(openalexId);
+        JSONObject json = JSONObject.parseObject(jsons);
+        String resJson = json.getString("results");
+        JSONArray resArray = JSON.parseArray(resJson);
+//        JSONArray jsonArray = new JSONArray();
+        MyWorkDis myWorkDis = new MyWorkDis();
+        for (int i = 0; i < resArray.size(); i++) {
+            JSONObject j = resArray.getJSONObject(i);
+            myWorkDis.setId(j.getString("id"));
+            myWorkDis.setTitle(j.getString("title"));
+            myWorkDis.setDate(j.getString("publication_date"));
+            JSONArray j2 = j.getJSONArray("concepts");
+            for (int k = 0; k < j2.size(); k++) {
+                myWorkDis.getConceptDis().add(new ConceptDis(j2.getJSONObject(k).getString("display_name")));
+            }
+//            JSONObject o1 = new JSONObject();
+//            o1.put("id", j.getString("id"));
+//            o1.put("title", j.getString("title"));
+//            o1.put("date", j.getString("publication_date"));
+//            JSONArray j3 = new JSONArray();
+//            JSONArray j2 = j.getJSONArray("concepts");
+//            for(int k = 0; k < j2.size(); k++) {
+//                JSONObject k2 = new JSONObject();
+//                k2.put("name",j2.getJSONObject(k).getString("display_name"));
+//                j3.add(k2);
+//            }
+//            o1.put("concepts",j3);
+//            jsonArray.add(o1);
+//        }
+        }
+        return getSuccessResponse(myWorkDis);
     }
 
     /*

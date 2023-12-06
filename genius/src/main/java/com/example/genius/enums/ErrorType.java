@@ -14,7 +14,12 @@ public enum ErrorType {
     collect_T_duplicate(1011, "重复收藏论文"),
     collect_T_not_found(1012, "未收藏论文"),
     collect_P_duplicate(1013, "重复收藏专利"),
-    collect_P_not_found(1014, "未收藏专利");
+    collect_P_not_found(1014, "未收藏专利"),
+    no_relate(1015, "该用户ID不存在或未认证"),
+    invalid_check(1016,"不合法的审批"),
+    not_registerd(1017,"用户未注册！" ),
+    delete_failed(1018,"删除失败");
+
 
     public Integer code;
     public String message;

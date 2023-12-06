@@ -14,4 +14,6 @@ public class UseridRelatedOpenalexid {
     private Integer UserId;
     @TableField("openalexid")
     private String Openalexid;
+    @TableField("ischeck")
+    private int ischeck;
 }
