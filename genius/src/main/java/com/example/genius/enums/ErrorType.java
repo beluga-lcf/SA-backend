@@ -23,6 +23,7 @@ public enum ErrorType {
     select_P_not_found(1020, "未查询到收藏专利"),
     select_mod_unknown(1021, "未知的查询模式");
 
+
     public Integer code;
     public String message;
 

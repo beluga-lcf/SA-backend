@@ -126,6 +126,18 @@ public class OpenAlexService {
         String url = "https://api.openalex.org/works/"+workid+"?select=authorships";
         return restTemplate.getForObject(url, String.class);
     }
+    public String getFunderInfoByFunderID(String funderID){
+        funderID = funderID.substring(21);
+        System.out.println(funderID);
+        String url = "https://api.openalex.org/funders/"+funderID+"?select=display_name,country_code,homepage_url,description";
+        return restTemplate.getForObject(url, String.class);
+    }
+    public String getRelatedWork(String funderID){
+        funderID = funderID.substring(21);
+        String url = "https://api.openalex.org/works?filter=grants.funder:"+funderID+"&per-page=10&select=id,display_name";
+        return restTemplate.getForObject(url, String.class);
+    }
+
     
 
 }
