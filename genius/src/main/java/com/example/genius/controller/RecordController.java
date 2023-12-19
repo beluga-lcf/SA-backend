@@ -80,4 +80,8 @@ public class RecordController extends BaseController{
         }
         return getSuccessResponse(disrecords);
     }
+
+    // TODO: 总热点领域
+    // TODO: 总热点成果
+    // TODO: 月热点成果
 }
