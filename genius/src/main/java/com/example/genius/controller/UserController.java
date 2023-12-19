@@ -88,10 +88,10 @@ public class UserController extends BaseController {
         User check_user = userService.getOne(queryWrapper);
         if (check_user != null) {
             return getErrorResponse(null, ErrorType.already_registerd);
-//        } else if (!checkVrCode(email, captcha)) {
-//            log.info(captcha);
-//            log.info(redisUtils.get(email));
-//            return getErrorResponse(null, ErrorType.wrong_captcha);
+        } else if (!checkVrCode(email, captcha)) {
+            log.info(captcha);
+            log.info(redisUtils.get(email));
+            return getErrorResponse(null, ErrorType.wrong_captcha);
         } else {
             userService.save(user);
             log.info("There is a new user! " + user.getNickName());
