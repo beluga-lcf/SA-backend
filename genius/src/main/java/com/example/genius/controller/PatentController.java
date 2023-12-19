@@ -28,6 +28,7 @@ public class PatentController {
         headers.set("sec-ch-ua", "\"Not/A)Brand\";v=\"99\", \"Google Chrome\";v=\"115\", \"Chromium\";v=\"115\"");
         headers.set("sec-ch-ua-mobile", "?0");
         headers.set("sec-ch-ua-platform", "\"Windows\"");
+
         return  headers;
     }
     @GetMapping("/{patentid}")
