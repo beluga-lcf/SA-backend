@@ -21,7 +21,10 @@ public enum ErrorType {
     delete_failed(1018,"删除失败"),
     select_T_not_found(1019, "未查询到收藏论文"),
     select_P_not_found(1020, "未查询到收藏专利"),
-    select_mod_unknown(1021, "未知的查询模式");
+    select_mod_unknown(1021, "未知的查询模式"),
+    log_off_not_found(1101, "用户不存在"),
+    log_off_failed(1102, "注销失败");
+
 
 
     public Integer code;

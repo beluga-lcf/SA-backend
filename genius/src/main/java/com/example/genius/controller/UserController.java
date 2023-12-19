@@ -582,7 +582,6 @@ public class UserController extends BaseController {
         return null;
     }
 
-    // TODO: 搜索收藏专利
     @RequestMapping(value = "/selectCP", method = RequestMethod.GET)
     public Response selectCP(@RequestHeader(value = "Authorization") String token, String selectPName, String mod) {
         // jwt解出id
@@ -664,6 +663,39 @@ public class UserController extends BaseController {
                 RePatentResult result = userId2PSPIdService.checkP(userid, rePatentId);
                 if (result.getCode() == 200) {
                     return getSuccessResponse(result.getPatentList());
+                }
+                else {
+                    return getSimpleError();
+                }
+            }
+            catch (Exception e) {
+                return getSimpleError();
+            }
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "/logoff", method = RequestMethod.POST)
+    public Response logOff(@RequestHeader(value = "Authorization") String token) {
+        // jwt解出id
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
+            try {
+                int result = userService.logOff(userid);
+                if (result == 0) {
+                    return getSuccessResponse(null);
+                }
+                else if (result == -1) {
+                    // 删除用户不存在
+                    return getErrorResponse(null, ErrorType.log_off_not_found);
+                }
+                else if (result == -2) {
+                    // 删除失败
+                    return getErrorResponse(null, ErrorType.log_off_failed);
                 }
                 else {
                     return getSimpleError();
