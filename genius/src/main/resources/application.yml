@@ -8,7 +8,7 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://114.115.179.52:5432/postgres?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true
-    username: root
+    username: openalex
     password: "@Genius2023"
   mvc:
     path match:
