@@ -88,10 +88,10 @@ public class UserController extends BaseController {
         User check_user = userService.getOne(queryWrapper);
         if (check_user != null) {
             return getErrorResponse(null, ErrorType.already_registerd);
-        } else if (!checkVrCode(email, captcha)) {
-            log.info(captcha);
-            log.info(redisUtils.get(email));
-            return getErrorResponse(null, ErrorType.wrong_captcha);
+//        } else if (!checkVrCode(email, captcha)) {
+//            log.info(captcha);
+//            log.info(redisUtils.get(email));
+//            return getErrorResponse(null, ErrorType.wrong_captcha);
         } else {
             userService.save(user);
             log.info("There is a new user! " + user.getNickName());
@@ -218,6 +218,7 @@ public class UserController extends BaseController {
         String resJson = json.getString("results");
         JSONArray resArray = JSON.parseArray(resJson);
 //        JSONArray jsonArray = new JSONArray();
+        ArrayList<MyWorkDis> myWorkDisArrayList = new ArrayList<>();
         MyWorkDis myWorkDis = new MyWorkDis();
         for (int i = 0; i < resArray.size(); i++) {
             JSONObject j = resArray.getJSONObject(i);
@@ -228,6 +229,7 @@ public class UserController extends BaseController {
             for (int k = 0; k < j2.size(); k++) {
                 myWorkDis.getConceptDis().add(new ConceptDis(j2.getJSONObject(k).getString("display_name")));
             }
+            myWorkDisArrayList.add(myWorkDis);
 //            JSONObject o1 = new JSONObject();
 //            o1.put("id", j.getString("id"));
 //            o1.put("title", j.getString("title"));
@@ -243,7 +245,7 @@ public class UserController extends BaseController {
 //            jsonArray.add(o1);
 //        }
         }
-        return getSuccessResponse(myWorkDis);
+        return getSuccessResponse(myWorkDisArrayList);
     }
 
     /*
