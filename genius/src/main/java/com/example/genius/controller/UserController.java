@@ -138,7 +138,7 @@ public class UserController extends BaseController {
         return token;
     }
 
-    @RequestMapping(value = "/sendVerifyCode", method = RequestMethod.POST)
+    @RequestMapping(value = "/sendVerifyCode", method = RequestMethod.GET)
     public Response sendVerifyCode(String email) { //邮箱，类型
         if (redisUtils.get(email) != null) {
             return getErrorResponse(null, ErrorType.already_send_email);
