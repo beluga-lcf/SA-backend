@@ -2,6 +2,9 @@ package com.example.genius.util;
 
 import com.example.genius.dto.searchResult.LanguageEnum;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.StringJoiner;
@@ -45,6 +48,13 @@ public class StringUtil {
 
     public static String spaceReplace(String input){
         return input.replace(" ", "%20");
+    }
+
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        //将url编码转换为正常格式
+        String encodedString = "(title%3A(haha~%20))%20AND%20(keyword%3A%22nihao~%20%22)";
+        String decodedString = URLDecoder.decode(encodedString, StandardCharsets.UTF_8);
+        System.out.println(decodedString);
     }
 
 }

@@ -14,8 +14,8 @@ public class ReverseSignatureUtil {
         String nonce=createNonce();
         stringBuilder.append(nonce);
 
-//        System.out.println(nonce);
-//        System.out.println(timestamp);
+        System.out.println(nonce);
+        System.out.println(timestamp);
 //        System.out.println(stringBuilder.toString());
 //        stringBuilder.append("1702995786128");
 //        stringBuilder.append("F8GJIJ");
