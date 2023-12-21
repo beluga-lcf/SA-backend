@@ -122,7 +122,7 @@ public class OpenAlexService {
         return restTemplate.getForObject(url, String.class);
     }
     public String getAuthorIDByWorkID(String workid){//通过作品ID获取作品作者的ID,直接传入以HTTP为头的ID
-        workid = workid.substring(20);
+        workid = workid.substring(21);
         String url = "https://api.openalex.org/works/"+workid+"?select=authorships";
         return restTemplate.getForObject(url, String.class);
     }
@@ -135,6 +135,11 @@ public class OpenAlexService {
     public String getRelatedWork(String funderID){
         funderID = funderID.substring(21);
         String url = "https://api.openalex.org/works?filter=grants.funder:"+funderID+"&per-page=10&select=id,display_name";
+        return restTemplate.getForObject(url, String.class);
+    }
+    public String getAuthorNameByAuthorID(String authorID){
+        authorID = authorID.substring(21);
+        String url = "https://api.openalex.org/people/"+authorID+"?select=display_name";
         return restTemplate.getForObject(url, String.class);
     }
 

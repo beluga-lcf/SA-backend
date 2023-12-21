@@ -1,12 +1,11 @@
 package com.example.genius.entity;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
+
 @Data
 @TableName("customer.userid_related_openalexid")
 public class UseridRelatedOpenalexid {
@@ -16,4 +15,6 @@ public class UseridRelatedOpenalexid {
     private String Openalexid;
     @TableField("ischeck")
     private int ischeck;
+    @TableField(value = "time",fill = FieldFill.INSERT)
+    private LocalDateTime time;
 }

@@ -162,7 +162,7 @@ public class UserController extends BaseController {
         queryWrapper.eq("user_id", userid);
         List<UseridRelatedOpenalexid> userids =uroMapper.selectList(queryWrapper);
         if(!userids.isEmpty()){
-            return getErrorResponse(null, ErrorType.not_registerd);
+            return getErrorResponse(null, ErrorType.already_relate);
         }
         else {
             uroService.save(a);
@@ -175,12 +175,56 @@ public class UserController extends BaseController {
     public Response approvalRelate(){
         List<UseridRelatedOpenalexid> list = uroService.list();
         ArrayList<approvalRelateReturn> list1 = new ArrayList<approvalRelateReturn>();
-        approvalRelateReturn approval = new approvalRelateReturn();
         for(UseridRelatedOpenalexid u : list){
-            approval.setId(u.getUserId());
-            approval.setOpenalexID(u.getOpenalexid());
-            approval.setIscheck(u.getIscheck());
-            list1.add(approval);
+            String jsons =openAlexService.getAuthorNameByAuthorID(u.getOpenalexid());
+            JSONObject json = JSONObject.parseObject(jsons);
+            String resJson = json.getString("display_name");
+            list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck()));
+        }
+        return getSuccessResponse(list1);
+    }
+    @RequestMapping(value = "/filterApproval", method = RequestMethod.GET)
+    public Response FilterApproval(int status){
+        if(status<0||status>3){
+            return getErrorResponse(null,ErrorType.invalid_check);
+        }
+        QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("ischeck", status);
+        List<UseridRelatedOpenalexid> list = uroService.list(queryWrapper);
+        ArrayList<approvalRelateReturn> list1 = new ArrayList<approvalRelateReturn>();
+        for(UseridRelatedOpenalexid u : list){
+            String jsons =openAlexService.getAuthorNameByAuthorID(u.getOpenalexid());
+            JSONObject json = JSONObject.parseObject(jsons);
+            String resJson = json.getString("display_name");
+            list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck()));
+        }
+        return getSuccessResponse(list1);
+    }
+    @RequestMapping(value = "/searchById",method = RequestMethod.GET)
+    public Response searchApprovalById(int id){
+        QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", id);
+        List<UseridRelatedOpenalexid> list = uroService.list(queryWrapper);
+        ArrayList<approvalRelateReturn> list1 = new ArrayList<approvalRelateReturn>();
+        for(UseridRelatedOpenalexid u : list){
+            String jsons =openAlexService.getAuthorNameByAuthorID(u.getOpenalexid());
+            JSONObject json = JSONObject.parseObject(jsons);
+            String resJson = json.getString("display_name");
+            list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck()));
+        }
+        return getSuccessResponse(list1);
+    }
+    @RequestMapping(value = "/searchApproval",method = RequestMethod.GET)
+    public Response searchApproval(String substring){
+        List<UseridRelatedOpenalexid> list = uroService.list();
+        ArrayList<approvalRelateReturn> list1 = new ArrayList<approvalRelateReturn>();
+        for(UseridRelatedOpenalexid u : list){
+            String jsons =openAlexService.getAuthorNameByAuthorID(u.getOpenalexid());
+            JSONObject json = JSONObject.parseObject(jsons);
+            String resJson = json.getString("display_name");
+            if(resJson.contains(substring)){
+                list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck()));
+            }
         }
         return getSuccessResponse(list1);
     }
@@ -193,7 +237,7 @@ public class UserController extends BaseController {
         if(a == null){
             return getErrorResponse(null,ErrorType.no_relate);
         }
-        if(isAgree!=1&&isAgree!=-1){
+        if(isAgree<0||isAgree>3){
             return getErrorResponse(null,ErrorType.invalid_check);
         }
         a.setIscheck(isAgree);

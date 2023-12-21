@@ -22,6 +22,7 @@ public enum ErrorType {
     select_T_not_found(1019, "未查询到收藏论文"),
     select_P_not_found(1020, "未查询到收藏专利"),
     select_mod_unknown(1021, "未知的查询模式"),
+    already_relate(1022,"用户已认证"),
     log_off_not_found(1101, "用户不存在"),
     log_off_failed(1102, "注销失败");
 
