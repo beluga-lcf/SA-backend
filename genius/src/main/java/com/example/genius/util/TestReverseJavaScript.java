@@ -29,14 +29,14 @@ public class TestReverseJavaScript {
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         headers.setCacheControl(CacheControl.noCache());
         headers.setConnection("keep-alive");
-        headers.set("Cookie", "XSRF-TOKEN=cd4df845-5a5c-473b-91ab-ed45b7c67d91");
+        headers.set("Cookie", "XSRF-TOKEN=cda9f9b4-b1eb-4904-bdcd-2e0d788e27ec");
         headers.set("Origin", "https://pubscholar.cn");
         headers.set("Pragma", "no-cache");
         headers.set("Sec-Fetch-Dest", "empty");
         headers.set("Sec-Fetch-Mode", "cors");
         headers.set("Sec-Fetch-Site", "same-origin");
         headers.set("User-Agent", "Mozilla/5.0 ... Safari/537.36");
-        headers.set("X-XSRF-TOKEN", "cd4df845-5a5c-473b-91ab-ed45b7c67d91");
+        headers.set("X-XSRF-TOKEN", "cda9f9b4-b1eb-4904-bdcd-2e0d788e27ec");
 
         headers.set("sec-ch-ua", "\"Not/A)Brand\";v=\"99\", \"Google Chrome\";v=\"115\", \"Chromium\";v=\"115\"");
         headers.set("sec-ch-ua-mobile", "?0");
@@ -65,7 +65,7 @@ public class TestReverseJavaScript {
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
         // 发送POST请求
-        ResponseEntity<String> response = restTemplate.postForEntity("https://pubscholar.cn/hky/api/v2/scholars/48bb3d184dd22adc05c0941194a2e718/search-keywords", entity, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity("https://pubscholar.cn/hky/open/resources/api/v1/articles", entity, String.class);
 
         // 返回响应体
         return response.getBody();
