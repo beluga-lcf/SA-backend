@@ -13,7 +13,7 @@ public interface ApiService {
     public String getSciencedata(SciencedataPayload payload, int type) throws Exception;
     public String getItems(JsonNode payload, String type) throws Exception ;
     public JsonNode getAggregations(JsonNode payload, String type) throws Exception;
-    public String complex(JsonNode payload, String type) throws Exception;
+    public String complex(JsonNode payload, String type, boolean isAggregations) throws Exception;
 
     public JsonNode test(JsonNode payload) throws Exception;
 

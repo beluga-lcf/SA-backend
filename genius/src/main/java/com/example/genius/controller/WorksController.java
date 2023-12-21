@@ -82,17 +82,7 @@ public class WorksController extends BaseController{
             return getSimpleError();
         }
     }
-    @GetMapping("/getReferenceById")
-    public Response<Object> getReferenceById(String workId){
-        try {
-            return getSuccessResponse(workService.getReferenceByWorkId(workId));
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            log.error(e.getMessage());
-            return getSimpleError();
-        }
-    }
+
 
 }
 

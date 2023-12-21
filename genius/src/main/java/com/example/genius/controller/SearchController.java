@@ -24,10 +24,10 @@ public class SearchController extends BaseController {
         this.searchService = searchService;
     }
 
-    @PostMapping("/complexSearch")
+    @PostMapping("/complex")
     public String complexSearch(@RequestBody JsonNode requestBody){
         try {
-            return searchService.complexSearch(requestBody);
+            return apiService.complex(requestBody,"articles", false);
         }
         catch (Exception e){
             e.printStackTrace();
@@ -164,8 +164,6 @@ public class SearchController extends BaseController {
             return null;
         }
     }
-
-
 
 
 

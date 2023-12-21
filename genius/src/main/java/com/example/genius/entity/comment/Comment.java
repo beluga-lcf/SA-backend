@@ -31,5 +31,7 @@ public class Comment {
 
     @Column(name = "like_count")
     private Integer likeCount;
+
+    private String type;
 }
 
