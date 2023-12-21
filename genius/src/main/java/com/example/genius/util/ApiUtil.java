@@ -14,6 +14,8 @@ import java.net.URLConnection;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.genius.util.ReverseSignatureUtil.*;
+
 @Slf4j
 public class ApiUtil {
     /**
@@ -121,30 +123,6 @@ public class ApiUtil {
     }
 
     /*
-     发送论文的DOI得到摘要
-
-     */
-    public static String getAbstract(String DOI) {
-        try {
-            String url = "https://api.crossref.org/works/" + DOI;
-            String param = "";
-            String result = ApiUtil.get(url, param);
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(result);
-            JsonNode abstractNode = jsonNode.get("message").get("abstract");
-//        if(abstractNode == null){
-//            String url2 = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
-//            String param2 = "db=pubmed&id="+DOI;
-//        }
-            if (abstractNode != null)
-                return abstractNode.asText();
-            else return "temporary empty";
-        } catch (Exception e) {
-            return "temporary empty";
-        }
-    }
-
-    /*
     url of scholar.cn
      */
     public static String getScholarUrl(String type) {
@@ -167,6 +145,18 @@ public class ApiUtil {
         headers.set("sec-ch-ua", "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"");
         headers.set("sec-ch-ua-mobile", "?0");
         headers.set("sec-ch-ua-platform", "\"Windows\"");
+        // 破译
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("foocrg227gng6m6fbo95inwakpingbti");
+        String timestamp=createTimestamp();
+        stringBuilder.append(timestamp);
+        String nonce=createNonce();
+        stringBuilder.append(nonce);
+        String signature=createSHA1(stringBuilder.toString());
+        // set
+        headers.set("timestamp", timestamp);
+        headers.set("nonce", nonce);
+        headers.set("signature", signature);
         return headers;
     }
 
@@ -189,6 +179,18 @@ public class ApiUtil {
         connection.setRequestProperty("sec-ch-ua", "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"");
         connection.setRequestProperty("sec-ch-ua-mobile", "?0");
         connection.setRequestProperty("sec-ch-ua-platform", "\"Windows\"");
+        // 破译
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("foocrg227gng6m6fbo95inwakpingbti");
+        String timestamp=createTimestamp();
+        stringBuilder.append(timestamp);
+        String nonce=createNonce();
+        stringBuilder.append(nonce);
+        String signature=createSHA1(stringBuilder.toString());
+        // set
+        connection.setRequestProperty("timestamp", timestamp);
+        connection.setRequestProperty("nonce", nonce);
+        connection.setRequestProperty("signature", signature);
         // 获取响应代码
         int responseCode = connection.getResponseCode();
         // 读取响应内容

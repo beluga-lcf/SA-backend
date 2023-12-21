@@ -1,5 +1,6 @@
 package com.example.genius.controller;
 
+
 import com.example.generated.entity.Authors;
 import com.example.generated.entity.Concepts;
 import com.example.generated.entity.Works;
@@ -15,6 +16,8 @@ import com.example.genius.service.WorkService;
 import com.example.genius.service.impl.OpenAlexService;
 import com.example.genius.service.impl.WorksServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/works")
@@ -88,35 +90,6 @@ public class WorksController extends BaseController{
         catch (Exception e){
             e.printStackTrace();
             log.error(e.getMessage());
-            return getSimpleError();
-        }
-    }
-
-    /*
-    type: article, book-chapter, dissertation, book, dataset, paratext,
-          other, reference-entry, report, peer-review, standard, editorial, erratum, grant, letter
-     */
-    @GetMapping("/filter")
-    public Response<Object> filterSearch(String type, String concept){
-        try {
-            SearchResult result = searchService.FilterSearch(concept, type);
-            return getSuccessResponse(result);
-        }
-        catch (Exception e) {
-            log.error("here is an error!");
-            return getSimpleError();
-        }
-    }
-
-    @GetMapping("/search")
-    public Response<Object> search(@RequestBody SearchRequest searchRequest){//可选，语言
-        try {
-            SearchResult result = searchService.ComplexSearch(searchRequest);
-            return getSuccessResponse(result);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            log.error("here is an error!");
             return getSimpleError();
         }
     }
