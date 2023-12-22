@@ -53,6 +53,8 @@ public class WorkServiceImpl implements WorkService {
     private WorksLocationsMapper worksLocationsMapper;
     @Autowired
     private WorksPrimaryLocationsMapper worksPrimaryLocationsMapper;
+    @Autowired
+    private OpenAlexService openAlexService;
 
     /*
     public String workId; //论文id
@@ -86,6 +88,9 @@ public class WorkServiceImpl implements WorkService {
             //title
             JsonNode titleNode = originalNode.get("title");
             newNode.set("title", titleNode);
+            //openalexid
+            String openaelexid = openAlexService.getWorkidByWorkname(titleNode.asText().trim());
+            newNode.put("openalexid",openaelexid);
             //authors
             JsonNode authorsNode = originalNode.get("author");
             newNode.set("authors", authorsNode);

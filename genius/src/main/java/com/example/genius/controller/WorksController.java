@@ -9,25 +9,28 @@ import com.example.generated.service.IConceptsService;
 import com.example.generated.service.IWorksService;
 import com.example.genius.dto.searchResult.SearchRequest;
 import com.example.genius.dto.searchResult.SearchResult;
+import com.example.genius.entity.Record;
 import com.example.genius.entity.Response;
+import com.example.genius.mapper.RecordMapper;
 import com.example.genius.service.IWorkssService;
+import com.example.genius.service.RecordService;
 import com.example.genius.service.SearchService;
 import com.example.genius.service.WorkService;
 import com.example.genius.service.impl.OpenAlexService;
 import com.example.genius.service.impl.WorksServiceImpl;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-import java.util.Random;
+
+import java.util.*;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,6 +41,11 @@ public class WorksController extends BaseController{
     private OpenAlexService openAlexService;
     private WorkService workService;
     private SearchService searchService;
+    @Autowired
+    private RecordService recordService;
+    @Autowired
+    private RecordMapper recordMapper;
+
     @Autowired
     public void setWorkService(WorkService workService) {
         this.workService = workService;
@@ -72,10 +80,23 @@ public class WorksController extends BaseController{
         return array.toString();
     }
 
+    public void AddRecord(String workId,String title,int UserId){
+        Record record = new Record();
+        record.setRecordId(workId);
+        record.setRecordName(title);
+        record.setSearchUserId(UserId);
+        recordService.save(record);
+    }
     @GetMapping("/displayWorkHomePage")
-    public Response<Object> displayWorkHomePage(String workId) {
+    public Response<Object> displayWorkHomePage(String workId,@RequestHeader(value = "Authorization") String token) {
         try {
-            return getSuccessResponse(workService.getWorkHomePage(workId));
+            JsonNode jsonNode = workService.getWorkHomePage(workId);
+            if(getIdByJwt(token)>=0){
+               int userId = getIdByJwt(token);
+                AddRecord(jsonNode.get("workId").asText().trim(),jsonNode.get("title").asText().trim(),userId);
+            }
+
+            return getSuccessResponse(jsonNode);
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

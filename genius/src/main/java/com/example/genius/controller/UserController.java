@@ -151,10 +151,11 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/relateOpenalex", method = RequestMethod.GET)
-    public Response relateOpenalex(String openalexId, @RequestHeader(value = "Authorization") String token){// 依据openalexID与Userid进行连接
+    public Response relateOpenalex(String openalexId,String text, @RequestHeader(value = "Authorization") String token){// 依据openalexID与Userid进行连接
         System.out.println("11");
         Integer userid = getIdByJwt(token);
         UseridRelatedOpenalexid a = new UseridRelatedOpenalexid();
+        a.setText(text);
         a.setUserId(userid);
         a.setOpenalexid(openalexId);
         a.setIscheck(0);
@@ -179,7 +180,7 @@ public class UserController extends BaseController {
             String jsons =openAlexService.getAuthorNameByAuthorID(u.getOpenalexid());
             JSONObject json = JSONObject.parseObject(jsons);
             String resJson = json.getString("display_name");
-            list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck()));
+            list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck(), u.getText()));
         }
         return getSuccessResponse(list1);
     }
@@ -196,7 +197,8 @@ public class UserController extends BaseController {
             String jsons =openAlexService.getAuthorNameByAuthorID(u.getOpenalexid());
             JSONObject json = JSONObject.parseObject(jsons);
             String resJson = json.getString("display_name");
-            list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck()));
+            list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck(), u.getText())
+            );
         }
         return getSuccessResponse(list1);
     }
@@ -210,7 +212,7 @@ public class UserController extends BaseController {
             String jsons =openAlexService.getAuthorNameByAuthorID(u.getOpenalexid());
             JSONObject json = JSONObject.parseObject(jsons);
             String resJson = json.getString("display_name");
-            list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck()));
+            list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck(),u.getText()));
         }
         return getSuccessResponse(list1);
     }
@@ -223,7 +225,7 @@ public class UserController extends BaseController {
             JSONObject json = JSONObject.parseObject(jsons);
             String resJson = json.getString("display_name");
             if(resJson.contains(substring)){
-                list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck()));
+                list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck(),u.getText()));
             }
         }
         return getSuccessResponse(list1);

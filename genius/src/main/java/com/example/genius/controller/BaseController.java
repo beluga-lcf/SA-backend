@@ -80,7 +80,7 @@ public class BaseController {
             // 处理令牌过期异常
             log.info("令牌已过期");
 //            JSONObject jsonObject = new JSONObject();
-            int user_id = getIdByJwt(token);
+//            int user_id = getIdByJwt(token);
 //            jsonObject.put("code", 204);
 //            jsonObject.put("message", "登录过期，请重新登陆");
 //            String json = jsonObject.toJSONString();
