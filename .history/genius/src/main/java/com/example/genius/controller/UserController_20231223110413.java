@@ -805,10 +805,6 @@ public class UserController extends BaseController {
             return getErrorResponse(null, ErrorType.login_timeout);
         } else if (userid == -2) {
             return getErrorResponse(null, ErrorType.jwt_illegal);
-        }
-        return null;
-    }
-
     // TODO: 论文名查询相关论文的作者id
     @RequestMapping(value = "./getauthorbypaper", method = RequestMethod.GET)
     public Response getAuthorByPaper(String userName, String paperName) {
