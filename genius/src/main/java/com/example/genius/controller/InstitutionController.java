@@ -18,9 +18,9 @@ public class InstitutionController extends BaseController{
     }
 
     @GetMapping("/getInstitutionHomePage")
-    public Response<Object> getInstitutionHomePage(String institutionName){
+    public Response<Object> getInstitutionHomePage(String institutionId){
         try {
-            return getSuccessResponse(institutionService.getInstitutionHomePage(institutionName));
+            return getSuccessResponse(institutionService.getInstitutionHomePage2(institutionId));
         }
         catch (Exception e){
             e.printStackTrace();
@@ -32,6 +32,17 @@ public class InstitutionController extends BaseController{
     public Response<Object> getInstitutionWorks(String institutionId){
         try {
             return getSuccessResponse(institutionService.getInstitutionWorks(institutionId));
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @GetMapping("/getInstitutionPatents")
+    public Response<Object> getInstitutionsForMainPage(){
+        try {
+            return getSuccessResponse(institutionService.getInstitutionsForMainPage());
         }
         catch (Exception e){
             e.printStackTrace();
