@@ -131,6 +131,26 @@ public class OpenAlexService {
         }
         return myWorkDisArrayList;
     }
+
+    public ArrayList<MyWorkDis> getWorks(String openalexId, String paperName) {//依据用户ID获取学术成果
+        System.out.println(openalexId);
+
+        String jsons = getWorksByUser(openalexId);
+        com.alibaba.fastjson2.JSONObject json = com.alibaba.fastjson2.JSONObject.parseObject(jsons);
+        String resJson = json.getString("results");
+        com.alibaba.fastjson2.JSONArray resArray = com.alibaba.fastjson2.JSON.parseArray(resJson);
+//        JSONArray jsonArray = new JSONArray();
+        ArrayList<MyWorkDis> myWorkDisArrayList = new ArrayList<MyWorkDis>();
+        for (int i = 0; i < resArray.size() && i < 3; i++) {
+            MyWorkDis myWorkDis = new MyWorkDis();
+            com.alibaba.fastjson2.JSONObject j = resArray.getJSONObject(i);
+            myWorkDis.setId(j.getString("id"));
+            myWorkDis.setTitle(j.getString("title"));
+            myWorkDisArrayList.add(myWorkDis);
+        }
+        return myWorkDisArrayList;
+    }
+
     public String getWorksByUser(String openalexUserID){
         String url = "https://api.openalex.org/works?select=id,title,publication_date,concepts&per_page=200&filter=authorships.author.id:"+openalexUserID;
         return restTemplate.getForObject(url, String.class);
@@ -203,7 +223,7 @@ public class OpenAlexService {
         return authorIdsList;
     }
 
-    public ScholarSimpleInform getAuthorSimpleSingle(String authorId) {
+    public ScholarSimpleInform getAuthorSimpleSingle(String authorId, String paperName) {
         String url="https://api.openalex.org/authors/" + authorId.substring(authorId.lastIndexOf("/") + 1);
         String jsonString = restTemplate.getForObject(url,String.class);
         JSONObject anAuthor = new JSONObject(jsonString);
@@ -248,6 +268,8 @@ public class OpenAlexService {
         catch (JSONException e) {
             achievementsNum = null;
         }
+        ArrayList<MyWorkDis> myWorkDisArrayList = getWorks(authorId, paperName);
+        System.out.println("成果" + myWorkDisArrayList.size());
         return new ScholarSimpleInform(
                 name, // name
                 names, // names
@@ -255,7 +277,8 @@ public class OpenAlexService {
                 organization, // organization
                 interests, // interests
                 citationsNum, // citationsNum
-                achievementsNum// achievements
+                achievementsNum, // achievements
+                myWorkDisArrayList
         );
     }
 }

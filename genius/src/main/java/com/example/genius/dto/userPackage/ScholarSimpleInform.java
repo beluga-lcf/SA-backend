@@ -3,6 +3,7 @@ package com.example.genius.dto.userPackage;
 import com.example.genius.dto.mywork.MyWorkDis;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ScholarSimpleInform {
     // 姓名
@@ -23,16 +24,19 @@ public class ScholarSimpleInform {
     public String citationsNum;
     // 学术成果数量
     public String achievementsNum;
+    // 相关学术成果
+    public ArrayList<MyWorkDis> myWorkDisArrayList;
     // 有无被认领
     public boolean isClaimed;
 
-    public ScholarSimpleInform(String name, String[] names, String organization, String[] interests, String citationsNum, String achievementsNum) {
+    public ScholarSimpleInform(String name, String[] names, String organization, String[] interests, String citationsNum, String achievementsNum, ArrayList<MyWorkDis> myWorkDisList) {
         this.name = name;
         this.names = names;
         this.organization = organization;
         this.interests = interests;
         this.citationsNum = citationsNum;
         this.achievementsNum = achievementsNum;
+        this.myWorkDisArrayList = myWorkDisList;
     }
 
     public void setEmail(String email) {

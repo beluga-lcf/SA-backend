@@ -805,7 +805,7 @@ public class UserController extends BaseController {
         List<String> scholarIds = openAlexService.getAuthoriIdByWorkname(paperName);
         for (String scholarId : scholarIds) {
             // 获得一个author
-            ScholarSimpleInform scholarSInform = openAlexService.getAuthorSimpleSingle(scholarId);
+            ScholarSimpleInform scholarSInform = openAlexService.getAuthorSimpleSingle(scholarId, paperName);
             if (scholarSInform == null) {
                 // 未知错误导致未查到
             }
@@ -825,10 +825,7 @@ public class UserController extends BaseController {
                             }
                         }
                     }
-                    acceptable = (matches - 2.0 / 3 * name_1.length >= 0) && (matches - 2.0 / 3 * name_2.length >= 0);
-                    if (acceptable) {
-                        break;
-                    }
+                    acceptable = acceptable || (matches - 2.0 / 3 * name_1.length >= 0) && (matches - 2.0 / 3 * name_2.length >= 0);
                 }
                 if (acceptable) {
                     QueryWrapper<UseridRelatedOpenalexid> uroQuery = new QueryWrapper<>();

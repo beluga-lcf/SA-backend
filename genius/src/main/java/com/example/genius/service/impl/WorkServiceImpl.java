@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -224,11 +225,11 @@ public class WorkServiceImpl implements WorkService {
             } else {
                 System.out.println("Request failed with status code: " + response.getStatusCodeValue());
             }
-            // TODO:维护hot表
+            // TODO:维护 hot表
             // hotField
             insertHotField(keywordsNode);
             // hotSpot
-            insertHotSpot(idNode.asText(), titleNode.asText());
+            insertHotSpot(idNode, titleNode);
             return newNode;
         }
 
@@ -238,7 +239,12 @@ public class WorkServiceImpl implements WorkService {
     @Transactional
     private void insertHotField(JsonNode keywords) {
         // TODO: 拆解keywords
-        String[] keys = new String[2];
+        ArrayList<String> keys = new ArrayList<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayNode array = objectMapper.convertValue(keywords, ArrayNode.class);
+        for(JsonNode child:array){
+            keys.add(child.asText());
+        }
         // 检索，有则update，无则insert
         for (String key : keys) {
             QueryWrapper<HotField> queryWrapper = new QueryWrapper<>();
@@ -257,7 +263,12 @@ public class WorkServiceImpl implements WorkService {
     }
 
     @Transactional
-    private void insertHotSpot(String idNode, String titleNode) {
+    private void insertHotSpot(JsonNode idNodeJ, JsonNode titleNodeJ) {
+        if (idNodeJ == null || titleNodeJ == null) {
+            return;
+        }
+        String idNode = idNodeJ.asText();
+        String titleNode = titleNodeJ.asText();
         // 查询，有则update，无则insert
         QueryWrapper<HotSpot> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", idNode);
