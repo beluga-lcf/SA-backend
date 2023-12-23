@@ -64,7 +64,32 @@ public class InstitutionServiceImpl implements InstitutionService {
         objectNode.set("authors", authorList);
         return  objectMapper.convertValue(objectNode, JsonNode.class);
     }
-
+    public JsonNode getInstitutionHomePage2(String Id) throws Exception{
+        ObjectMapper objectMapper = new ObjectMapper();
+        String url = "https://api.openalex.org/institutions/"+StringUtil.removePrefix(Id);
+        String params = "";
+        String result = ApiUtil.get(url, params);
+        JsonNode jsonNode = objectMapper.readTree(result);
+        JsonNode institution = jsonNode.get("results");
+        // 先剔除一部分没用的数据，避免干扰其前端同学
+        ObjectNode objectNode = objectMapper.convertValue(institution, ObjectNode.class);
+        objectNode.remove("lineage");
+        objectNode.remove("international");
+        // 作者
+        String url2 = "https://api.openalex.org/authors";
+        String params2 = "filter=" + "last_known_institution.id:" + Id;
+        String result2 = ApiUtil.get(url2, params2);
+        JsonNode allAuthors = objectMapper.readTree(result2).get("results");
+        ArrayNode arrayNode = objectMapper.convertValue(allAuthors, ArrayNode.class);
+        ArrayNode authorList = objectMapper.createArrayNode();
+        for (int i = 0; i < Math.min(5, arrayNode.size()); i++) {
+            JsonNode newAuthor = simplifyAuthor(arrayNode.get(i));
+            authorList.add(newAuthor);
+        }
+        // 遍历数组，取前五个
+        objectNode.set("authors", authorList);
+        return  objectMapper.convertValue(objectNode, JsonNode.class);
+    }
     // 简化机构中的作者信息
     public JsonNode simplifyAuthor(JsonNode oriNode){
         ObjectMapper objectMapper = new ObjectMapper();
@@ -117,6 +142,46 @@ public class InstitutionServiceImpl implements InstitutionService {
         // 被引次数
         newWork.set("cited_by_count",oriNode.get("cited_by_count"));
         return newWork;
+    }
+
+    @Override
+    public JsonNode getInstitutionsForMainPage() throws Exception {
+        // https://api.openalex.org/institutions?sort=cited_by_count:desc
+        ObjectMapper objectMapper = new ObjectMapper();
+        String url = "https://api.openalex.org/institutions";
+        String params = "sort=cited_by_count:desc";
+        String result = ApiUtil.get(url, params);
+        JsonNode jsonNode = objectMapper.readTree(result);
+        JsonNode institutions = jsonNode.get("results");
+        ArrayNode arrayNode = objectMapper.convertValue(institutions, ArrayNode.class);
+        ArrayNode institutionList = objectMapper.createArrayNode();
+        for (int i = 0; i < Math.min(5, arrayNode.size()); i++) {
+            JsonNode institution = arrayNode.get(i);
+            JsonNode newInstitution = simplifyInstitution(institution);
+            institutionList.add(newInstitution);
+        }
+        return objectMapper.convertValue(institutionList,JsonNode.class);
+    }
+
+    public JsonNode simplifyInstitution(JsonNode oriNode){
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.set("id",oriNode.get("id"));
+        objectNode.set("display_name",oriNode.get("display_name"));
+        objectNode.set("logo",oriNode.get("image_url"));
+        objectNode.set("cited_by_count",oriNode.get("cited_by_count"));
+        // 擅长领域
+        ArrayNode oriConcepts = objectMapper.convertValue(oriNode.get("x_concepts"),ArrayNode.class);
+        ArrayList<String> newConcepts = new ArrayList<>();
+        for (int i = 0; ; i++){
+            JsonNode concept = oriConcepts.get(i);
+            if(concept.get("score").asInt()>50){
+                newConcepts.add(concept.get("display_name").asText());
+            }
+            if(newConcepts.size()>=5) break;
+        }
+        objectNode.put("concepts", String.valueOf(newConcepts));
+        return objectMapper.convertValue(objectNode,JsonNode.class);
     }
 }
 

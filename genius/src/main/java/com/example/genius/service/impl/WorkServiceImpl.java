@@ -159,12 +159,14 @@ public class WorkServiceImpl implements WorkService {
             //links
             JsonNode linksNode = originalNode.get("links");
             ArrayNode linksArray = objectMapper.convertValue(linksNode, ArrayNode.class);
-            ArrayNode newLinksArray = objectMapper.createArrayNode();
+            JsonNode newLinks = null;
             for (JsonNode linkNode : linksArray) {
-                if(linkNode.get("is_open_access").asBoolean())
-                    newLinksArray.add(linkNode);
+                if(linkNode.get("is_open_access").asBoolean()){
+                    newLinks = linksNode;
+                    break;
+                }
             }
-            newNode.set("links", newLinksArray);
+            newNode.set("links", newLinks);
             //ref_articles
             if(originalNode.get("ref_articles") != null){
                 JsonNode refArticles = originalNode.get("ref_articles");
