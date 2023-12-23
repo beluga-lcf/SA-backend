@@ -7,11 +7,15 @@ import com.example.genius.dto.mywork.ConceptDis;
 import com.example.genius.dto.mywork.MyWorkDis;
 import com.example.genius.dto.userPackage.ScholarInform;
 import com.example.genius.entity.User;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import springfox.documentation.spring.web.json.Json;
 import org.json.JSONObject;
+
+import java.util.*;
 
 @Service
 public class OpenAlexService {
@@ -43,6 +47,7 @@ public class OpenAlexService {
         String jsonString = restTemplate.getForObject(url,String.class);
         JSONObject anAuthor = new JSONObject(jsonString);
         String name;
+        String[] names;
         String organization;
         String[] interests;
         String citationsNum;
@@ -53,6 +58,7 @@ public class OpenAlexService {
         catch (JSONException e) {
             name = null;
         }
+        // TODO:add names
         try {
             organization = (String) new JSONObject(anAuthor.get("last_known_institution")).get("display_name");
         }
@@ -137,7 +143,39 @@ public class OpenAlexService {
         String url = "https://api.openalex.org/works?filter=grants.funder:"+funderID+"&per-page=10&select=id,display_name";
         return restTemplate.getForObject(url, String.class);
     }
+    public List<String> getAuthoriIdByWorkname(String username){//通过作品名字获取作者ID
+        String url = "https://api.openalex.org/works?filter=title.search:"+username;
+        String jsonResponse = restTemplate.getForObject(url, String.class);
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        Set<String> authorIdsSet = new HashSet<>();
+
+        try {
+            // 解析JSON字符串为JsonNode对象
+            JsonNode rootNode = objectMapper.readTree(jsonResponse);
+
+            // 获取"results"数组节点
+            JsonNode resultsNode = rootNode.get("results");
+
+            // 遍历结果数组
+            for (JsonNode resultNode : resultsNode) {
+                JsonNode authorshipsNode = resultNode.get("authorships");
+
+                for (JsonNode authorshipNode : authorshipsNode) {
+                    JsonNode authorNode = authorshipNode.get("author");
+                    String authorId = authorNode.get("id").asText();
+
+                    // 将作者ID添加到Set中
+                    authorIdsSet.add(authorId);
+                }
+            }
+        } catch (Exception e) {
+            // 处理异常
+            e.printStackTrace();
+        }
+        List<String> authorIdsList = new ArrayList<>(Arrays.asList(authorIdsSet.toArray(new String[0])));
+        return authorIdsList;
+    }
     
 
 }

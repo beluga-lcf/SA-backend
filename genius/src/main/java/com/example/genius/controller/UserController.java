@@ -582,7 +582,6 @@ public class UserController extends BaseController {
         return null;
     }
 
-    // TODO: 搜索收藏专利
     @RequestMapping(value = "/selectCP", method = RequestMethod.GET)
     public Response selectCP(@RequestHeader(value = "Authorization") String token, String selectPName, String mod) {
         // jwt解出id
@@ -627,6 +626,57 @@ public class UserController extends BaseController {
         }
         return null;
     }
+
+    @RequestMapping(value = "/getCThesis", method = RequestMethod.GET)
+    public Response getCThesis(@RequestHeader(value = "Authorization") String token) {
+        // jwt解出id
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
+            try {
+                ThesisResult result = userId2PSTIdService.getT(userid);
+                if (result.getCode() == 200) {
+                    return getSuccessResponse(result.getThesisList());
+                }
+                else {
+                    return getSimpleError();
+                }
+            }
+            catch (Exception e) {
+                return getSimpleError();
+            }
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
+        }
+        return null;
+    }
+    // TODO: 查询全部收藏专利
+    @RequestMapping(value = "/getCPatent", method = RequestMethod.GET)
+    public Response getCPatent(@RequestHeader(value = "Authorization") String token) {
+        // jwt解出id
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
+            try {
+                RePatentResult result = userId2PSPIdService.getP(userid);
+                if (result.getCode() == 200) {
+                    return getSuccessResponse(result.getPatentList());
+                }
+                else {
+                    return getSimpleError();
+                }
+            }
+            catch (Exception e) {
+                return getSimpleError();
+            }
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
+        }
+        return null;
+    }
+
 
     @RequestMapping(value = "/checkcollcetT", method = RequestMethod.GET)
     public Response checkCollectThesis(@RequestHeader(value = "Authorization") String token, String thesisId) {
@@ -676,6 +726,24 @@ public class UserController extends BaseController {
             return getErrorResponse(null, ErrorType.login_timeout);
         } else if (userid == -2) {
             return getErrorResponse(null, ErrorType.jwt_illegal);
+        }
+        return null;
+    }
+
+    // TODO: 论文名查询相关论文的作者id
+    @RequestMapping(value = "./getauthorbypaper", method = RequestMethod.GET)
+    public Response getAuthorByPaper(String userName, String paperName) {
+        List<String> userIds = openAlexService.getAuthoriIdByWorkname(paperName);
+        List<User> users = new ArrayList<>();
+        for (String userId : userIds) {
+            // 获得一个user
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            User aUser = userService.getOne(queryWrapper);
+            if (aUser == null) {
+                // 未知错误导致未查到
+            }
+            // 如果name可接受，加入users
+            // 处理users，返回
         }
         return null;
     }
