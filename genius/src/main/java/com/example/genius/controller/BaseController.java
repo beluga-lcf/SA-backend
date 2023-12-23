@@ -29,7 +29,7 @@ public class BaseController {
         return response;
     }
 
-    protected <T> Response<T> getSimpleError(){
+    public static <T> Response<T> getSimpleError(){
         Response<T> response = new Response<>();
         response.setStatus("error");
         response.setCode(500);
@@ -37,6 +37,7 @@ public class BaseController {
         response.setData(null);
         return response;
     }
+
     protected <T> Response<T> getSuccessResponse(T t) {
         Response<T> response = new Response<>();
         response.setStatus("success");
@@ -54,7 +55,7 @@ public class BaseController {
         response.setData(t);
         return response;
     }
-    protected <T> Response<T> getErrorResponse(T t, ErrorType errorType) {
+    public static <T> Response<T> getErrorResponse(T t, ErrorType errorType) {
         Response<T> response = new Response<>();
         response.setStatus("error");
         response.setCode(errorType.getCode());
@@ -70,7 +71,7 @@ public class BaseController {
     令牌非法返回-2
     以封装响应事件
      */
-    public int getIdByJwt(String token){
+    public static int getIdByJwt(String token){
         try {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256("Wunderkinder")).build();
             DecodedJWT verify = jwtVerifier.verify(token);
