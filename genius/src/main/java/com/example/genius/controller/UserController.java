@@ -74,12 +74,14 @@ public class UserController extends BaseController {
 
     }
 
+
     @RequestMapping(value = "/register", method = RequestMethod.GET)
     public Response register(String nick_name, String email, String password, String captcha) {
         User user = new User();
         user.setNickName(nick_name);
         user.setEmail(email);
         user.setPassword(password);
+
 //        if (captcha != null) {
 //            user.setPersonDescription(captcha);
 //        }
@@ -115,8 +117,8 @@ public class UserController extends BaseController {
             String token = contextLoads(email, Math.toIntExact(checkUser.getUserId()));
             session.setAttribute("userId", checkUser.getUserId());
             log.info("一名用户已登录,id:" + checkUser.getUserId());
-            Token atoken = new Token(token);
-            return getSuccessResponse(atoken);
+            LoginInfo loginInfo = new LoginInfo(checkUser.getNickName(), token);
+            return getSuccessResponse(loginInfo);
         }
     }
 
@@ -158,7 +160,7 @@ public class UserController extends BaseController {
         a.setText(text);
         a.setUserId(userid);
         a.setOpenalexid(openalexId);
-        a.setIscheck(0);
+        a.setIscheck(1);
         QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userid);
         List<UseridRelatedOpenalexid> userids =uroMapper.selectList(queryWrapper);
@@ -177,7 +179,7 @@ public class UserController extends BaseController {
         List<UseridRelatedOpenalexid> list = uroService.list();
         ArrayList<approvalRelateReturn> list1 = new ArrayList<approvalRelateReturn>();
         for(UseridRelatedOpenalexid u : list){
-            String jsons =openAlexService.getAuthorNameByAuthorID(u.getOpenalexid());
+            String jsons = openAlexService.getAuthorNameByAuthorID(u.getOpenalexid());
             JSONObject json = JSONObject.parseObject(jsons);
             String resJson = json.getString("display_name");
             list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck(), u.getText()));
@@ -437,22 +439,24 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/getScholarInfo", method = RequestMethod.GET)
-    public Response getScholarInfo(int user_id) {
+    public Response getScholarInfo(String user_id) {
         // 查关联表
         QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", user_id);
+        queryWrapper.eq("openalexid", user_id);
         UseridRelatedOpenalexid searchUser = uroService.getOne(queryWrapper);
+        ScholarInform scholarInform = openAlexService.getAuthorSingle(searchUser.getOpenalexid());
         if (searchUser == null) {
-            // 未查到对应的openalex id, 可能是openalex没收录或不是认证学者
-            // 根据认证来源判断一定是没认证
-            return getErrorResponse(null, ErrorType.not_scholar);
+            // 未查到认领记录
+            scholarInform.setIsClaimed(false);
+            scholarInform.setEmail("暂无邮箱信息");
+            scholarInform.setIntroduction("暂无学者简介");
         } else {
-            ScholarInform scholarInform = openAlexService.getAuthorSingle(searchUser.getOpenalexid());
+            scholarInform.setIsClaimed(true);
             User user = userService.getById(user_id);
             scholarInform.setEmail(user.getEmail());
             scholarInform.setIntroduction(user.getPersonDescription());
-            return getSuccessResponse(scholarInform);
         }
+        return getSuccessResponse(scholarInform);
     }
 
     @RequestMapping(value = "/disregister", method = RequestMethod.POST)
@@ -810,19 +814,74 @@ public class UserController extends BaseController {
     }
 
     // TODO: 论文名查询相关论文的作者id
-    @RequestMapping(value = "./getauthorbypaper", method = RequestMethod.GET)
+    @RequestMapping(value = "/getauthorbypaper", method = RequestMethod.GET)
     public Response getAuthorByPaper(String userName, String paperName) {
-        List<String> userIds = openAlexService.getAuthoriIdByWorkname(paperName);
-        List<User> users = new ArrayList<>();
-        for (String userId : userIds) {
-            // 获得一个user
-            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-            User aUser = userService.getOne(queryWrapper);
-            if (aUser == null) {
+        List<ScholarSimpleInform> authors = new ArrayList<>();
+        List<String> scholarIds = openAlexService.getAuthoriIdByWorkname(paperName);
+        for (String scholarId : scholarIds) {
+            // 获得一个author
+            ScholarSimpleInform scholarSInform = openAlexService.getAuthorSimpleSingle(scholarId);
+            if (scholarSInform == null) {
                 // 未知错误导致未查到
             }
-            // 如果name可接受，加入users
-            // 处理users，返回
+            else {
+                // 如果name可接受，加入users
+                // 获取全部名字,包括name和names
+                String[] names = scholarSInform.getNames();
+                boolean acceptable = false;
+                for (String name : names) {
+                    String[] name_1 = name.split(" ");
+                    String[] name_2 = userName.split(" ");
+                    int matches = 0;
+                    for (String str1 : name_1) {
+                        for (String str2 : name_2) {
+                            if (str1.contains(str2) || str2.contains(str1)) {
+                                matches++;
+                            }
+                        }
+                    }
+                    acceptable = (matches - 2.0 / 3 * name_1.length >= 0) && (matches - 2.0 / 3 * name_2.length >= 0);
+                    if (acceptable) {
+                        break;
+                    }
+                }
+                if (acceptable) {
+                    QueryWrapper<UseridRelatedOpenalexid> uroQuery = new QueryWrapper<>();
+                    uroQuery.eq("openalexid", scholarId);
+                    UseridRelatedOpenalexid uroUser = uroService.getOne(uroQuery);
+                    if (uroUser == null) {
+                        // 未认领
+                        authors.add(scholarSInform);
+                    }
+                }
+            }
+        }
+        // 处理authors，返回
+        return getSuccessResponse(authors);
+    }
+
+    // TODO: 收藏论文和专利的个数
+    @RequestMapping(value = "/getTsPs", method = RequestMethod.GET)
+    public Response getTsPs(@RequestHeader(value = "Authorization") String token) {
+        // jwt解出id
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
+            long numThesis = 0;
+            long numPatent = 0;
+            try {
+                numThesis = userId2PSTIdService.getNum(userid);
+                numPatent = userId2PSPIdService.getNum(userid);
+                ThesePatentNum tpNum = new ThesePatentNum(numThesis, numPatent);
+                System.out.println("成功" + tpNum.getNumPatent() + " " + tpNum.getNumThesis());
+                return getSuccessResponse(tpNum);
+            }
+            catch (Exception e) {
+                return getSimpleError();
+            }
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
         }
         return null;
     }

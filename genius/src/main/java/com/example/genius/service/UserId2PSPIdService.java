@@ -12,4 +12,5 @@ public interface UserId2PSPIdService extends IService<UserId2PSPatentId> {
     RePatentResult checkP(int userid, String rePatentId);
     RePatentResult selectP(int userid, String selectPName, SelectCollectMod sMod);
     RePatentResult getP(int userid);
+    long getNum(int userid);
 }

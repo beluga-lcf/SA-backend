@@ -112,6 +112,15 @@ public class UserId2PSTIdServiceImpl extends ServiceImpl<UserId2PSTIdMapper, Use
         return new ThesisResult(200, "获取收藏论文", thesisIds);
     }
 
+    @Override
+    @Transactional
+    public long getNum(int userid) {
+        QueryWrapper<UserId2PSThesisId> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userid", userid);
+        long num = userId2PSTIdMapper.selectCount(queryWrapper);
+        return num;
+    }
+
     @Transactional
     public List<UserId2PSThesisId> fragmentLike(String selectTName, LambdaQueryWrapper<UserId2PSThesisId> lambdaQueryWrapper) {
         int countCharNum = selectTName.length();

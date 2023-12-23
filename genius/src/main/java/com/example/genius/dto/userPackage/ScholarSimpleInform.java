@@ -1,16 +1,15 @@
 package com.example.genius.dto.userPackage;
 
 import com.example.genius.dto.mywork.MyWorkDis;
-import com.example.genius.entity.User;
 
 import java.util.ArrayList;
 
-public class ScholarInform {
+public class ScholarSimpleInform {
     // 姓名
     public String name;
     // 其他名字
     public String[] names;
-//    // 学术身份
+    //    // 学术身份
 //    public String identity;
     // 所属组织
     public String organization;
@@ -24,19 +23,16 @@ public class ScholarInform {
     public String citationsNum;
     // 学术成果数量
     public String achievementsNum;
-    // 学术成果
-    public ArrayList<MyWorkDis> myWorkDisArrayList;
     // 有无被认领
     public boolean isClaimed;
 
-    public ScholarInform(String name, String[] names, String organization, String[] interests, String citationsNum, String achievementsNum, ArrayList<MyWorkDis> myWorkDisArrayList) {
+    public ScholarSimpleInform(String name, String[] names, String organization, String[] interests, String citationsNum, String achievementsNum) {
         this.name = name;
         this.names = names;
         this.organization = organization;
         this.interests = interests;
         this.citationsNum = citationsNum;
         this.achievementsNum = achievementsNum;
-        this.myWorkDisArrayList = myWorkDisArrayList;
     }
 
     public void setEmail(String email) {
@@ -47,15 +43,11 @@ public class ScholarInform {
         this.introduction = introduction;
     }
 
-    public void setMyWorkDis(ArrayList<MyWorkDis> myWorkDisArrayList) {
-        this.myWorkDisArrayList = myWorkDisArrayList;
-    }
-
-    public void setIsClaimed(boolean isClaimed) {
-        this.isClaimed = isClaimed;
+    public void setClaimed(boolean claimed) {
+        isClaimed = claimed;
     }
 
     public String[] getNames() {
-        return this.names;
+        return names;
     }
 }
