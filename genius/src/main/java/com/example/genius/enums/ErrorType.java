@@ -24,7 +24,8 @@ public enum ErrorType {
     select_mod_unknown(1021, "未知的查询模式"),
     already_relate(1022,"用户已认证"),
     log_off_not_found(1101, "用户不存在"),
-    log_off_failed(1102, "注销失败");
+    log_off_failed(1102, "注销失败"),
+    no_such_admin(1103, "不存在的管理员");
 
 
 

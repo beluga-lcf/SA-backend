@@ -13,6 +13,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -98,6 +100,35 @@ public class BaseController {
         }
     }
 
+    public String getAdminNameByJwt(String token){
+        try {
+            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256("Wunderkinder")).build();
+            DecodedJWT verify = jwtVerifier.verify(token);
+            log.info("管理员名" + String.valueOf(verify.getClaim("username")));
+            log.info("令牌过期时间：" + verify.getExpiresAt());
+            return String.valueOf(verify.getClaim("username"));
+        } catch (TokenExpiredException e) {
+            // 处理令牌过期异常
+            log.info("令牌已过期");
+//            JSONObject jsonObject = new JSONObject();
+//            int user_id = getIdByJwt(token);
+//            jsonObject.put("code", 204);
+//            jsonObject.put("message", "登录过期，请重新登陆");
+//            String json = jsonObject.toJSONString();
+//            getErrorResponse(ErrorType.login_timeout);
+            return "token_time_out";
+        } catch (JWTVerificationException e) {
+            // 处理非法令牌异常
+            log.info("非法令牌");
+//            JSONObject jsonObject = new JSONObject();
+//            jsonObject.put("code", 203);
+//            jsonObject.put("message", "请先登录");
+//            String json = jsonObject.toJSONString();
+//            getErrorResponse(ErrorType.jwt_illegal);
+            return "invalid_token";
+        }
+    }
+
     public static String[] readJsonArray(JSONArray jsonArray, String key) {
         // 创建一个列表来存储 display_name 的值
         List<String> displayNameList = new ArrayList<>();
@@ -112,4 +143,40 @@ public class BaseController {
         // 将列表转换为 String 数组
         return displayNameList.toArray(new String[0]);
     }
+
+    public String contextLoads(String email, int id) {
+
+        HashMap<String, Object> map = new HashMap<>();
+
+        Calendar instance = Calendar.getInstance();
+        // 3600秒后令牌token失效
+        instance.add(Calendar.SECOND, 3600 * 5);
+
+        String token = JWT.create()
+                .withHeader(map) // header可以不写，因为默认值就是它
+                .withClaim("email", email)  //payload
+//                .withClaim("email", "2505293361@qq.com")
+                .withClaim("userid", id)
+                .withExpiresAt(instance.getTime()) // 指定令牌的过期时间
+                .sign(Algorithm.HMAC256("Wunderkinder"));//签名
+        return token;
+    }
+
+    public String contextLoads(String userName) {
+
+        HashMap<String, Object> map = new HashMap<>();
+
+        Calendar instance = Calendar.getInstance();
+        // 3600秒后令牌token失效
+        instance.add(Calendar.SECOND, 3600 * 5);
+
+        String token = JWT.create()
+                .withHeader(map) // header可以不写，因为默认值就是它
+                .withClaim("username", userName)  //payload
+//                .withClaim("email", "2505293361@qq.com")
+                .withExpiresAt(instance.getTime()) // 指定令牌的过期时间
+                .sign(Algorithm.HMAC256("Wunderkinder"));//签名
+        return token;
+    }
+
 }

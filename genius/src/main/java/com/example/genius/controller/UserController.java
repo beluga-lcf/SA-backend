@@ -122,24 +122,6 @@ public class UserController extends BaseController {
         }
     }
 
-    private String contextLoads(String email, int id) {
-
-        HashMap<String, Object> map = new HashMap<>();
-
-        Calendar instance = Calendar.getInstance();
-        // 3600秒后令牌token失效
-        instance.add(Calendar.SECOND, 3600 * 5);
-
-        String token = JWT.create()
-                .withHeader(map) // header可以不写，因为默认值就是它
-                .withClaim("email", email)  //payload
-//                .withClaim("email", "2505293361@qq.com")
-                .withClaim("userid", id)
-                .withExpiresAt(instance.getTime()) // 指定令牌的过期时间
-                .sign(Algorithm.HMAC256("Wunderkinder"));//签名
-        return token;
-    }
-
     @RequestMapping(value = "/sendVerifyCode", method = RequestMethod.GET)
     public Response sendVerifyCode(String email) { //邮箱，类型
         if (redisUtils.get(email) != null) {

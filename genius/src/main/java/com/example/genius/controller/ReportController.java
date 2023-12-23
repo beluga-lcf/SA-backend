@@ -4,11 +4,10 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.genius.dto.Approval.approvalRelateReturn;
 import com.example.genius.dto.Report.WorkRepRet;
-import com.example.genius.entity.Response;
-import com.example.genius.entity.User;
-import com.example.genius.entity.UseridRelatedOpenalexid;
-import com.example.genius.entity.WorkReport;
+import com.example.genius.dto.userPackage.LoginInfo;
+import com.example.genius.entity.*;
 import com.example.genius.enums.ErrorType;
+import com.example.genius.service.AdminService;
 import com.example.genius.service.UserService;
 import com.example.genius.service.WorkReportService;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +32,8 @@ public class ReportController extends BaseController{
     private WorkReportService workReportService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private AdminService adminService;
     @RequestMapping(value = "/workReport", method = RequestMethod.GET)
     public Response workReport(String openalexID, String comment,@RequestHeader(value = "Authorization") String token){
         int id = getIdByJwt(token);
@@ -84,6 +85,25 @@ public class ReportController extends BaseController{
             return null;
         }else {
             return check_user.getNickName();
+        }
+    }
+
+    @RequestMapping(value = "/adminLogin", method = RequestMethod.GET)
+    private Response adminLogin(String userName, String password) {
+        QueryWrapper<Admin> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", userName);
+        Admin checkAdmin = adminService.getOne(queryWrapper);
+        if (checkAdmin == null) {
+            return getErrorResponse(null, ErrorType.no_such_admin);
+        }
+        if (!checkAdmin.getPassword().equalsIgnoreCase(password)) {
+            return getErrorResponse(null, ErrorType.wrong_pwd);
+        } else {
+            String token = contextLoads(checkAdmin.getUserName());
+            session.setAttribute("username", checkAdmin.getUserName());
+            log.info("管理员" +checkAdmin.getUserName() + "已登录");
+            LoginInfo loginInfo = new LoginInfo(checkAdmin.getUserName(), token);
+            return getSuccessResponse(loginInfo);
         }
     }
 }
