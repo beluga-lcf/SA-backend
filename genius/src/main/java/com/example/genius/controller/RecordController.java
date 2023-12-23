@@ -117,6 +117,22 @@ public class RecordController extends BaseController{
 
 
     // TODO: 总热点领域
+    @RequestMapping(value = "/hotfield",method = RequestMethod.GET)
+    public Response getHotField() {
+        // 归一化热值*1000+1000即[1000, 2000]
+        // 展示成果同时维护表
+        return null;
+    }
     // TODO: 总热点成果
+    @RequestMapping(value = "/hotspots",method = RequestMethod.GET)
+    public Response getHotSpots() {
+        // 触发器绑定记录表（只绑定insert动作）
+        return null;
+    }
     // TODO: 月热点成果
+    @RequestMapping(value = "/hotspotsM",method = RequestMethod.GET)
+    public Response getHotSpotsM() {
+        // 触发器绑定记录表（只绑定insert动作）
+        return null;
+    }
 }
