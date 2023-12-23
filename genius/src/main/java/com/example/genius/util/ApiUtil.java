@@ -129,6 +129,9 @@ public class ApiUtil {
         return "https://pubscholar.cn/hky/open/resources/api/v1/" + type;
     }
 
+    public static String getScholarUrl2(String type) {
+        return "https://pubscholar.cn/hky/open/resources/api/v2/" + type;
+    }
     public static HttpHeaders getHeaders(){
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", "application/json, text/plain, */*");

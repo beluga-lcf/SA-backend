@@ -70,12 +70,18 @@ public class WorkServiceImpl implements WorkService {
      */
     @Override
     public JsonNode getWorkHomePage(String workId) throws Exception {
-        String baseUrl = ApiUtil.getScholarUrl("article")+"/"+ ReverseAESUtil.encrypt(workId);
+        String baseUrl = ApiUtil.getScholarUrl2("article")+"/"+ ReverseAESUtil.encrypt(workId);
         String param = "uid=3b9547dd87904c44923d675711729962&type=article";
         String path = baseUrl + "?" + param;
         if(Properties.isDebug) System.out.println(path);
         if(true){
-            String responseBody = ApiUtil.getConnection(path);
+            // 使用RestTemplate发起POST请求
+            String apiUrl = path;
+//            HttpEntity<String> entity = new HttpEntity<>(null, ApiUtil.getHeaders());
+            ResponseEntity<String> response = new RestTemplate().exchange(apiUrl, HttpMethod.GET, null, String.class, ApiUtil.getHeaders());
+            String responseBody = response.getBody();
+            // 解析返回值
+            System.out.println("responseBody: "+responseBody);
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode originalNode = objectMapper.readValue(responseBody, ObjectNode.class);
             ObjectNode newNode = objectMapper.createObjectNode();
@@ -91,7 +97,6 @@ public class WorkServiceImpl implements WorkService {
             JsonNode titleNode = originalNode.get("title");
             newNode.set("title", titleNode);
             //openalexid
-
             String openaelexid = openAlexService.getWorkidByWorkname(titleNode.asText().trim());
             ObjectNode openalexidNode = objectMapper.createObjectNode();
             openalexidNode.put("openalexid",openaelexid);
@@ -177,11 +182,11 @@ public class WorkServiceImpl implements WorkService {
             payload.put("query", titleNode.asText());
             payload.put("userId", "3b9547dd87904c44923d675711729962");
             String requestBody = objectMapper.writeValueAsString(payload);
-            HttpEntity<String> entity = new HttpEntity<>(requestBody, ApiUtil.getHeaders());
-            ResponseEntity<String> response = new RestTemplate().exchange(recommendPath, HttpMethod.POST, entity, String.class);
+            HttpEntity<String> entity2 = new HttpEntity<>(requestBody, ApiUtil.getHeaders());
+            ResponseEntity<String> response2 = new RestTemplate().exchange(recommendPath, HttpMethod.POST, entity2, String.class);
             // 处理响应
             if (response.getStatusCode().is2xxSuccessful()) {
-                responseBody = response.getBody();
+                responseBody = response2.getBody();
                 ArrayNode recommends = objectMapper.readValue(responseBody, ArrayNode.class);
                 ArrayNode newRecommends = objectMapper.createArrayNode();
                 int count = 0;
@@ -206,6 +211,10 @@ public class WorkServiceImpl implements WorkService {
             }
             return newNode;
         }
+
         return null;
     }
+
+
+
 }
