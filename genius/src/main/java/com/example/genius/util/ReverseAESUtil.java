@@ -7,8 +7,10 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 
 public class ReverseAESUtil {
-    public static String encrypt(String input, byte[] keyBytes, byte[] ivBytes) {
+    public static String encrypt(String input) {
         try {
+            byte[] keyBytes=convertWordsToBytes(new int[]{1901552978, 1952019785, 1867538771, 1682335560},16);
+            byte[] ivBytes=convertWordsToBytes(new int[]{1248545914, 1482905186, 1315778617, 943142453},16);
             IvParameterSpec iv = new IvParameterSpec(ivBytes);
             SecretKeySpec skeySpec = new SecretKeySpec(keyBytes, "AES");
 
@@ -34,10 +36,7 @@ public class ReverseAESUtil {
 
     public static void main(String[] args) {
         String originalString = "dde20bd4c00a96e185ef0e7adc66399e";//要加密的原字符串
-        byte[] keyBytes = convertWordsToBytes(new int[]{1901552978, 1952019785, 1867538771, 1682335560},16);
-        byte[] ivBytes =  convertWordsToBytes(new int[]{1248545914, 1482905186, 1315778617, 943142453},16);
-
-        System.out.println(encrypt(originalString, keyBytes, ivBytes));
+        System.out.println(encrypt(originalString));
     }
 }
 
