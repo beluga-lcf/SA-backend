@@ -14,7 +14,6 @@ public class User {
     @TableId(value = "userid", type = IdType.AUTO)
     private Long userId;
     private String nickName;
-
     @TableField("email")
     private String email;
     private String password;

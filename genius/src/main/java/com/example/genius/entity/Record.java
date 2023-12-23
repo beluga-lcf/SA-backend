@@ -1,17 +1,18 @@
 package com.example.genius.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
+import javax.persistence.SequenceGenerator;
 import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
 @TableName("customer.search_record")
+@KeySequence(value = "search_record_id_seq",dbType = DbType.POSTGRE_SQL)
 public class Record {
+    @TableId(value = "id",type = IdType.AUTO)
+    private Integer id;
     @TableField("record_name")
     private String recordName;
     @TableField(value = "time",fill = FieldFill.INSERT)
@@ -20,4 +21,7 @@ public class Record {
     private int SearchUserId;
     @TableField("record_id")
     private String RecordId;
+    public Record(){
+
+    }
 }
