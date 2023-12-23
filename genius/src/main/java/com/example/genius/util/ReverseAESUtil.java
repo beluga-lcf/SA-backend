@@ -35,7 +35,7 @@ public class ReverseAESUtil {
     }
 
     public static void main(String[] args) {
-        String originalString = "dde20bd4c00a96e185ef0e7adc66399e";//要加密的原字符串
+        String originalString = "c6f51ede40a548e08e9cc5c5f57fba31";//要加密的原字符串
         System.out.println(encrypt(originalString));
     }
 }

@@ -18,7 +18,7 @@ public class PatentController {
     @GetMapping("/{patentid}")
     public ResponseEntity<String> getPatent(@PathVariable String patentid) {
         // 设置请求的URL
-        String url = "https://pubscholar.cn/hky/open/resources/api/v1/patent/" + patentid + "?uid=48bb3d184dd22adc05c0941194a2e718&type=";
+        String url = "https://pubscholar.cn/hky/open/resources/api/v2/patent/" + patentid + "?uid=3b9547dd87904c44923d675711729962&type=";
 
         // 创建RestTemplate实例
         RestTemplate restTemplate = new RestTemplate();
