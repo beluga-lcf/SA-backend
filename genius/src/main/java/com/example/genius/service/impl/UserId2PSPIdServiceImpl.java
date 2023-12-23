@@ -114,6 +114,14 @@ public class UserId2PSPIdServiceImpl extends ServiceImpl<UserId2PSPIdMapper, Use
         return new RePatentResult(200, "获取收藏专利", patents);
     }
 
+    @Override
+    public long getNum(int userid) {
+        QueryWrapper<UserId2PSPatentId> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userid", userid);
+        long num = userId2PSPIdMapper.selectCount(queryWrapper);
+        return num;
+    }
+
     @Transactional
     public List<UserId2PSPatentId> fragmentLike(String selectPName, LambdaQueryWrapper<UserId2PSPatentId> lambdaQueryWrapper) {
         int countCharNum = selectPName.length();
