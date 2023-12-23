@@ -11,4 +11,5 @@ public interface UserId2PSTIdService extends IService<UserId2PSThesisId> {
     ThesisResult deleteT(int userid, ThesisRequest thesisRequest);
     ThesisResult checkT(int userid, String thesisId);
     ThesisResult selectT(int userid, String selectTName, SelectCollectMod mod);
+    ThesisResult getT(int userid);
 }
