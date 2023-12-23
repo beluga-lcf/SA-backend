@@ -2,16 +2,15 @@ package com.example.genius.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.genius.dto.Report.CommentRep;
+import com.example.genius.dto.Report.ReportRate;
 import com.example.genius.dto.Report.WorkRepRet;
 import com.example.genius.dto.userPackage.LoginInfo;
-import com.example.genius.entity.Admin;
-import com.example.genius.entity.Response;
-import com.example.genius.entity.User;
-import com.example.genius.entity.WorkReport;
+import com.example.genius.entity.*;
 import com.example.genius.entity.comment.Comment;
 import com.example.genius.entity.comment.CommentReport;
 import com.example.genius.enums.ErrorType;
 import com.example.genius.service.*;
+import com.example.genius.service.impl.UseridRelatedOpenalexidServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -39,6 +38,8 @@ public class ReportController extends BaseController{
     private CommentService commentService;
     @Autowired
     private CommentReportService commentReportService;
+    @Autowired
+    private UseridRelatedOpenalexService uroService;
     @RequestMapping(value = "/workReport", method = RequestMethod.GET)
     public Response workReport(String openalexID, String comment,@RequestHeader(value = "Authorization") String token){
         int id = getIdByJwt(token);
@@ -98,7 +99,7 @@ public class ReportController extends BaseController{
         List<WorkReport> list = workReportService.list();
         ArrayList<WorkRepRet> list1 = new ArrayList<WorkRepRet>();
         for(WorkReport u : list){
-            if(u.getReporterName().contains(substring)||u.getDescription().contains(substring)){
+            if(u.getReporterName().contains(substring)){
                 list1.add(new WorkRepRet(u.getId(),u.getReporterName(),u.getReporter_id(),u.getReporteeWork(),u.getDescription(),u.getTime(),u.getIscheck()));
             }
         }
@@ -217,7 +218,7 @@ public class ReportController extends BaseController{
         List<CommentReport> list = commentReportService.list();
         ArrayList<CommentRep> list1 = new ArrayList<CommentRep>();
         for(CommentReport u : list){
-            if(u.getReporterName().contains(substring)||u.getReporteeComment().contains(substring)||u.getDescription().contains(substring)||u.getReason().contains(substring)){
+            if(u.getReporterName().contains(substring)||u.getReporteeComment().contains(substring)||u.getReason().contains(substring)){
                 list1.add(new CommentRep(u.getId(),u.getReporterName(),u.getReporteeComment(),u.getReporteeCommentId(),u.getReporter_id(),u.getIscheck(),u.getTime(),u.getDescription(),u.getReason()));
             }
         }
@@ -236,6 +237,23 @@ public class ReportController extends BaseController{
             list1.add(new CommentRep(u.getId(),u.getReporterName(),u.getReporteeComment(),u.getReporteeCommentId(),u.getReporter_id(),u.getIscheck(),u.getTime(),u.getDescription(),u.getReason()));
         }
         return getSuccessResponse(list1);
+    }
+    @RequestMapping(value = "/getSuccessRate", method = RequestMethod.GET)
+    public Response getSuccessRate(){
+        QueryWrapper<UseridRelatedOpenalexid> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("ischeck", 3);
+        QueryWrapper<WorkReport> queryWrapper2 = new QueryWrapper<>();
+        queryWrapper2.eq("ischeck", 3);
+        QueryWrapper<CommentReport> queryWrapper3 = new QueryWrapper<>();
+        queryWrapper3.eq("ischeck", 3);
+        int TotalRelate = uroService.list().size();
+        int SucRelate = uroService.list(queryWrapper1).size();
+        int TotalWorkReport = workReportService.list().size();
+        int SucWorkReport = workReportService.list(queryWrapper2).size();
+        int TotalCommentReport = commentReportService.list().size();
+        int SucCommentReport = commentReportService.list(queryWrapper3).size();
+        ReportRate reportRate = new ReportRate(TotalRelate, SucRelate, TotalWorkReport,SucWorkReport,TotalCommentReport,SucCommentReport);
+        return getSuccessResponse(reportRate);
     }
 
 }

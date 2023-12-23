@@ -161,7 +161,7 @@ public class OpenAlexService {
     }
     public String getRelatedWork(String funderID){
         funderID = funderID.substring(21);
-        String url = "https://api.openalex.org/works?filter=grants.funder:"+funderID+"&per-page=10&select=id,display_name";
+        String url = "https://api.openalex.org/works?filter=grants.funder:"+funderID+"&per-page=10&select=id,display_name,authorships";
         return restTemplate.getForObject(url, String.class);
     }
     public String getAuthorNameByAuthorID(String authorID){

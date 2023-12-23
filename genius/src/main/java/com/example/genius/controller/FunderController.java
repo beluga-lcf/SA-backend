@@ -3,6 +3,7 @@ package com.example.genius.controller;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.example.genius.dto.authorDisplay.AuthorDisplay;
 import com.example.genius.dto.funder.DisFunder;
 import com.example.genius.dto.funder.RelateWork;
 import com.example.genius.dto.funder.ReturnFunder;
@@ -53,10 +54,18 @@ public class FunderController extends BaseController{
         ArrayList<RelateWork> relateWorks = new ArrayList<>();
         for(int i = 0; i < resArray.size(); i++){
             JSONObject j = resArray.getJSONObject(i);
-            relateWorks.add(new RelateWork(j.getString("id"),j.getString("display_name")));
+            JSONArray jsonArray = j.getJSONArray("authorships");
+            ArrayList<AuthorDisplay> authorDisplays = new ArrayList<>();
+            for(int k = 0; k <min5(jsonArray.size());k++){
+                authorDisplays.add(new AuthorDisplay(jsonArray.getJSONObject(k).getJSONObject("author").getString("display_name")));
+            }
+            relateWorks.add(new RelateWork(j.getString("id"),j.getString("display_name"),authorDisplays));
         }
         disFunder.setRelateWorks(relateWorks);
         return getSuccessResponse(disFunder);
+    }
+    private int min5(int a){
+        return Math.min(a,5);
     }
 
 }

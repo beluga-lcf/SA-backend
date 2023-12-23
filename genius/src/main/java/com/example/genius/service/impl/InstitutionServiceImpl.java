@@ -76,7 +76,7 @@ public class InstitutionServiceImpl implements InstitutionService {
         return objectMapper.convertValue(objectNode,JsonNode.class);
     }
 
-    public JsonNode getInstitutionWorks(String institutionId) throws JsonProcessingException {
+    public JsonNode getInstitutionWorks(String institutionId) throws JsonProcessingException, ParseException {
         String url = "https://api.openalex.org/works";
         String params = "filter=" + "institutions.id:" + institutionId;
         String result = ApiUtil.get(url, params);
@@ -85,7 +85,8 @@ public class InstitutionServiceImpl implements InstitutionService {
         ArrayNode arrayNode = objectMapper.convertValue(allWorks,ArrayNode.class);
         ArrayNode workList = objectMapper.createArrayNode();
         for (int i = 0; i < Math.min(5, arrayNode.size()); i++) {
-            JsonNode newWork = arrayNode.get(i);
+            JsonNode oldWork = arrayNode.get(i);
+            JsonNode newWork = simplifyWork(oldWork);
             workList.add(newWork);
         }
         return objectMapper.convertValue(workList,JsonNode.class);
@@ -102,15 +103,20 @@ public class InstitutionServiceImpl implements InstitutionService {
         Date date = inputFormat.parse(oriNode.get("publication_date").asText());
         String outputDateString = outputFormat.format(date);
         newWork.put("date",outputDateString);
-        // 作者
+        // 作者名
         ArrayNode oriAuthors = objectMapper.convertValue(oriNode.get("authorships"),ArrayNode.class);
         ArrayList<String> newAuthors = new ArrayList<>();
         for (int i = 0; i < Math.min(5, oriAuthors.size()); i++){
             JsonNode author = oriAuthors.get(i);
-//            newAuthors.add(author.)
+            newAuthors.add(author.get("author").get("display_name").asText());
         }
-        return null;
-
+        newWork.put("authors", String.valueOf(newAuthors));
+        // 领域
+        String concept = oriNode.get("concepts").get(0).get("display_name").asText();
+        newWork.put("field",concept);
+        // 被引次数
+        newWork.set("cited_by_count",oriNode.get("cited_by_count"));
+        return newWork;
     }
 }
 
