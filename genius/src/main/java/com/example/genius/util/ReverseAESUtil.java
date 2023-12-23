@@ -18,7 +18,7 @@ public class ReverseAESUtil {
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
 
             byte[] encrypted = cipher.doFinal(input.getBytes());
-            return Base64.getEncoder().encodeToString(encrypted);
+            return Base64.getEncoder().encodeToString(Base64.getEncoder().encodeToString(encrypted).getBytes());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
