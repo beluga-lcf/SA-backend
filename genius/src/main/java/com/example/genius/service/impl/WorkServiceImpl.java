@@ -77,8 +77,8 @@ public class WorkServiceImpl implements WorkService {
         if(true){
             // 使用RestTemplate发起POST请求
             String apiUrl = path;
-//            HttpEntity<String> entity = new HttpEntity<>(null, ApiUtil.getHeaders());
-            ResponseEntity<String> response = new RestTemplate().exchange(apiUrl, HttpMethod.GET, null, String.class, ApiUtil.getHeaders());
+            HttpEntity<String> entity = new HttpEntity<>("haha", ApiUtil.getHeaders());
+            ResponseEntity<String> response = new RestTemplate().exchange(apiUrl, HttpMethod.GET, entity, String.class);
             String responseBody = response.getBody();
             // 解析返回值
             System.out.println("responseBody: "+responseBody);
@@ -97,10 +97,9 @@ public class WorkServiceImpl implements WorkService {
             JsonNode titleNode = originalNode.get("title");
             newNode.set("title", titleNode);
             //openalexid
-            String openaelexid = openAlexService.getWorkidByWorkname(titleNode.asText().trim());
-            ObjectNode openalexidNode = objectMapper.createObjectNode();
-            openalexidNode.put("openalexid",openaelexid);
-            newNode.put("openalexId",openalexidNode);
+            String workentity = openAlexService.getWorkidByWorkname(titleNode.asText());
+            String openalexId = objectMapper.readTree(workentity).get("results").get(0).get("id").asText();
+            newNode.put("openalexId",openalexId);
             //authors
             JsonNode authorsNode = originalNode.get("author");
             newNode.set("authors", authorsNode);
@@ -197,9 +196,11 @@ public class WorkServiceImpl implements WorkService {
                     newRecommend.set("id", recommend.get("id"));
                     String year = recommend.get("year").asText().trim();
                     String volume = recommend.get("volume").asText().trim();
-                    String author = recommend.get("author").get(0).asText().trim();
+                    String author = "";
+                    if(recommend.get("author").get(0)!=null) author = recommend.get("author").get(0).asText().trim();
                     StringJoiner infoJoiner = new StringJoiner(" ");
-                    infoJoiner.add(author).add(year).add(volume);
+                    if(!author.isEmpty()) infoJoiner.add(author);
+                    infoJoiner.add(year).add(volume);
                     String infomation = infoJoiner.toString();
                     newRecommend.put("info",infomation);
                     newRecommends.add(newRecommend);
