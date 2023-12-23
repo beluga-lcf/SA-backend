@@ -15,8 +15,11 @@ import org.springframework.web.client.RestTemplate;
 import springfox.documentation.spring.web.json.Json;
 import org.json.JSONObject;
 
+<<<<<<< HEAD
 import java.util.ArrayList;
+=======
 import java.util.*;
+>>>>>>> Terrry-x
 
 @Service
 public class OpenAlexService {
@@ -146,14 +149,17 @@ public class OpenAlexService {
         String url = "https://api.openalex.org/works?filter=grants.funder:"+funderID+"&per-page=10&select=id,display_name";
         return restTemplate.getForObject(url, String.class);
     }
+<<<<<<< HEAD
     public String getAuthorNameByAuthorID(String authorID){
         authorID = authorID.substring(21);
         String url = "https://api.openalex.org/people/"+authorID+"?select=display_name";
         return restTemplate.getForObject(url, String.class);
     }
+=======
     public List<String> getAuthoriIdByWorkname(String username){//通过作品名字获取作者ID
         String url = "https://api.openalex.org/works?filter=title.search:"+username;
         String jsonResponse = restTemplate.getForObject(url, String.class);
+>>>>>>> Terrry-x
 
         ObjectMapper objectMapper = new ObjectMapper();
         Set<String> authorIdsSet = new HashSet<>();

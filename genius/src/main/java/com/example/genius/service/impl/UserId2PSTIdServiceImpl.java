@@ -15,8 +15,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 
-import static com.example.genius.enums.SelectCollectMod.*;
-
 @Service
 public class UserId2PSTIdServiceImpl extends ServiceImpl<UserId2PSTIdMapper, UserId2PSThesisId> implements UserId2PSTIdService {
     @Autowired
@@ -102,6 +100,16 @@ public class UserId2PSTIdServiceImpl extends ServiceImpl<UserId2PSTIdMapper, Use
         else {
             return new ThesisResult(200, "查询到收藏论文", checkers);
         }
+    }
+
+    @Override
+    @Transactional
+    public ThesisResult getT(int userid) {
+        QueryWrapper<UserId2PSThesisId> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userid", userid);
+        List<UserId2PSThesisId> thesisIds;
+        thesisIds = userId2PSTIdMapper.selectList(queryWrapper);
+        return new ThesisResult(200, "获取收藏论文", thesisIds);
     }
 
     @Transactional
