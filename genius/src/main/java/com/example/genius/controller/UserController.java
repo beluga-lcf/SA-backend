@@ -74,12 +74,14 @@ public class UserController extends BaseController {
 
     }
 
+
     @RequestMapping(value = "/register", method = RequestMethod.GET)
     public Response register(String nick_name, String email, String password, String captcha) {
         User user = new User();
         user.setNickName(nick_name);
         user.setEmail(email);
         user.setPassword(password);
+
 //        if (captcha != null) {
 //            user.setPersonDescription(captcha);
 //        }
@@ -158,7 +160,7 @@ public class UserController extends BaseController {
         a.setText(text);
         a.setUserId(userid);
         a.setOpenalexid(openalexId);
-        a.setIscheck(0);
+        a.setIscheck(1);
         QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userid);
         List<UseridRelatedOpenalexid> userids =uroMapper.selectList(queryWrapper);
