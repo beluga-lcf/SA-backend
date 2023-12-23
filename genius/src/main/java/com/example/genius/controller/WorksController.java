@@ -93,7 +93,7 @@ public class WorksController extends BaseController{
             JsonNode jsonNode = workService.getWorkHomePage(workId);
             if(getIdByJwt(token)>=0){
                int userId = getIdByJwt(token);
-                AddRecord(jsonNode.get("workId").asText().trim(),jsonNode.get("title").asText().trim(),userId);
+                AddRecord(jsonNode.get("openalexid").asText().trim(),jsonNode.get("title").asText().trim(),userId);
             }
 
             return getSuccessResponse(jsonNode);
