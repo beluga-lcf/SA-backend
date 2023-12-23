@@ -768,26 +768,28 @@ public class UserController extends BaseController {
         // jwt解出id
         int userid = getIdByJwt(token);
         if (userid >= 0) {
-            try {
-                int result = userService.logOff(userid);
-                if (result == 0) {
-                    return getSuccessResponse(null);
-                }
-                else if (result == -1) {
-                    // 删除用户不存在
-                    return getErrorResponse(null, ErrorType.log_off_not_found);
-                }
-                else if (result == -2) {
-                    // 删除失败
-                    return getErrorResponse(null, ErrorType.log_off_failed);
-                }
-                else {
-                    return getSimpleError();
-                }
+            int result = userService.logOff(userid);
+            if (result == 0) {
+                return getSuccessResponse(null);
             }
-            catch (Exception e) {
+            else if (result == -1) {
+                // 删除用户不存在
+                return getErrorResponse(null, ErrorType.log_off_not_found);
+            }
+            else if (result == -2) {
+                // 删除失败
+                return getErrorResponse(null, ErrorType.log_off_failed);
+            }
+            else {
                 return getSimpleError();
             }
+//
+//            try {
+//            }
+//            catch (Exception e) {
+//                System.out.println("数据库操作失败");
+//                return getSimpleError();
+//            }
         } else if (userid == -1) {
             return getErrorResponse(null, ErrorType.login_timeout);
         } else if (userid == -2) {
@@ -857,6 +859,7 @@ public class UserController extends BaseController {
             return getSuccessResponse(tpNum);
         }
         catch (Exception e) {
+
             return getSimpleError();
         }
     }

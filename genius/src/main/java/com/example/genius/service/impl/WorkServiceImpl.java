@@ -1,5 +1,6 @@
 package com.example.genius.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.generated.mapper.*;
 import com.example.genius.config.Properties;
 import com.example.genius.dto.referenceWork.ReferenceWork;
@@ -7,6 +8,10 @@ import com.example.genius.dto.workDisplay.WorkDisplay;
 import com.example.genius.dto.workDisplay.InnerAuthor;
 import com.example.genius.dto.workDisplay.InnerLocation;
 import com.example.genius.dto.workDisplay.InnerSource;
+import com.example.genius.entity.HotField;
+import com.example.genius.entity.HotSpot;
+import com.example.genius.mapper.HotFieldMapper;
+import com.example.genius.mapper.HotSpotMapper;
 import com.example.genius.service.AccessService;
 import com.example.genius.service.WorkService;
 import com.example.genius.util.ApiUtil;
@@ -26,8 +31,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import springfox.documentation.spring.web.json.Json;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.StringJoiner;
+import java.util.UnknownFormatConversionException;
 
 @Slf4j
 @Service
@@ -55,6 +62,10 @@ public class WorkServiceImpl implements WorkService {
     private WorksPrimaryLocationsMapper worksPrimaryLocationsMapper;
     @Autowired
     private OpenAlexService openAlexService;
+    @Autowired
+    private HotFieldMapper hotFieldMapper;
+    @Autowired
+    private HotSpotMapper hotSpotMapper;
 
     /*
     public String workId; //论文id
@@ -202,8 +213,52 @@ public class WorkServiceImpl implements WorkService {
             } else {
                 System.out.println("Request failed with status code: " + response.getStatusCodeValue());
             }
+            // TODO:维护hot表
+            // hotField
+            insertHotField(keywordsNode);
+            // hotSpot
+            insertHotSpot(idNode.asText(), titleNode.asText());
             return newNode;
         }
         return null;
+    }
+
+    @Transactional
+    private void insertHotField(JsonNode keywords) {
+        // TODO: 拆解keywords
+        String[] keys = new String[2];
+        // 检索，有则update，无则insert
+        for (String key : keys) {
+            QueryWrapper<HotField> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("name", key);
+            HotField checker = hotFieldMapper.selectOne(queryWrapper);
+            if (checker == null) {
+                checker = new HotField(key, 1);
+                hotFieldMapper.insert(checker);
+            }
+            else {
+                checker.addHotNum();
+                hotFieldMapper.update(checker, queryWrapper);
+            }
+        }
+
+    }
+
+    @Transactional
+    private void insertHotSpot(String idNode, String titleNode) {
+        // 查询，有则update，无则insert
+        QueryWrapper<HotSpot> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", idNode);
+        HotSpot checker = hotSpotMapper.selectOne(queryWrapper);
+        if (checker == null) {
+            // 未记录，增加一条1
+            checker = new HotSpot(titleNode, 1, idNode);
+            hotSpotMapper.insert(checker);
+        }
+        else {
+            // 已记录，hotnum加1
+            checker.addHotNum();
+            hotSpotMapper.update(checker, queryWrapper);
+        }
     }
 }

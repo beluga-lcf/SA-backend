@@ -27,6 +27,15 @@ public class UserId2PSTIdServiceImpl extends ServiceImpl<UserId2PSTIdMapper, Use
         userId2PSThesisId.setUserId(userid);
         userId2PSThesisId.setpSThesisId(thesisRequest.getThesisId());
         userId2PSThesisId.setpSThesisName(thesisRequest.getThesisName());
+        StringBuilder sb = new StringBuilder();
+        if (thesisRequest.getAuthor().length > 0) {
+            sb.append(thesisRequest.getAuthor()[0]);
+        }
+        for (int i = 1; i < thesisRequest.getAuthor().length; i++) {
+            sb.append(", " + thesisRequest.getAuthor()[i]);
+        }
+        String authors = sb.toString();
+        userId2PSThesisId.setAuthor(authors);
         QueryWrapper<UserId2PSThesisId> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("userid", userid);
         queryWrapper.eq("psthesisid", thesisRequest.getThesisId());

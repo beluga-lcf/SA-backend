@@ -15,6 +15,8 @@ public class UserId2PSThesisId {
     private String pSThesisId;
     @TableField("tname")
     private String pSThesisName;
+    @TableField("author")
+    private String author;
 
     public void setUserId(int userId) {
         this.userId = userId;
@@ -26,5 +28,9 @@ public class UserId2PSThesisId {
 
     public void setpSThesisName(String pSThesisName) {
         this.pSThesisName = pSThesisName;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 }

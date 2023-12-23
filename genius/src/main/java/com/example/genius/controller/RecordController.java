@@ -5,12 +5,13 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.genius.dto.Disrecord.Disrecord;
 import com.example.genius.dto.mywork.ConceptDis;
-import com.example.genius.entity.Record;
-import com.example.genius.entity.Response;
+import com.example.genius.entity.*;
 import com.alibaba.fastjson2.JSONArray;
-import com.example.genius.entity.User;
+import com.example.genius.entity.Record;
 import com.example.genius.enums.ErrorType;
 import com.example.genius.mapper.RecordMapper;
+import com.example.genius.service.HotFieldService;
+import com.example.genius.service.HotSpotService;
 import com.example.genius.service.RecordService;
 import com.example.genius.service.impl.OpenAlexService;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,10 @@ public class RecordController extends BaseController{
     private RecordMapper recordMapper;
     @Autowired
     private OpenAlexService openAlexService;
+    @Autowired
+    private HotFieldService hotFieldService;
+    @Autowired
+    private HotSpotService hotSpotService;
     @RequestMapping(value = "/display", method = RequestMethod.GET)
     public Response search( @RequestHeader(value = "Authorization") String token){
         int id = getIdByJwt(token);
@@ -115,25 +120,65 @@ public class RecordController extends BaseController{
         return getSuccessResponse("成功");
     }
 
-
-
     // TODO: 总热点领域
     @RequestMapping(value = "/hotfield",method = RequestMethod.GET)
     public Response getHotField() {
-        // 归一化热值*1000+1000即[1000, 2000]
-        // 展示成果同时维护表
-        return null;
+        List<HotField> hotFields = hotFieldService.getTop10();
+        if (hotFields == null) {
+            // 查询错误
+            return getErrorResponse(null, ErrorType.hotField_fail);
+        }
+        else {
+            // 归一化热值*1000+1000即[1000, 2000]
+            int max = 0;
+            int min = 10000000;
+            for (HotField hotField : hotFields) {
+                if (max < hotField.getHotNum()) {
+                    max = hotField.getHotNum();
+                }
+                if (min > hotField.getHotNum()) {
+                    min = hotField.getHotNum();
+                }
+            }
+            int mid = (max - min) == 0 ? 1 : 0;
+            for (HotField hotField : hotFields) {
+                hotField.setHotNum((int) ((hotField.getHotNum() - min) / mid * 500.0 + 500));
+            }
+            return getSuccessResponse(hotFields);
+        }
     }
+
     // TODO: 总热点成果
     @RequestMapping(value = "/hotspots",method = RequestMethod.GET)
     public Response getHotSpots() {
-        // 触发器绑定记录表（只绑定insert动作）
-        return null;
+        List<HotSpot> hotSpots = hotSpotService.getTop10();
+        if (hotSpots == null) {
+            // 查询错误
+            return getErrorResponse(null, ErrorType.hotSpot_fail);
+        }
+        else {
+            // 归一化热值*1000+1000即[1000, 2000]
+            int max = 0;
+            int min = 10000000;
+            for (HotSpot hotSpot : hotSpots) {
+                if (max < hotSpot.getHotNum()) {
+                    max = hotSpot.getHotNum();
+                }
+                if (min > hotSpot.getHotNum()) {
+                    min = hotSpot.getHotNum();
+                }
+            }
+            int mid = (max - min) == 0 ? 1 : 0;
+            for (HotSpot hotSpot : hotSpots) {
+                hotSpot.setHotNum((int) ((hotSpot.getHotNum() - min) / mid * 500.0 + 500));
+            }
+            return getSuccessResponse(hotSpots);
+        }
     }
-    // TODO: 月热点成果
-    @RequestMapping(value = "/hotspotsM",method = RequestMethod.GET)
-    public Response getHotSpotsM() {
-        // 触发器绑定记录表（只绑定insert动作）
-        return null;
-    }
+//    // TODO: 月热点成果
+//    @RequestMapping(value = "/hotspotsM",method = RequestMethod.GET)
+//    public Response getHotSpotsM() {
+//        // 触发器绑定记录表（只绑定insert动作）
+//        return null;
+//    }
 }

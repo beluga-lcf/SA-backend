@@ -29,6 +29,15 @@ public class UserId2PSPIdServiceImpl extends ServiceImpl<UserId2PSPIdMapper, Use
         userId2PSPatentId.setUserId(userid);
         userId2PSPatentId.setPSPatentId(patentRequest.getPatentId());
         userId2PSPatentId.setPatentName(patentRequest.getPatentName());
+        StringBuilder sb = new StringBuilder();
+        if (patentRequest.getAuthor().length > 0) {
+            sb.append(patentRequest.getAuthor()[0]);
+        }
+        for (int i = 1; i < patentRequest.getAuthor().length; i++) {
+            sb.append(", " + patentRequest.getAuthor()[i]);
+        }
+        String authors = sb.toString();
+        userId2PSPatentId.setAuthor(authors);
         QueryWrapper<UserId2PSPatentId> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("userid", userid);
         queryWrapper.eq("pspatentId", patentRequest.getPatentId());

@@ -25,7 +25,9 @@ public enum ErrorType {
     already_relate(1022,"用户已认证"),
     log_off_not_found(1101, "用户不存在"),
     log_off_failed(1102, "注销失败"),
-    no_such_admin(1103, "不存在的管理员");
+    no_such_admin(1103, "不存在的管理员"),
+    hotField_fail(1104, "获取热点领域错误"),
+    hotSpot_fail(1105, "获取热点成果错误");
 
 
 

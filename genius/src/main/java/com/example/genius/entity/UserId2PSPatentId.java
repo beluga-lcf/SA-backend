@@ -13,6 +13,8 @@ public class UserId2PSPatentId {
     private String PSPatentId;
     @TableField("pname")
     private String PatentName;
+    @TableField("author")
+    private String author;
 
     public void setUserId(int userId) {
         this.userId = userId;
@@ -24,5 +26,9 @@ public class UserId2PSPatentId {
 
     public void setPatentName(String patentName) {
         PatentName = patentName;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 }
