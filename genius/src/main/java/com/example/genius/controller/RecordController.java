@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.genius.dto.Disrecord.Disrecord;
+import com.example.genius.dto.mywork.ConceptDis;
 import com.example.genius.entity.Record;
 import com.example.genius.entity.Response;
 import com.alibaba.fastjson2.JSONArray;
@@ -11,6 +12,7 @@ import com.example.genius.entity.User;
 import com.example.genius.enums.ErrorType;
 import com.example.genius.mapper.RecordMapper;
 import com.example.genius.service.RecordService;
+import com.example.genius.service.impl.OpenAlexService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -32,6 +34,8 @@ public class RecordController extends BaseController{
     private RecordService recordService;
     @Autowired
     private RecordMapper recordMapper;
+    @Autowired
+    private OpenAlexService openAlexService;
     @RequestMapping(value = "/display", method = RequestMethod.GET)
     public Response search( @RequestHeader(value = "Authorization") String token){
         int id = getIdByJwt(token);
@@ -48,7 +52,14 @@ public class RecordController extends BaseController{
 //                j.put("time",record.getSearchTime());
 //                j.put("id",record.getId());
 //                array.add(j);
-                disrecords.add(new Disrecord(record.getRecordId(),record.getRecordName(),record.getTime()));
+                String result = openAlexService.getConceptByWorkID(record.getRecordId());
+                ArrayList<ConceptDis> conceptDis = new ArrayList<>();
+                JSONObject jsonObject = JSONObject.parseObject(result);
+                JSONArray jsonArray = jsonObject.getJSONArray("concepts");
+                for(int i = 0; i<jsonArray.size(); i++){
+                    conceptDis.add(new ConceptDis(jsonArray.getJSONObject(i).getString("display_name")));
+                }
+                disrecords.add(new Disrecord(record.getRecordId(),record.getRecordName(),record.getTime(),conceptDis));
             }
             return getSuccessResponse(disrecords);
         }
@@ -75,7 +86,14 @@ public class RecordController extends BaseController{
         ArrayList<Disrecord> disrecords = new ArrayList<>();
         for(Record record : records){
             if(record.getRecordName().contains(keyword)){
-                disrecords.add(new Disrecord(record.getRecordId(),record.getRecordName(),record.getTime()));
+                String result = openAlexService.getConceptByWorkID(record.getRecordId());
+                ArrayList<ConceptDis> conceptDis = new ArrayList<>();
+                JSONObject jsonObject = JSONObject.parseObject(result);
+                JSONArray jsonArray = jsonObject.getJSONArray("concepts");
+                for(int i = 0; i<jsonArray.size(); i++){
+                    conceptDis.add(new ConceptDis(jsonArray.getJSONObject(i).getString("display_name")));
+                }
+                disrecords.add(new Disrecord(record.getRecordId(),record.getRecordName(),record.getTime(),conceptDis));
             }
         }
         return getSuccessResponse(disrecords);
@@ -91,7 +109,7 @@ public class RecordController extends BaseController{
     public Response test(@RequestHeader(value = "Authorization") String token){
         int user = getIdByJwt(token);
         if(user>=0){
-            AddRecord1("2233","dsfaf",user);
+            AddRecord1("https://openalex.org/W2741809807","dsfaf",user);
         }
         return getSuccessResponse("成功");
     }
