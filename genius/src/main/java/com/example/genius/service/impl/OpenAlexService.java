@@ -26,6 +26,11 @@ public class OpenAlexService {
     public OpenAlexService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
+    public String getConceptByWorkID(String workID){
+        workID = workID.substring(21);
+        String url = "https://api.openalex.org/works/"+workID+"?select=concepts";
+        return restTemplate.getForObject(url, String.class);
+    }
 
     public String getType() {
         String url = "https://api.openalex.org/works?group_by=type";
