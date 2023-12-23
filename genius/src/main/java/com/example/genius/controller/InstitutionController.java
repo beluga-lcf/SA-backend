@@ -27,4 +27,15 @@ public class InstitutionController extends BaseController{
             return null;
         }
     }
+
+    @GetMapping("/getInstitutionWorks")
+    public Response<Object> getInstitutionWorks(String institutionId){
+        try {
+            return getSuccessResponse(institutionService.getInstitutionWorks(institutionId));
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

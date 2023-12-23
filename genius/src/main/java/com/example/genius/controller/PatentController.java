@@ -1,6 +1,7 @@
 package com.example.genius.controller;
 
 
+import com.example.genius.util.ReverseAESUtil;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -18,7 +19,7 @@ public class PatentController {
     @GetMapping("/{patentid}")
     public ResponseEntity<String> getPatent(@PathVariable String patentid) {
         // 设置请求的URL
-        String url = "https://pubscholar.cn/hky/open/resources/api/v1/patent/" + patentid + "?uid=48bb3d184dd22adc05c0941194a2e718&type=";
+        String url = "https://pubscholar.cn/hky/open/resources/api/v2/patent/" + ReverseAESUtil.encrypt(patentid) + "?uid=664ab44bcbb54371b6fbc154241c9072&type=";
 
         // 创建RestTemplate实例
         RestTemplate restTemplate = new RestTemplate();

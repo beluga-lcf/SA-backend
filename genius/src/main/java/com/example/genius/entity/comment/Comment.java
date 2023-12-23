@@ -34,5 +34,8 @@ public class Comment {
 
     @Column(name = "type")
     private String type;
+
+    @Column(name = "user_name", nullable = false)
+    private String userName;
 }
 

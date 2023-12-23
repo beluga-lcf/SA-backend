@@ -123,25 +123,28 @@ public class ApiUtil {
     }
 
     /*
-    url of scholar.cn
+    url of pubscholar.cn
      */
     public static String getScholarUrl(String type) {
         return "https://pubscholar.cn/hky/open/resources/api/v1/" + type;
     }
 
+    public static String getScholarUrl2(String type) {
+        return "https://pubscholar.cn/hky/open/resources/api/v2/" + type;
+    }
     public static HttpHeaders getHeaders(){
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", "application/json, text/plain, */*");
         headers.set("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
         headers.set("Connection", "keep-alive");
         headers.set("Content-Type", "application/json;charset=UTF-8");
-        headers.set("Cookie", "XSRF-TOKEN=e01d46ee-1f94-4e60-ad16-3eed506b263b");
+        headers.set("Cookie", "XSRF-TOKEN=c46101a8-6be3-43cb-b141-8329042e49ad");
         headers.set("Origin", "https://pubscholar.cn");
         headers.set("Sec-Fetch-Dest", "empty");
         headers.set("Sec-Fetch-Mode", "cors");
         headers.set("Sec-Fetch-Site", "same-origin");
         headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0");
-        headers.set("X-XSRF-TOKEN", "e01d46ee-1f94-4e60-ad16-3eed506b263b");
+        headers.set("X-XSRF-TOKEN", "c46101a8-6be3-43cb-b141-8329042e49ad");
         headers.set("sec-ch-ua", "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"");
         headers.set("sec-ch-ua-mobile", "?0");
         headers.set("sec-ch-ua-platform", "\"Windows\"");
@@ -170,12 +173,12 @@ public class ApiUtil {
         connection.setRequestProperty("Accept", "application/json, text/plain, */*");
         connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
         connection.setRequestProperty("Connection", "keep-alive");
-        connection.setRequestProperty("Cookie", "XSRF-TOKEN=0023e620-b52e-4ede-98f4-455d5363fddd");
+        connection.setRequestProperty("Cookie", "XSRF-TOKEN=c46101a8-6be3-43cb-b141-8329042e49ad");
         connection.setRequestProperty("Sec-Fetch-Dest", "empty");
         connection.setRequestProperty("Sec-Fetch-Mode", "cors");
         connection.setRequestProperty("Sec-Fetch-Site", "same-origin");
         connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0");
-        connection.setRequestProperty("X-XSRF-TOKEN", "0023e620-b52e-4ede-98f4-455d5363fddd");
+        connection.setRequestProperty("X-XSRF-TOKEN", "c46101a8-6be3-43cb-b141-8329042e49ad");
         connection.setRequestProperty("sec-ch-ua", "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"");
         connection.setRequestProperty("sec-ch-ua-mobile", "?0");
         connection.setRequestProperty("sec-ch-ua-platform", "\"Windows\"");

@@ -16,7 +16,7 @@ public class MainPageController extends BaseController {
     public void setSearchService(SearchService searchService){
         this.searchService = searchService;
     }
-    @GetMapping("/getHotFields")
+    @GetMapping("/getAllFields")
     public JsonNode getHotFields(){
         try {
             return searchService.getHotFields();

@@ -1,7 +1,10 @@
 package com.example.genius.service.impl;
 
+<<<<<<< HEAD
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+=======
 import com.alibaba.fastjson2.JSONObject;
+>>>>>>> 1a5a1114316f266b4ef2e8b5094229231bed6fde
 import com.example.generated.mapper.*;
 import com.example.genius.config.Properties;
 import com.example.genius.dto.referenceWork.ReferenceWork;
@@ -233,6 +236,7 @@ public class WorkServiceImpl implements WorkService {
         return null;
     }
 
+<<<<<<< HEAD
     @Transactional
     private void insertHotField(JsonNode keywords) {
         // TODO: 拆解keywords
@@ -271,4 +275,8 @@ public class WorkServiceImpl implements WorkService {
             hotSpotMapper.update(checker, queryWrapper);
         }
     }
+=======
+
+
+>>>>>>> 1a5a1114316f266b4ef2e8b5094229231bed6fde
 }
