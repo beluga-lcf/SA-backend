@@ -123,7 +123,7 @@ public class ApiUtil {
     }
 
     /*
-    url of scholar.cn
+    url of pubscholar.cn
      */
     public static String getScholarUrl(String type) {
         return "https://pubscholar.cn/hky/open/resources/api/v1/" + type;

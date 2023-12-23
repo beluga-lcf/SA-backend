@@ -10,6 +10,7 @@ import com.example.genius.dto.workDisplay.InnerSource;
 import com.example.genius.service.AccessService;
 import com.example.genius.service.WorkService;
 import com.example.genius.util.ApiUtil;
+import com.example.genius.util.ReverseAESUtil;
 import com.example.genius.util.StringUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -69,9 +70,10 @@ public class WorkServiceImpl implements WorkService {
      */
     @Override
     public JsonNode getWorkHomePage(String workId) throws Exception {
-        String baseUrl = ApiUtil.getScholarUrl("article")+"/"+workId;
+        String baseUrl = ApiUtil.getScholarUrl("article")+"/"+ ReverseAESUtil.encrypt(workId);
         String param = "uid=3b9547dd87904c44923d675711729962&type=article";
         String path = baseUrl + "?" + param;
+        if(Properties.isDebug) System.out.println(path);
         if(true){
             String responseBody = ApiUtil.getConnection(path);
             ObjectMapper objectMapper = new ObjectMapper();
