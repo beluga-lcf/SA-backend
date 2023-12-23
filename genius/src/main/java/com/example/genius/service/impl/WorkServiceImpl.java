@@ -98,14 +98,9 @@ public class WorkServiceImpl implements WorkService {
             JsonNode titleNode = originalNode.get("title");
             newNode.set("title", titleNode);
             //openalexid
-
-            String openaelexid = openAlexService.getWorkidByWorkname(titleNode.asText().trim());
-            JSONObject jsonObject = JSONObject.parseObject(openaelexid);
-            JSONObject results = jsonObject.getJSONObject("results");
-            openaelexid = results.getString("id");
-            ObjectNode openalexidNode = objectMapper.createObjectNode();
-            openalexidNode.put("openalexid",openaelexid);
-            newNode.put("openalexId",openalexidNode);
+            String workEntity = openAlexService.getWorkidByWorkname(titleNode.asText().trim());
+            String openaelexId = objectMapper.readTree(workEntity).get("results").get(0).get("id").asText();
+            newNode.put("openalexId", openaelexId);
             //authors
             JsonNode authorsNode = originalNode.get("author");
             newNode.set("authors", authorsNode);
