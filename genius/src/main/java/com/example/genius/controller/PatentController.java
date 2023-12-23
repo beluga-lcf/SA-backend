@@ -9,28 +9,12 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.example.genius.util.ApiUtil.getHeaders;
+
 @RestController
 @RequestMapping("/api/patents")
 public class PatentController {
-    public HttpHeaders getHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.set("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
-        headers.setCacheControl(CacheControl.noCache());
-        headers.setConnection("keep-alive");
-        headers.set("Cookie", "XSRF-TOKEN=be214c6e-81ab-4185-aa9b-65a102798470");
-        headers.setPragma("no-cache");
-        headers.set("Sec-Fetch-Dest", "empty");
-        headers.set("Sec-Fetch-Mode", "cors");
-        headers.set("Sec-Fetch-Site", "same-origin");
-        headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36");
-        headers.set("X-XSRF-TOKEN", "be214c6e-81ab-4185-aa9b-65a102798470");
-        headers.set("sec-ch-ua", "\"Not/A)Brand\";v=\"99\", \"Google Chrome\";v=\"115\", \"Chromium\";v=\"115\"");
-        headers.set("sec-ch-ua-mobile", "?0");
-        headers.set("sec-ch-ua-platform", "\"Windows\"");
 
-        return  headers;
-    }
     @GetMapping("/{patentid}")
     public ResponseEntity<String> getPatent(@PathVariable String patentid) {
         // 设置请求的URL

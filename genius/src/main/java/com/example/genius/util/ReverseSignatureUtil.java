@@ -120,7 +120,7 @@ public class ReverseSignatureUtil {
         // 复制原始数据
         System.arraycopy(words, 0, paddedWords, 0, words.length);
 
-        // 添加1位和0位填充
+        // 添加 1位和 0位填充
         int index = bitsLength / 32;
         paddedWords[index] |= 1 << (31 - (bitsLength % 32));
         paddedWords[paddedWords.length - 2] = bitsLength >>> 32;

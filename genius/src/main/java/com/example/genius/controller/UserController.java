@@ -186,7 +186,7 @@ public class UserController extends BaseController {
     }
     @RequestMapping(value = "/filterApproval", method = RequestMethod.GET)
     public Response FilterApproval(int status){
-        if(status<0||status>3){
+        if(status<1||status>4){
             return getErrorResponse(null,ErrorType.invalid_check);
         }
         QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
@@ -239,7 +239,7 @@ public class UserController extends BaseController {
         if(a == null){
             return getErrorResponse(null,ErrorType.no_relate);
         }
-        if(isAgree<0||isAgree>3){
+        if(isAgree<1||isAgree>4){
             return getErrorResponse(null,ErrorType.invalid_check);
         }
         a.setIscheck(isAgree);

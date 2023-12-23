@@ -17,9 +17,10 @@ public class CommentController {
     @Autowired
     private CommentLikesService commentLikesService;
 
-    @GetMapping("/getByWorkId")
-    public List<Comment> getCommentsByWorkId(@RequestParam String workId) {
-        return commentService.getAllCommentsByWorkId(workId);
+    @GetMapping("/getByWorkIdAndType")
+    public List<Comment> getCommentsByWorkId(@RequestParam String workId,
+                                             @RequestParam String type) {
+        return commentService.getAllCommentsByWorkIdAndType(workId,type);
     }
 
     @PostMapping("/create")

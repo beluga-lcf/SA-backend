@@ -184,7 +184,7 @@ public class ApiServiceImpl implements ApiService{
         return complex(payload,type,false);
     }
     public JsonNode getAggregations(JsonNode payload, String type) throws Exception{
-        ObjectMapper objectMapper = new ObjectMapper();
+
 //        objectMapper.configure(SerializationFeature.INDENT_OUTPUT, false);
 //        String requestBody = objectMapper.writeValueAsString(payload);
 //        if (Properties.isDebug) System.out.println("Request: " + requestBody);
@@ -192,6 +192,7 @@ public class ApiServiceImpl implements ApiService{
 //        // 使用RestTemplate发起POST请求
 //        String apiUrl = ApiUtil.getScholarUrl(type) + "/aggregations";
 //        ResponseEntity<String> response = new RestTemplate().exchange(apiUrl, HttpMethod.POST, entity, String.class);
+        ObjectMapper objectMapper = new ObjectMapper();
         String responseBody = complex(payload,type,true);
         // 处理响应
         JsonNode originalNode = objectMapper.readTree(responseBody);
@@ -257,32 +258,6 @@ public class ApiServiceImpl implements ApiService{
             System.out.println("Request failed with status code: " + response.getStatusCodeValue());
             return "error";
         }
-    }
-    public String package_one_strategy(JsonNode strategy,int type){// content的类型，1:string,2:int,3:year
-        JsonNode op = strategy.get("op");
-        JsonNode tag = strategy.get("tag");
-        JsonNode content = strategy.get("content");
-        JsonNode fuzzy = strategy.get("fuzzy");
-        StringBuilder builder = new StringBuilder();
-        if(type==2) {
-            // (title:(1))
-            builder.append("(").append(tag).append(":(").append(content.asInt());
-            if(fuzzy.asInt()==1) builder.append("~");
-            builder.append("))");
-        }
-        else if(type==1){
-            // (keyword:"2")
-            builder.append("(").append(tag).append(":").append(content.asText());
-            if(fuzzy.asInt()==1) builder.append("~");
-            builder.append(")");
-        }
-        else{ //type == 3, content:"2022,2023"
-            // (year:[2020 TO 2023])
-            String strs = content.asText();
-            String[] years = strs.split(",");
-            builder.append("(").append(tag).append(":[").append(years[0]).append(" TO ").append(years[1]).append("])");
-        }
-        return builder.toString();
     }
     public JsonNode test(JsonNode payload) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
