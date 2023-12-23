@@ -15,7 +15,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     public List<Comment> getAllCommentsByWorkIdAndType(String workId,String type) {
         //获取所有评论
         QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("work_id", workId);
+        queryWrapper.eq("work_id", workId).eq("type", type);
         return list(queryWrapper);
     }
     @Override
