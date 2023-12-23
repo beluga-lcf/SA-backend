@@ -242,16 +242,22 @@ public class ReportController extends BaseController{
     public Response getSuccessRate(){
         QueryWrapper<UseridRelatedOpenalexid> queryWrapper1 = new QueryWrapper<>();
         queryWrapper1.eq("ischeck", 3);
+        QueryWrapper<UseridRelatedOpenalexid> queryWrapper4 = new QueryWrapper<>();
+        queryWrapper4.eq("ischeck", 4);
         QueryWrapper<WorkReport> queryWrapper2 = new QueryWrapper<>();
         queryWrapper2.eq("ischeck", 3);
+        QueryWrapper<WorkReport> queryWrapper5 = new QueryWrapper<>();
+        queryWrapper5.eq("ischeck", 4);
         QueryWrapper<CommentReport> queryWrapper3 = new QueryWrapper<>();
         queryWrapper3.eq("ischeck", 3);
+        QueryWrapper<CommentReport> queryWrapper6 = new QueryWrapper<>();
+        queryWrapper6.eq("ischeck", 4);
         int TotalRelate = uroService.list().size();
-        int SucRelate = uroService.list(queryWrapper1).size();
+        int SucRelate = uroService.list(queryWrapper1).size()+uroService.list(queryWrapper4).size();
         int TotalWorkReport = workReportService.list().size();
-        int SucWorkReport = workReportService.list(queryWrapper2).size();
+        int SucWorkReport = workReportService.list(queryWrapper2).size()+workReportService.list(queryWrapper5).size();
         int TotalCommentReport = commentReportService.list().size();
-        int SucCommentReport = commentReportService.list(queryWrapper3).size();
+        int SucCommentReport = commentReportService.list(queryWrapper3).size()+commentReportService.list(queryWrapper6).size();
         ReportRate reportRate = new ReportRate(TotalRelate, SucRelate, TotalWorkReport,SucWorkReport,TotalCommentReport,SucCommentReport);
         return getSuccessResponse(reportRate);
     }

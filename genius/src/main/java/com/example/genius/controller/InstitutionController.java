@@ -39,7 +39,7 @@ public class InstitutionController extends BaseController{
         }
     }
 
-    @GetMapping("/getInstitutionPatents")
+    @GetMapping("/getInstitutionsForMainPage")
     public Response<Object> getInstitutionsForMainPage(){
         try {
             return getSuccessResponse(institutionService.getInstitutionsForMainPage());
@@ -49,4 +49,6 @@ public class InstitutionController extends BaseController{
             return null;
         }
     }
+
+
 }

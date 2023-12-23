@@ -67,10 +67,9 @@ public class InstitutionServiceImpl implements InstitutionService {
     public JsonNode getInstitutionHomePage2(String Id) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         String url = "https://api.openalex.org/institutions/"+StringUtil.removePrefix(Id);
-        String params = "";
-        String result = ApiUtil.get(url, params);
-        JsonNode jsonNode = objectMapper.readTree(result);
-        JsonNode institution = jsonNode.get("results");
+        System.out.println(url);
+        String result = ApiUtil.get(url);
+        JsonNode institution = objectMapper.readTree(result);
         // 先剔除一部分没用的数据，避免干扰其前端同学
         ObjectNode objectNode = objectMapper.convertValue(institution, ObjectNode.class);
         objectNode.remove("lineage");
@@ -173,7 +172,7 @@ public class InstitutionServiceImpl implements InstitutionService {
         // 擅长领域
         ArrayNode oriConcepts = objectMapper.convertValue(oriNode.get("x_concepts"),ArrayNode.class);
         ArrayList<String> newConcepts = new ArrayList<>();
-        for (int i = 0; ; i++){
+        for (int i = 0; i< oriConcepts.size(); i++){
             JsonNode concept = oriConcepts.get(i);
             if(concept.get("score").asInt()>50){
                 newConcepts.add(concept.get("display_name").asText());
