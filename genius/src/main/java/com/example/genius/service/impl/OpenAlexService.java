@@ -248,7 +248,6 @@ public class OpenAlexService {
                 e.printStackTrace();
             }
         }
-
         try {
             organization = (String) new JSONObject(anAuthor.get("last_known_institution")).get("display_name");
         }
@@ -271,6 +270,7 @@ public class OpenAlexService {
         ArrayList<MyWorkDis> myWorkDisArrayList = getWorks(authorId, paperName);
         System.out.println("成果" + myWorkDisArrayList.size());
         return new ScholarSimpleInform(
+                authorId,
                 name, // name
                 names, // names
 //                // identity

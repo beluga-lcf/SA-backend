@@ -802,6 +802,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/getauthorbypaper", method = RequestMethod.GET)
     public Response getAuthorByPaper(String userName, String paperName) {
         List<ScholarSimpleInform> authors = new ArrayList<>();
+        System.out.println("建立List");
         List<String> scholarIds = openAlexService.getAuthoriIdByWorkname(paperName);
         for (String scholarId : scholarIds) {
             // 获得一个author

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ScholarSimpleInform {
+    // openlaexId
+    public String id;
     // 姓名
     public String name;
     // 其他名字
@@ -29,7 +31,8 @@ public class ScholarSimpleInform {
     // 有无被认领
     public boolean isClaimed;
 
-    public ScholarSimpleInform(String name, String[] names, String organization, String[] interests, String citationsNum, String achievementsNum, ArrayList<MyWorkDis> myWorkDisList) {
+    public ScholarSimpleInform(String id, String name, String[] names, String organization, String[] interests, String citationsNum, String achievementsNum, ArrayList<MyWorkDis> myWorkDisList) {
+        this.id = id;
         this.name = name;
         this.names = names;
         this.organization = organization;
