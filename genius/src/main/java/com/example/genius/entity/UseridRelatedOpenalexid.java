@@ -17,4 +17,6 @@ public class UseridRelatedOpenalexid {
     private int ischeck;
     @TableField(value = "time",fill = FieldFill.INSERT)
     private LocalDateTime time;
+    @TableField(value = "text")
+    private String text;
 }

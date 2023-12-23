@@ -11,11 +11,13 @@ public class approvalRelateReturn {
     private int ischeck;
     private String approvePeople;
     private LocalDateTime time;
-    public approvalRelateReturn(int id, String openalexID, String approvePeople, LocalDateTime time,int ischeck) {
+    private String text;
+    public approvalRelateReturn(int id, String openalexID, String approvePeople, LocalDateTime time,int ischeck,String text) {
         this.id = id;
         this.openalexID = openalexID;
         this.ischeck = ischeck;
         this.approvePeople = approvePeople;
         this.time = time;
+        this.text = text;
     }
 }

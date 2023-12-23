@@ -53,6 +53,20 @@ public class WorkServiceImpl implements WorkService {
     private WorksLocationsMapper worksLocationsMapper;
     @Autowired
     private WorksPrimaryLocationsMapper worksPrimaryLocationsMapper;
+    @Autowired
+    private OpenAlexService openAlexService;
+
+    /*
+    public String workId; //论文id
+    public String type; //论文类型
+    public String title; //论文标题
+    public List<AuthorOfWork> authors; //论文作者
+    public List<ConceptOfWork> keywords; //论文关键词
+    public Integer citationCount; //论文被引用次数
+    public SourceOfWork source; // 论文来源(期刊或数据库)
+    public String publicationDate; //论文出版日期
+    public LocationOfWork location; //论文下载地址
+     */
     @Override
     public JsonNode getWorkHomePage(String workId) throws Exception {
         String baseUrl = ApiUtil.getScholarUrl("article")+"/"+workId;
@@ -74,6 +88,9 @@ public class WorkServiceImpl implements WorkService {
             //title
             JsonNode titleNode = originalNode.get("title");
             newNode.set("title", titleNode);
+            //openalexid
+            String openaelexid = openAlexService.getWorkidByWorkname(titleNode.asText().trim());
+            newNode.put("openalexid",openaelexid);
             //authors
             JsonNode authorsNode = originalNode.get("author");
             newNode.set("authors", authorsNode);

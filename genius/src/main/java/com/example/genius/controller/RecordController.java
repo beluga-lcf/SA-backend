@@ -32,7 +32,7 @@ public class RecordController extends BaseController{
     private RecordService recordService;
     @Autowired
     private RecordMapper recordMapper;
-    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    @RequestMapping(value = "/display", method = RequestMethod.GET)
     public Response search( @RequestHeader(value = "Authorization") String token){
         int id = getIdByJwt(token);
         QueryWrapper<Record> queryWrapper = new QueryWrapper<>();
@@ -48,7 +48,7 @@ public class RecordController extends BaseController{
 //                j.put("time",record.getSearchTime());
 //                j.put("id",record.getId());
 //                array.add(j);
-                disrecords.add(new Disrecord(record.getRecordText(),record.getSearchTime(),record.getId()));
+                disrecords.add(new Disrecord(record.getRecordId(),record.getRecordName(),record.getTime()));
             }
             return getSuccessResponse(disrecords);
         }
@@ -74,12 +74,29 @@ public class RecordController extends BaseController{
         List<Record> records = recordService.list(queryWrapper);
         ArrayList<Disrecord> disrecords = new ArrayList<>();
         for(Record record : records){
-            if(record.getRecordText().contains(keyword)){
-                disrecords.add(new Disrecord(record.getRecordText(),record.getSearchTime(),record.getId()));
+            if(record.getRecordName().contains(keyword)){
+                disrecords.add(new Disrecord(record.getRecordId(),record.getRecordName(),record.getTime()));
             }
         }
         return getSuccessResponse(disrecords);
     }
+    public void AddRecord1(String workId,String title,int UserId){
+        Record record = new Record();
+        record.setRecordId(workId);
+        record.setRecordName(title);
+        record.setSearchUserId(UserId);
+        recordService.save(record);
+    }
+    @RequestMapping(value = "/test",method = RequestMethod.GET)
+    public Response test(@RequestHeader(value = "Authorization") String token){
+        int user = getIdByJwt(token);
+        if(user>=0){
+            AddRecord1("2233","dsfaf",user);
+        }
+        return getSuccessResponse("成功");
+    }
+
+
 
     // TODO: 总热点领域
     // TODO: 总热点成果

@@ -13,6 +13,8 @@ import org.springframework.web.client.RestTemplate;
 import springfox.documentation.spring.web.json.Json;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 @Service
 public class OpenAlexService {
 
@@ -72,7 +74,7 @@ public class OpenAlexService {
         catch (JSONException e) {
             achievementsNum = null;
         }
-        MyWorkDis myWorkDis = getWorks(authorId);
+        ArrayList<MyWorkDis> myWorkDisArrayList = getWorks(authorId);
         return new ScholarInform(
                 name, // name
 //                // identity
@@ -80,10 +82,10 @@ public class OpenAlexService {
                 interests, // interests
                 citationsNum, // citationsNum
                 achievementsNum, // achievements
-                myWorkDis
+                myWorkDisArrayList
         );
     }
-    public MyWorkDis getWorks(String openalexId) {//依据用户ID获取学术成果
+    public ArrayList<MyWorkDis> getWorks(String openalexId) {//依据用户ID获取学术成果
         System.out.println(openalexId);
 
         String jsons = getWorksByUser(openalexId);
@@ -91,6 +93,7 @@ public class OpenAlexService {
         String resJson = json.getString("results");
         JSONArray resArray = JSON.parseArray(resJson);
 //        JSONArray jsonArray = new JSONArray();
+        ArrayList<MyWorkDis> myWorkDisArrayList = new ArrayList<MyWorkDis>();
         MyWorkDis myWorkDis = new MyWorkDis();
         for (int i = 0; i < resArray.size(); i++) {
             com.alibaba.fastjson2.JSONObject j = resArray.getJSONObject(i);
@@ -101,8 +104,9 @@ public class OpenAlexService {
             for (int k = 0; k < j2.size(); k++) {
                 myWorkDis.getConceptDis().add(new ConceptDis(j2.getJSONObject(k).getString("display_name")));
             }
+            myWorkDisArrayList.add(myWorkDis);
         }
-        return myWorkDis;
+        return myWorkDisArrayList;
     }
     public String getWorksByUser(String openalexUserID){
         String url = "https://api.openalex.org/works?select=id,title,publication_date,concepts&per_page=200&filter=authorships.author.id:"+openalexUserID;
