@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -120,24 +121,6 @@ public class UserController extends BaseController {
             LoginInfo loginInfo = new LoginInfo(checkUser.getNickName(), token);
             return getSuccessResponse(loginInfo);
         }
-    }
-
-    private String contextLoads(String email, int id) {
-
-        HashMap<String, Object> map = new HashMap<>();
-
-        Calendar instance = Calendar.getInstance();
-        // 3600秒后令牌token失效
-        instance.add(Calendar.SECOND, 3600 * 5);
-
-        String token = JWT.create()
-                .withHeader(map) // header可以不写，因为默认值就是它
-                .withClaim("email", email)  //payload
-//                .withClaim("email", "2505293361@qq.com")
-                .withClaim("userid", id)
-                .withExpiresAt(instance.getTime()) // 指定令牌的过期时间
-                .sign(Algorithm.HMAC256("Wunderkinder"));//签名
-        return token;
     }
 
     @RequestMapping(value = "/sendVerifyCode", method = RequestMethod.GET)
@@ -862,27 +845,25 @@ public class UserController extends BaseController {
 
     // TODO: 收藏论文和专利的个数
     @RequestMapping(value = "/getTsPs", method = RequestMethod.GET)
-    public Response getTsPs(@RequestHeader(value = "Authorization") String token) {
-        // jwt解出id
-        int userid = getIdByJwt(token);
-        if (userid >= 0) {
-            long numThesis = 0;
-            long numPatent = 0;
-            try {
-                numThesis = userId2PSTIdService.getNum(userid);
-                numPatent = userId2PSPIdService.getNum(userid);
-                ThesePatentNum tpNum = new ThesePatentNum(numThesis, numPatent);
-                System.out.println("成功" + tpNum.getNumPatent() + " " + tpNum.getNumThesis());
-                return getSuccessResponse(tpNum);
-            }
-            catch (Exception e) {
-                return getSimpleError();
-            }
-        } else if (userid == -1) {
-            return getErrorResponse(null, ErrorType.login_timeout);
-        } else if (userid == -2) {
-            return getErrorResponse(null, ErrorType.jwt_illegal);
+    public Response getTsPs(HttpServletRequest request) {
+        int userid = (int) request.getAttribute("id");
+        long numThesis = 0;
+        long numPatent = 0;
+        try {
+            numThesis = userId2PSTIdService.getNum(userid);
+            numPatent = userId2PSPIdService.getNum(userid);
+            ThesePatentNum tpNum = new ThesePatentNum(numThesis, numPatent);
+            System.out.println("成功" + tpNum.getNumPatent() + " " + tpNum.getNumThesis());
+            return getSuccessResponse(tpNum);
         }
-        return null;
+        catch (Exception e) {
+            return getSimpleError();
+        }
+    }
+
+    @RequestMapping(value = "/JwtTest", method = RequestMethod.GET)
+    public Response jwtTest(HttpServletRequest request, int myInt) {
+        int userid = (int) request.getAttribute("id");
+        return getSuccessResponse(userid);
     }
 }

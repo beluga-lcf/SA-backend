@@ -3,6 +3,7 @@ package com.example.genius.controller;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.genius.dto.Disrecord.DisConcepts;
 import com.example.genius.dto.Disrecord.Disrecord;
 import com.example.genius.dto.mywork.ConceptDis;
 import com.example.genius.entity.Record;
@@ -21,8 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -114,10 +114,67 @@ public class RecordController extends BaseController{
         }
         return getSuccessResponse("成功");
     }
+    @RequestMapping(value = "/getConcept",method = RequestMethod.GET)
+    public Response getConcept(@RequestHeader(value = "Authorization") String token){
+        int user = getIdByJwt(token);
+        QueryWrapper<Record> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("search_userid", user);
+        List<Record> records = recordService.list(queryWrapper);
+        HashMap<String,Integer> map = new HashMap<>();
+        for(Record record : records){
+            String result = openAlexService.getConceptByWorkID(record.getRecordId());
+            JSONObject jsonObject = JSONObject.parseObject(result);
+            JSONArray jsonArray = jsonObject.getJSONArray("concepts");
+            for(int i = 0; i<jsonArray.size(); i++){
+                if(!map.containsKey(jsonArray.getJSONObject(i).getString("display_name"))){
+                    map.put(jsonArray.getJSONObject(i).getString("display_name"),1);
+                }else {
+                    map.put(jsonArray.getJSONObject(i).getString("display_name"),map.get(jsonArray.getJSONObject(i).getString("display_name"))+1);
+                }
+            }
+        }
+        ArrayList<DisConcepts> retConcepts = new ArrayList<>();
+        List<Map.Entry<String,Integer>> list = new ArrayList<Map.Entry<String,Integer>>(map.entrySet());
+        Collections.sort(list,new Comparator<Map.Entry<String,Integer>>() {
+            public int compare(Map.Entry<String, Integer> o1,
+                               Map.Entry<String, Integer> o2) {
+                return o2.getValue().compareTo(o1.getValue());
+            }
+
+        });
+        int count = 0;
+        for(Map.Entry<String, Integer> mapping:list){
+            retConcepts.add(new DisConcepts(mapping.getValue(),mapping.getKey()));
+            count++;
+            if(count==5){
+                break;
+            }
+        }
+        return getSuccessResponse(retConcepts);
+    }
+    int min5(int a){
+        return Math.min(a, 5);
+    }
 
 
 
     // TODO: 总热点领域
+    @RequestMapping(value = "/hotfield",method = RequestMethod.GET)
+    public Response getHotField() {
+        // 归一化热值*1000+1000即[1000, 2000]
+        // 展示成果同时维护表
+        return null;
+    }
     // TODO: 总热点成果
+    @RequestMapping(value = "/hotspots",method = RequestMethod.GET)
+    public Response getHotSpots() {
+        // 触发器绑定记录表（只绑定insert动作）
+        return null;
+    }
     // TODO: 月热点成果
+    @RequestMapping(value = "/hotspotsM",method = RequestMethod.GET)
+    public Response getHotSpotsM() {
+        // 触发器绑定记录表（只绑定insert动作）
+        return null;
+    }
 }
