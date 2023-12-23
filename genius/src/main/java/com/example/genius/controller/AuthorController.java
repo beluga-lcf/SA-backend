@@ -63,7 +63,7 @@ public class AuthorController extends BaseController{
         List<String> scholarIds = openAlexService.getAuthoriIdByWorkname(workName);
         for (String scholarId : scholarIds) {
             // 获得一个author
-            ScholarSimpleInform scholarSInform = openAlexService.getAuthorSimpleSingle(scholarId);
+            ScholarSimpleInform scholarSInform = openAlexService.getAuthorSimpleSingle(scholarId, workName);
             if (scholarSInform == null) {
                 // 未知错误导致未查到
             }
