@@ -98,7 +98,7 @@ public class ReportController extends BaseController{
         List<WorkReport> list = workReportService.list();
         ArrayList<WorkRepRet> list1 = new ArrayList<WorkRepRet>();
         for(WorkReport u : list){
-            if(u.getReporterName().contains(substring)||u.getDescription().contains(substring)){
+            if(u.getReporterName().contains(substring)){
                 list1.add(new WorkRepRet(u.getId(),u.getReporterName(),u.getReporter_id(),u.getReporteeWork(),u.getDescription(),u.getTime(),u.getIscheck()));
             }
         }
@@ -217,7 +217,7 @@ public class ReportController extends BaseController{
         List<CommentReport> list = commentReportService.list();
         ArrayList<CommentRep> list1 = new ArrayList<CommentRep>();
         for(CommentReport u : list){
-            if(u.getReporterName().contains(substring)||u.getReporteeComment().contains(substring)||u.getDescription().contains(substring)||u.getReason().contains(substring)){
+            if(u.getReporterName().contains(substring)||u.getReporteeComment().contains(substring)||u.getReason().contains(substring)){
                 list1.add(new CommentRep(u.getId(),u.getReporterName(),u.getReporteeComment(),u.getReporteeCommentId(),u.getReporter_id(),u.getIscheck(),u.getTime(),u.getDescription(),u.getReason()));
             }
         }

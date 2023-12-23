@@ -1,5 +1,6 @@
 package com.example.genius.service.impl;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.example.generated.mapper.*;
 import com.example.genius.config.Properties;
 import com.example.genius.dto.referenceWork.ReferenceWork;
@@ -97,9 +98,14 @@ public class WorkServiceImpl implements WorkService {
             JsonNode titleNode = originalNode.get("title");
             newNode.set("title", titleNode);
             //openalexid
-            String workentity = openAlexService.getWorkidByWorkname(titleNode.asText());
-            String openalexId = objectMapper.readTree(workentity).get("results").get(0).get("id").asText();
-            newNode.put("openalexId",openalexId);
+
+            String openaelexid = openAlexService.getWorkidByWorkname(titleNode.asText().trim());
+            JSONObject jsonObject = JSONObject.parseObject(openaelexid);
+            JSONObject results = jsonObject.getJSONObject("results");
+            openaelexid = results.getString("id");
+            ObjectNode openalexidNode = objectMapper.createObjectNode();
+            openalexidNode.put("openalexid",openaelexid);
+            newNode.put("openalexId",openalexidNode);
             //authors
             JsonNode authorsNode = originalNode.get("author");
             newNode.set("authors", authorsNode);
