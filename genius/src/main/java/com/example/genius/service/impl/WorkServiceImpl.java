@@ -71,7 +71,7 @@ public class WorkServiceImpl implements WorkService {
     @Override
     public JsonNode getWorkHomePage(String workId) throws Exception {
         String baseUrl = ApiUtil.getScholarUrl2("article")+"/"+ ReverseAESUtil.encrypt(workId);
-        String param = "uid=3b9547dd87904c44923d675711729962&type=article";
+        String param = "uid=664ab44bcbb54371b6fbc154241c9072&type=article";
         String path = baseUrl + "?" + param;
         if(Properties.isDebug) System.out.println(path);
         if(true){
