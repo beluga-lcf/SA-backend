@@ -50,5 +50,16 @@ public class InstitutionController extends BaseController{
         }
     }
 
+    @GetMapping("/getInstitionIdFromName")
+    public String getInstitionIdFromName(String institutionName){
+        try {
+            return institutionService.getInstitionIdFromName(institutionName);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
 }

@@ -182,6 +182,15 @@ public class InstitutionServiceImpl implements InstitutionService {
         objectNode.put("concepts", String.valueOf(newConcepts));
         return objectMapper.convertValue(objectNode,JsonNode.class);
     }
+
+    public String getInstitionIdFromName(String institutionName) throws Exception{
+        ObjectMapper objectMapper = new ObjectMapper();
+        String url = "https://api.openalex.org/institutions";
+        String params = "search=" + institutionName;
+        String result = ApiUtil.get(url, params);
+        JsonNode jsonNode = objectMapper.readTree(result);
+        return  jsonNode.get("results").get(0).get("id").toString();
+    }
 }
 
 
