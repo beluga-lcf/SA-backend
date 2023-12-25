@@ -887,6 +887,8 @@ public class UserController extends BaseController {
 
     // TODO: 收藏论文和专利的个数
     @RequestMapping(value = "/getTsPs", method = RequestMethod.GET)
+//    public Response getTsPs(HttpServletRequest request) {
+//        int userid = (int) request.getAttribute("id");
     public Response getTsPs(@RequestHeader(value = "Authorization") String token) {
         int userid = getIdByJwt(token);
         if (userid >= 0) {
