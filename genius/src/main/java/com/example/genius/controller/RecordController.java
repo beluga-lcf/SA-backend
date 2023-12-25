@@ -64,7 +64,7 @@ public class RecordController extends BaseController{
                 for(int i = 0; i<jsonArray.size(); i++){
                     conceptDis.add(new ConceptDis(jsonArray.getJSONObject(i).getString("display_name")));
                 }
-                disrecords.add(new Disrecord(record.getId(),record.getRecordId(),record.getRecordName(),record.getTime(),conceptDis,conceptDis.size()));
+                disrecords.add(new Disrecord(record.getId(),record.getRecordId(),record.getRecordName(),record.getTime(),conceptDis,conceptDis.size(),record.getPbscholarId()));
             }
             return getSuccessResponse(disrecords);
         }
@@ -98,7 +98,7 @@ public class RecordController extends BaseController{
                 for(int i = 0; i<jsonArray.size(); i++){
                     conceptDis.add(new ConceptDis(jsonArray.getJSONObject(i).getString("display_name")));
                 }
-                disrecords.add(new Disrecord(record.getId(),record.getRecordId(),record.getRecordName(),record.getTime(),conceptDis,conceptDis.size()));
+                disrecords.add(new Disrecord(record.getId(),record.getRecordId(),record.getRecordName(),record.getTime(),conceptDis,conceptDis.size(),record.getPbscholarId()));
             }
         }
         return getSuccessResponse(disrecords);

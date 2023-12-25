@@ -14,13 +14,15 @@ public class Disrecord {
     int searchID;//搜索者ID
     String recordId ;//成果ID
     ArrayList<ConceptDis> conceptDis = new ArrayList<ConceptDis>();
+    String pbscholarID;
     int count = 0;
-    public Disrecord(int ID,String recordId, String content, LocalDateTime time,ArrayList<ConceptDis> conceptDis,int count) {
+    public Disrecord(int ID,String recordId, String content, LocalDateTime time,ArrayList<ConceptDis> conceptDis,int count,String pbscholarID) {
         this.name = content;
         this.time = time;
         this.recordId = recordId;
         this.conceptDis = conceptDis;
         this.count = count;
         this.searchID = ID;
+        this.pbscholarID = pbscholarID;
     }
 }
