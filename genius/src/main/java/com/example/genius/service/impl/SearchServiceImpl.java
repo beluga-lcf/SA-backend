@@ -43,12 +43,12 @@ public class SearchServiceImpl implements SearchService {
     public JsonNode getAllFields() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode fields = objectMapper.createObjectNode();
-        fields.put("论文", "95,888,519");
-        fields.put("专利", "80,412,855");
-        fields.put("领域快报", "8377");
-        fields.put("动态快讯", "9379");
-        fields.put("科学数据","520,320");
-        fields.put("图书", "123,760");
+        fields.put("论文", 95888519);
+        fields.put("专利", 80412855);
+        fields.put("领域快报", 8377);
+        fields.put("动态快讯", 9379);
+        fields.put("科学数据",520320);
+        fields.put("图书", 123760);
         return fields;
     }
 }

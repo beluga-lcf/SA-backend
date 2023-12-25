@@ -1,5 +1,7 @@
 package com.example.genius.service.impl;
 
+import com.example.genius.entity.storage.SInstitutions;
+import com.example.genius.mapper.storage.SInstitutionsMapper;
 import com.example.genius.service.InstitutionService;
 import com.example.genius.util.ApiUtil;
 import com.example.genius.util.StringUtil;
@@ -8,18 +10,22 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import springfox.documentation.spring.web.json.Json;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class InstitutionServiceImpl implements InstitutionService {
+    private SInstitutionsMapper s;
+    @Autowired
+    public void setsInstitutions(SInstitutionsMapper sInstitutionsMapper){
+        this.s = sInstitutionsMapper;
+    }
     public JsonNode getOpenalexIdFromInstitutionName(String institutionName) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         String url = "https://api.openalex.org/institutions";
@@ -163,6 +169,15 @@ public class InstitutionServiceImpl implements InstitutionService {
         return objectMapper.convertValue(institutionList,JsonNode.class);
     }
 
+    @Override
+    public JsonNode getInstitutionsForMainPage2() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        JsonNode results = objectMapper.convertValue(s.selectList(null), JsonNode.class);
+        objectNode.set("results",results);
+        return objectNode;
+    }
+
     public JsonNode simplifyInstitution(JsonNode oriNode){
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode objectNode = objectMapper.createObjectNode();
@@ -193,6 +208,15 @@ public class InstitutionServiceImpl implements InstitutionService {
         ArrayNode ins = objectMapper.convertValue(jsonNode.get("results"),ArrayNode.class);
         if(ins.size()==0) return null;
         return  ins.get(0).get("id").asText();
+    }
+
+    @Override
+    public void addSInstitions(JsonNode requestBody) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayNode ins = objectMapper.convertValue(requestBody.get("data"),ArrayNode.class);
+        for(JsonNode in : ins){
+            s.insert(objectMapper.convertValue(in,SInstitutions.class));
+        }
     }
 }
 

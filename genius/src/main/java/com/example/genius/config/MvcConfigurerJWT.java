@@ -16,6 +16,7 @@ public class MvcConfigurerJWT implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authorizationInterceptor)
                 .addPathPatterns("/api/user/JwtTest")
-                .addPathPatterns("/api/user/getTsPs"); // 添加需要拦截的接口路径
+//                .addPathPatterns("/api/user/getTsPs")
+        ; // 添加需要拦截的接口路径
     }
 }
