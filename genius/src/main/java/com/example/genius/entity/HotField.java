@@ -17,12 +17,6 @@ public class HotField {
         this.hotNum = hotNum;
     }
 
-    public HotField() {
-<<<<<<< HEAD
-
-=======
->>>>>>> c292418bb9f2d14060f4a9b69386c9823dc1a93b
-    }
 
     public void setName(String name) {
         this.name = name;

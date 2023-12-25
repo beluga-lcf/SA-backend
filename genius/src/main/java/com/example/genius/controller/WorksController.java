@@ -88,14 +88,9 @@ public class WorksController extends BaseController{
         recordService.save(record);
     }
     @GetMapping("/displayWorkHomePage")
-    public Response<Object> displayWorkHomePage(String workId, @RequestHeader(value = "Authorization") String token) {
+    public Response<Object> displayWorkHomePage(String workId) {
         try {
             JsonNode jsonNode = workService.getWorkHomePage(workId);
-            if(getIdByJwt(token)>=0){
-               int userId = getIdByJwt(token);
-                AddRecord(jsonNode.get("openalexid").asText().trim(),jsonNode.get("title").asText().trim(),userId);
-            }
-
             return getSuccessResponse(jsonNode);
         } catch (Exception e) {
             e.printStackTrace();
