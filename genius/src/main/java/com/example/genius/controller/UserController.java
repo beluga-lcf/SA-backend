@@ -139,6 +139,9 @@ public class UserController extends BaseController {
     public Response relateOpenalex(String openalexId,String text, @RequestHeader(value = "Authorization") String token){// 依据openalexID与Userid进行连接
         System.out.println("11");
         Integer userid = getIdByJwt(token);
+        if(userid<=0){
+            return getErrorResponse(null,ErrorType.not_login);
+        }
         UseridRelatedOpenalexid a = new UseridRelatedOpenalexid();
         a.setText(text);
         a.setUserId(userid);
@@ -148,7 +151,8 @@ public class UserController extends BaseController {
         queryWrapper.eq("user_id", userid);
         List<UseridRelatedOpenalexid> userids =uroMapper.selectList(queryWrapper);
         if(!userids.isEmpty()){
-            return getErrorResponse(null, ErrorType.already_relate);
+            uroService.saveOrUpdate(a);
+            return getSuccessResponse("学者认证申请已修改！");
         }
         else {
             uroService.save(a);

@@ -6,11 +6,11 @@ import lombok.Data;
 import java.util.ArrayList;
 @Data
 public class DisConcepts {
-    int count;
-    String conceptName;
+    int value;
+    String name;
 
     public DisConcepts(int i, String displayName) {
-        count = i;
-        conceptName = displayName;
+        value = i;
+        name = displayName;
     }
 }
