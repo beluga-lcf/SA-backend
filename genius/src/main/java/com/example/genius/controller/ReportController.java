@@ -57,6 +57,9 @@ public class ReportController extends BaseController{
         workReport.setIscheck(1);
         workReport.setDescription(comment);
         workReportService.save(workReport);
+        if(openalexID==null){
+
+        }
         return getSuccessResponse("举报成功！");
     }
     @RequestMapping(value = "/workDisplay",method = RequestMethod.GET)
