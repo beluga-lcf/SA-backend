@@ -221,6 +221,9 @@ public class UserController extends BaseController {
         QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userid);
         UseridRelatedOpenalexid a = uroService.getOne(queryWrapper);
+        QueryWrapper<User> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("userid",userid);
+        User u = userService.getOne(queryWrapper1);
         if(a == null){
             return getErrorResponse(null,ErrorType.no_relate);
         }
@@ -229,6 +232,12 @@ public class UserController extends BaseController {
         }
         a.setIscheck(isAgree);
         uroService.saveOrUpdate(a);
+        if(isAgree == 3){
+            String jsons = openAlexService.getAuthorNameByAuthorID(a.getOpenalexid());
+            JSONObject json = JSONObject.parseObject(jsons);
+            String resJson = json.getString("display_name");
+            emailService.sendRelateEmail(u.getEmail(),u.getNickName(),resJson);
+        }
         return getSuccessResponse("审批成功！");
     }
     @GetMapping(value = "/getWorks")

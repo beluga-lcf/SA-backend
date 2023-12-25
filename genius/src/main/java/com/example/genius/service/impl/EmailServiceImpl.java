@@ -46,6 +46,20 @@ public class EmailServiceImpl implements EmailService {
         log.info("发送注册验证邮件成功:{}->{}",sendMailer,simpleMail.getTo());
     }
 
+
+    @Override
+    public void sendRelateEmail(String customMail, String relater, String relatee){
+        SimpleMailMessage simpleMail = new SimpleMailMessage();
+        simpleMail.setFrom(sendMailer);
+        simpleMail.setTo(customMail);
+        simpleMail.setSubject("学者认证");
+        simpleMail.setText("恭喜您，您的账户"+relater+"认领学者"+relatee+"成功！");
+        simpleMail.setSentDate(new Date());
+        javaMailSender.send(simpleMail);
+        log.info("发送认证验证邮件成功:{}->{}",sendMailer,simpleMail.getTo());
+
+    }
+
     @Override
     public void sendSimpleMail(Mail Mail) {
         SimpleMailMessage message = new SimpleMailMessage();
