@@ -164,6 +164,7 @@ public class RecordController extends BaseController{
     // TODO: 总热点领域
     @RequestMapping(value = "/hotfield",method = RequestMethod.GET)
     public Response getHotField() {
+        System.out.println("进入热点领域");
         List<HotField> hotFields = hotFieldService.getTop10();
         if (hotFields == null) {
             // 查询错误
@@ -181,7 +182,8 @@ public class RecordController extends BaseController{
                     min = hotField.getHotNum();
                 }
             }
-            int mid = (max - min) == 0 ? 1 : 0;
+            int mid = (max - min);
+            mid = (mid == 0 ? 1 : mid);
             for (HotField hotField : hotFields) {
                 hotField.setHotNum((int) ((hotField.getHotNum() - min) / mid * 500.0 + 500));
             }
@@ -209,7 +211,8 @@ public class RecordController extends BaseController{
                     min = hotSpot.getHotNum();
                 }
             }
-            int mid = (max - min) == 0 ? 1 : 0;
+            int mid = (max - min);
+            mid = (mid == 0 ? 1 : mid);
             for (HotSpot hotSpot : hotSpots) {
                 hotSpot.setHotNum((int) ((hotSpot.getHotNum() - min) / mid * 500.0 + 500));
             }

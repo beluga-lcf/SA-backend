@@ -883,21 +883,30 @@ public class UserController extends BaseController {
 
     // TODO: 收藏论文和专利的个数
     @RequestMapping(value = "/getTsPs", method = RequestMethod.GET)
-    public Response getTsPs(HttpServletRequest request) {
-        int userid = (int) request.getAttribute("id");
-        long numThesis = 0;
-        long numPatent = 0;
-        try {
-            numThesis = userId2PSTIdService.getNum(userid);
-            numPatent = userId2PSPIdService.getNum(userid);
-            ThesePatentNum tpNum = new ThesePatentNum(numThesis, numPatent);
-            System.out.println("成功" + tpNum.getNumPatent() + " " + tpNum.getNumThesis());
-            return getSuccessResponse(tpNum);
-        }
-        catch (Exception e) {
+//    public Response getTsPs(HttpServletRequest request) {
+//        int userid = (int) request.getAttribute("id");
+    public Response getTsPs(@RequestHeader(value = "Authorization") String token) {
+        int userid = getIdByJwt(token);
+        if (userid >= 0) {
+            long numThesis = 0;
+            long numPatent = 0;
+            try {
+                numThesis = userId2PSTIdService.getNum(userid);
+                numPatent = userId2PSPIdService.getNum(userid);
+                ThesePatentNum tpNum = new ThesePatentNum(numThesis, numPatent);
+                System.out.println("成功" + tpNum.getNumPatent() + " " + tpNum.getNumThesis());
+                return getSuccessResponse(tpNum);
+            }
+            catch (Exception e) {
 
-            return getSimpleError();
+                return getSimpleError();
+            }
+        } else if (userid == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (userid == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
         }
+        return null;
     }
 
     @RequestMapping(value = "/JwtTest", method = RequestMethod.GET)
