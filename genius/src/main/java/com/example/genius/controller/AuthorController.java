@@ -1,6 +1,9 @@
 package com.example.genius.controller;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.genius.dto.authorDisplay.AuthorDisplay;
 import com.example.genius.dto.userPackage.ScholarSimpleInform;
 import com.example.genius.entity.Response;
 import com.example.genius.entity.UseridRelatedOpenalexid;
@@ -54,6 +57,20 @@ public class AuthorController extends BaseController{
             log.error(e.getMessage());
             return getSimpleError();
         }
+    }
+
+    @GetMapping("/getAuthorsByAuthor")
+    public Response getAuthorsByAuthor(String authorName){
+        String json = openAlexService.getFirstWorkByAuthor(authorName);
+        JSONObject jsonObject = JSONObject.parseObject(json);
+        JSONArray jsonArray = jsonObject.getJSONArray("results");
+        JSONObject jsonObject1 = jsonArray.getJSONObject(0);
+        JSONArray jsonArray1= jsonObject1.getJSONArray("authorships");
+        ArrayList<AuthorDisplay> authorDisplays = new ArrayList<AuthorDisplay>();
+        for(int j =0 ;j<jsonArray1.size();j++){
+            authorDisplays.add(new AuthorDisplay(jsonArray1.getJSONObject(j).getJSONObject("author").getString("display_name")));
+        }
+        return getSuccessResponse(authorDisplays);
     }
 
     @GetMapping("/getAuthorId")
