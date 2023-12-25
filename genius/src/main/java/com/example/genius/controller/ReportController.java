@@ -40,6 +40,8 @@ public class ReportController extends BaseController{
     private CommentReportService commentReportService;
     @Autowired
     private UseridRelatedOpenalexService uroService;
+    @Autowired
+    private EmailService emailservice;
     @RequestMapping(value = "/workReport", method = RequestMethod.GET)
     public Response workReport(String openalexID, String comment,@RequestHeader(value = "Authorization") String token){
         int id = getIdByJwt(token);
@@ -47,7 +49,7 @@ public class ReportController extends BaseController{
             return getErrorResponse(ErrorType.login_timeout);
         }
         WorkReport workReport = new WorkReport();
-        workReport.setReporter_id(id);
+        workReport.setReporterId(id);
         String name;
         if((name = getUserNameByUserId(id))==null){
             return getErrorResponse(ErrorType.log_off_not_found);
@@ -76,6 +78,10 @@ public class ReportController extends BaseController{
         QueryWrapper<WorkReport> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", id);
         WorkReport a = workReportService.getOne(queryWrapper);
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        int r_id = a.getReporter_id();
+        userQueryWrapper.eq("userid",r_id);
+        User u = userService.getOne(userQueryWrapper);
         if(a == null){
             return getErrorResponse(null,ErrorType.illegal_work);
         }
@@ -83,7 +89,10 @@ public class ReportController extends BaseController{
             return getErrorResponse(null,ErrorType.invalid_check);
         }
         a.setIscheck(isAgree);
-        workReportService.saveOrUpdate(a);
+        workReportService.updateById(a);
+        if(isAgree == 3){
+            emailservice.sendReportEmail(u.getEmail(),u.getNickName());
+        }
         return getSuccessResponse("审批成功！");
     }
     @RequestMapping(value = "/searchWorkById",method = RequestMethod.GET)
@@ -165,7 +174,7 @@ public class ReportController extends BaseController{
             return getErrorResponse(ErrorType.illegal_comment);
         }
         WorkReport workReport = new WorkReport();
-        workReport.setReporter_id(id);
+        workReport.setReporterId(id);
         String name;
         if((name = getUserNameByUserId(id))==null){
             return getErrorResponse(ErrorType.log_off_not_found);
@@ -177,7 +186,7 @@ public class ReportController extends BaseController{
         commentReport.setReason(reason);
         commentReport.setIscheck(1);
         commentReport.setReporterName(name);
-        commentReport.setReporter_id(id);
+        commentReport.setReporterId(id);
         commentReportService.save(commentReport);
         return getSuccessResponse("举报成功！");
     }
@@ -186,7 +195,7 @@ public class ReportController extends BaseController{
         List<CommentReport> list = commentReportService.list();
         ArrayList<CommentRep> list1 = new ArrayList<CommentRep>();
         for(CommentReport u : list){
-            list1.add(new CommentRep(u.getId(),u.getReporterName(),u.getReporteeComment(),u.getReporteeCommentId(),u.getReporter_id(),u.getIscheck(),u.getTime(),u.getDescription(),u.getReason()));
+            list1.add(new CommentRep(u.getId(),u.getReporterName(),u.getReporteeComment(),u.getReporteeCommentId(),u.getReporterId(),u.getIscheck(),u.getTime(),u.getDescription(),u.getReason()));
         }
         return getSuccessResponse(list1);
     }
@@ -195,6 +204,10 @@ public class ReportController extends BaseController{
         QueryWrapper<CommentReport> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", id);
         CommentReport a = commentReportService.getOne(queryWrapper);
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        int r_id = a.getReporterId();
+        userQueryWrapper.eq("userid",r_id);
+        User u = userService.getOne(userQueryWrapper);
         if(a == null){
             return getErrorResponse(null,ErrorType.illegal_comment);
         }
@@ -202,7 +215,10 @@ public class ReportController extends BaseController{
             return getErrorResponse(null,ErrorType.invalid_check);
         }
         a.setIscheck(isAgree);
-        commentReportService.saveOrUpdate(a);
+        commentReportService.updateById(a);
+        if(isAgree == 3){
+            emailservice.sendReportEmail(u.getEmail(),u.getNickName());
+        }
         return getSuccessResponse("审批成功！");
     }
     @RequestMapping(value = "/searchCommentById",method = RequestMethod.GET)
@@ -212,7 +228,7 @@ public class ReportController extends BaseController{
         List<CommentReport> list = commentReportService.list(queryWrapper);
         ArrayList<CommentRep> list1 = new ArrayList<CommentRep>();
         for(CommentReport u : list){
-            list1.add(new CommentRep(u.getId(),u.getReporterName(),u.getReporteeComment(),u.getReporteeCommentId(),u.getReporter_id(),u.getIscheck(),u.getTime(),u.getDescription(),u.getReason()));
+            list1.add(new CommentRep(u.getId(),u.getReporterName(),u.getReporteeComment(),u.getReporteeCommentId(),u.getReporterId(),u.getIscheck(),u.getTime(),u.getDescription(),u.getReason()));
         }
         return getSuccessResponse(list1);
     }
@@ -222,7 +238,7 @@ public class ReportController extends BaseController{
         ArrayList<CommentRep> list1 = new ArrayList<CommentRep>();
         for(CommentReport u : list){
             if(u.getReporterName().contains(substring)||u.getReporteeComment().contains(substring)||u.getReason().contains(substring)){
-                list1.add(new CommentRep(u.getId(),u.getReporterName(),u.getReporteeComment(),u.getReporteeCommentId(),u.getReporter_id(),u.getIscheck(),u.getTime(),u.getDescription(),u.getReason()));
+                list1.add(new CommentRep(u.getId(),u.getReporterName(),u.getReporteeComment(),u.getReporteeCommentId(),u.getReporterId(),u.getIscheck(),u.getTime(),u.getDescription(),u.getReason()));
             }
         }
         return getSuccessResponse(list1);
@@ -237,7 +253,7 @@ public class ReportController extends BaseController{
         List<CommentReport> list = commentReportService.list(queryWrapper);
         ArrayList<CommentRep> list1 = new ArrayList<CommentRep>();
         for(CommentReport u : list){
-            list1.add(new CommentRep(u.getId(),u.getReporterName(),u.getReporteeComment(),u.getReporteeCommentId(),u.getReporter_id(),u.getIscheck(),u.getTime(),u.getDescription(),u.getReason()));
+            list1.add(new CommentRep(u.getId(),u.getReporterName(),u.getReporteeComment(),u.getReporteeCommentId(),u.getReporterId(),u.getIscheck(),u.getTime(),u.getDescription(),u.getReason()));
         }
         return getSuccessResponse(list1);
     }

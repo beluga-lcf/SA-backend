@@ -108,5 +108,17 @@ public class EmailServiceImpl implements EmailService {
             log.error("发送邮件时发生异常！",e);
         }
     }
+
+    @Override
+    public void sendReportEmail(String customMail, String reporter) {
+        SimpleMailMessage simpleMail = new SimpleMailMessage();
+        simpleMail.setFrom(sendMailer);
+        simpleMail.setTo(customMail);
+        simpleMail.setSubject("举报通知");
+        simpleMail.setText("尊敬的"+reporter+"，感谢您的举报，您的举报信息已经核实，我们会尽快处理");
+        simpleMail.setSentDate(new Date());
+        javaMailSender.send(simpleMail);
+        log.info("发送认证验证邮件成功:{}->{}",sendMailer,simpleMail.getTo());
+    }
 }
 
