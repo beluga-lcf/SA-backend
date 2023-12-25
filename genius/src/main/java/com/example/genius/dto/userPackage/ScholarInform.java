@@ -2,9 +2,10 @@ package com.example.genius.dto.userPackage;
 
 import com.example.genius.dto.mywork.MyWorkDis;
 import com.example.genius.entity.User;
+import lombok.Data;
 
 import java.util.ArrayList;
-
+@Data
 public class ScholarInform {
     // 姓名
     public String name;
@@ -38,6 +39,9 @@ public class ScholarInform {
         this.achievementsNum = achievementsNum;
         this.myWorkDisArrayList = myWorkDisArrayList;
     }
+    public ScholarInform(){
+
+    }
 
     public void setEmail(String email) {
         this.email = email;
@@ -55,7 +59,5 @@ public class ScholarInform {
         this.isClaimed = isClaimed;
     }
 
-    public String[] getNames() {
-        return this.names;
-    }
+
 }

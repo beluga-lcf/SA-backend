@@ -431,24 +431,53 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/getScholarInfo", method = RequestMethod.GET)
-    public Response getScholarInfo(String user_id) {
+    public Response getScholarInfo(int user_id) {
         // 查关联表
         QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("openalexid", user_id);
+        queryWrapper.eq("user_id", user_id);
         UseridRelatedOpenalexid searchUser = uroService.getOne(queryWrapper);
-        ScholarInform scholarInform = openAlexService.getAuthorSingle(searchUser.getOpenalexid());
+        ScholarInform scholarInform = new ScholarInform();
         if (searchUser == null) {
             // 未查到认领记录
             scholarInform.setIsClaimed(false);
             scholarInform.setEmail("暂无邮箱信息");
             scholarInform.setIntroduction("暂无学者简介");
         } else {
+            openAlexService.getAuthorSingle(searchUser.getOpenalexid());
             scholarInform.setIsClaimed(true);
             User user = userService.getById(user_id);
             scholarInform.setEmail(user.getEmail());
             scholarInform.setIntroduction(user.getPersonDescription());
         }
         return getSuccessResponse(scholarInform);
+    }
+
+    @RequestMapping(value = "/getInfoByOpenID", method = RequestMethod.GET)
+    public Response getInfoByOpenID(String openalexId){
+        ScholarInform scholarInform = openAlexService.getAuthorSingle(openalexId);
+        NewScholarInform newScholarInform = new NewScholarInform();
+        newScholarInform.setClaimed(scholarInform.isClaimed);
+        newScholarInform.setInterests(scholarInform.interests);
+        newScholarInform.setAchievementsNum(scholarInform.achievementsNum);
+        newScholarInform.setName(scholarInform.name);
+        newScholarInform.setNames(scholarInform.names);
+        newScholarInform.setOrganization(scholarInform.getOrganization());
+        newScholarInform.setCitationsNum(scholarInform.citationsNum);
+        newScholarInform.setEmail(scholarInform.getEmail());
+        newScholarInform.setIntroduction(scholarInform.getIntroduction());
+        newScholarInform.setMyWorkDisArrayList(scholarInform.myWorkDisArrayList);
+        QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("openalexid",openalexId);
+        int isRelated = 0;
+        List<UseridRelatedOpenalexid> arrayList = uroService.list(queryWrapper);
+        for(UseridRelatedOpenalexid u : arrayList){
+            if(u.getIscheck()==3){
+                isRelated = u.getUserId();
+                break;
+            }
+        }
+        newScholarInform.setIsRelate(isRelated);
+        return getSuccessResponse(newScholarInform);
     }
 
     @RequestMapping(value = "/disregister", method = RequestMethod.POST)
