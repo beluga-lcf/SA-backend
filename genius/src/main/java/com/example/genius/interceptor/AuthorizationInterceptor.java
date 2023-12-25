@@ -32,7 +32,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             }
         } else {
             // 如果没有 Authorization 头，也直接返回错误响应
-            sendErrorResponse(response, -2);
+            sendErrorResponse(response, -3);
             return false; // 不再处理请求
         }
     }
@@ -58,6 +58,10 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             }
             case -2: {
                 errorResponse = BaseController.getErrorResponse(null, ErrorType.jwt_illegal);
+                break;
+            }
+            case -3: {
+                errorResponse = BaseController.getErrorResponse(null, ErrorType.no_jwt);
                 break;
             }
             default: {

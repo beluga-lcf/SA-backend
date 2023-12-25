@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/api/institution")
 public class InstitutionController extends BaseController{
@@ -19,6 +21,7 @@ public class InstitutionController extends BaseController{
 
     @GetMapping("/getInstitutionHomePage")
     public Response<Object> getInstitutionHomePage(String institutionId){
+
         try {
             return getSuccessResponse(institutionService.getInstitutionHomePage2(institutionId));
         }

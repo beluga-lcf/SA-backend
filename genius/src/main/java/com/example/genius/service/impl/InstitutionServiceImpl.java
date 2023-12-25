@@ -154,8 +154,9 @@ public class InstitutionServiceImpl implements InstitutionService {
         JsonNode institutions = jsonNode.get("results");
         ArrayNode arrayNode = objectMapper.convertValue(institutions, ArrayNode.class);
         ArrayNode institutionList = objectMapper.createArrayNode();
-        for (int i = 0; i < Math.min(100, arrayNode.size()); i++) {
+        for (int i = 0; i < Math.min(25, arrayNode.size()); i++) {
             JsonNode institution = arrayNode.get(i);
+            if(institution.get("display_name").asText().toLowerCase().startsWith("columbia")) continue;
             JsonNode newInstitution = simplifyInstitution(institution);
             institutionList.add(newInstitution);
         }

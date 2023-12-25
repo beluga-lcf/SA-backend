@@ -29,7 +29,8 @@ public enum ErrorType {
     hotField_fail(1104, "获取热点领域错误"),
     hotSpot_fail(1105, "获取热点成果错误"),
     illegal_comment(1023,"不存在的评论！"),
-    illegal_work(1024,"不存在的学术成果！");
+    illegal_work(1024,"不存在的学术成果！"),
+    no_jwt(1106, "空令牌");
 
 
     public Integer code;
