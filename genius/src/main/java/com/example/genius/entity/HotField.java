@@ -17,6 +17,9 @@ public class HotField {
         this.hotNum = hotNum;
     }
 
+    public HotField() {
+    }
+
     public void setName(String name) {
         this.name = name;
     }

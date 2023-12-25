@@ -19,7 +19,7 @@ public class MainPageController extends BaseController {
     @GetMapping("/getAllFields")
     public JsonNode getHotFields(){
         try {
-            return searchService.getHotFields();
+            return searchService.getAllFields();
         }
         catch (Exception e){
             log.error(e.getMessage());

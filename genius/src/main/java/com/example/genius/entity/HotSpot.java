@@ -20,6 +20,9 @@ public class HotSpot {
         this.id = id;
     }
 
+    public HotSpot() {
+    }
+
     public void setName(String name) {
         this.name = name;
     }

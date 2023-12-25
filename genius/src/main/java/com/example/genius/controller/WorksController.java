@@ -88,7 +88,7 @@ public class WorksController extends BaseController{
         recordService.save(record);
     }
     @GetMapping("/displayWorkHomePage")
-    public Response<Object> displayWorkHomePage(String workId,@RequestHeader(value = "Authorization") String token) {
+    public Response<Object> displayWorkHomePage(String workId, @RequestHeader(value = "Authorization") String token) {
         try {
             JsonNode jsonNode = workService.getWorkHomePage(workId);
             if(getIdByJwt(token)>=0){

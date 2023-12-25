@@ -101,8 +101,8 @@ public class WorkServiceImpl implements WorkService {
             //id
             JsonNode idNode = originalNode.get("id");
             newNode.set("workId", idNode);
-            //type,article_type
             JsonNode cnTypeNode = originalNode.get("type");
+            //type,article_type
             JsonNode articleTypeNode = originalNode.get("article_type");
             newNode.set("type", cnTypeNode);
             newNode.set("article_type", articleTypeNode);
@@ -111,7 +111,14 @@ public class WorkServiceImpl implements WorkService {
             newNode.set("title", titleNode);
             //openalexid
             String workEntity = openAlexService.getWorkidByWorkname(titleNode.asText().trim());
-            String openaelexId = objectMapper.readTree(workEntity).get("results").get(0).get("id").asText();
+            JsonNode workEntityNode = objectMapper.readTree(workEntity).get("results");
+            String openaelexId;
+            if(workEntityNode == null){
+                openaelexId = null;
+            }
+            else {
+                openaelexId = workEntityNode.get(0).get("id").asText();
+            }
             newNode.put("openalexId", openaelexId);
             //authors
             JsonNode authorsNode = originalNode.get("author");
@@ -232,12 +239,11 @@ public class WorkServiceImpl implements WorkService {
             insertHotSpot(idNode, titleNode);
             return newNode;
         }
-
         return null;
     }
 
     @Transactional
-    private void insertHotField(JsonNode keywords) {
+    public void insertHotField(JsonNode keywords) {
         // TODO: 拆解keywords
         ArrayList<String> keys = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -263,7 +269,7 @@ public class WorkServiceImpl implements WorkService {
     }
 
     @Transactional
-    private void insertHotSpot(JsonNode idNodeJ, JsonNode titleNodeJ) {
+    public void insertHotSpot(JsonNode idNodeJ, JsonNode titleNodeJ) {
         if (idNodeJ == null || titleNodeJ == null) {
             return;
         }
