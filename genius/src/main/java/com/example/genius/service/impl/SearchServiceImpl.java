@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -39,13 +40,15 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public JsonNode getHotFields() throws Exception {
+    public JsonNode getAllFields() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        ArticlesPayload articlesPayload = new ArticlesPayload();
-        System.out.println(articlesPayload);
-        JsonNode payload = objectMapper.convertValue(articlesPayload, JsonNode.class);
-        JsonNode resultNode= apiService.getAggregations(payload, "articles");
-        ArrayNode arrayNode = objectMapper.convertValue(resultNode, ArrayNode.class);
-        return arrayNode.get(1).get("content");
+        ObjectNode fields = objectMapper.createObjectNode();
+        fields.put("论文", "95,888,519");
+        fields.put("专利", "80,412,855");
+        fields.put("领域快报", "8377");
+        fields.put("动态快讯", "9379");
+        fields.put("科学数据","520,320");
+        fields.put("图书", "123,760");
+        return fields;
     }
 }

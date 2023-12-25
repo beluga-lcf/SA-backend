@@ -11,5 +11,5 @@ import java.util.ArrayList;
 public interface SearchService {
     public String complexSearch(JsonNode requestBody) throws Exception;
 
-    public JsonNode getHotFields() throws Exception;
+    public JsonNode getAllFields() throws Exception;
 }

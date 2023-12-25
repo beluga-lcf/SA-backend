@@ -189,6 +189,11 @@ public class OpenAlexService {
         String url = "https://api.openalex.org/people/"+authorID+"?select=display_name";
         return restTemplate.getForObject(url, String.class);
     }
+    public String getFirstWorkByAuthor(String authorID){
+        authorID = authorID.substring(21);
+        String url = "https://api.openalex.org/works?filter=author.id:"+authorID+"&per-page=1";
+        return restTemplate.getForObject(url, String.class);
+    }
     public List<String> getAuthoriIdByWorkname(String username){//通过作品名字获取作者ID
         String url = "https://api.openalex.org/works?filter=title.search:"+username;
         String jsonResponse = restTemplate.getForObject(url, String.class);
