@@ -154,7 +154,7 @@ public class InstitutionServiceImpl implements InstitutionService {
         JsonNode institutions = jsonNode.get("results");
         ArrayNode arrayNode = objectMapper.convertValue(institutions, ArrayNode.class);
         ArrayNode institutionList = objectMapper.createArrayNode();
-        for (int i = 0; i < Math.min(5, arrayNode.size()); i++) {
+        for (int i = 0; i < Math.min(100, arrayNode.size()); i++) {
             JsonNode institution = arrayNode.get(i);
             JsonNode newInstitution = simplifyInstitution(institution);
             institutionList.add(newInstitution);
@@ -189,7 +189,9 @@ public class InstitutionServiceImpl implements InstitutionService {
         String params = "search=" + institutionName;
         String result = ApiUtil.get(url, params);
         JsonNode jsonNode = objectMapper.readTree(result);
-        return  jsonNode.get("results").get(0).get("id").toString();
+        ArrayNode ins = objectMapper.convertValue(jsonNode.get("results"),ArrayNode.class);
+        if(ins.size()==0) return null;
+        return  ins.get(0).get("id").asText();
     }
 }
 
