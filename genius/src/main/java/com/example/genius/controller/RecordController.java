@@ -127,14 +127,16 @@ public class RecordController extends BaseController{
         List<Record> records = recordService.list(queryWrapper);
         HashMap<String,Integer> map = new HashMap<>();
         for(Record record : records){
-            String result = openAlexService.getConceptByWorkID(record.getRecordId());
-            JSONObject jsonObject = JSONObject.parseObject(result);
-            JSONArray jsonArray = jsonObject.getJSONArray("concepts");
-            for(int i = 0; i<jsonArray.size(); i++){
-                if(!map.containsKey(jsonArray.getJSONObject(i).getString("display_name"))){
-                    map.put(jsonArray.getJSONObject(i).getString("display_name"),1);
-                }else {
-                    map.put(jsonArray.getJSONObject(i).getString("display_name"),map.get(jsonArray.getJSONObject(i).getString("display_name"))+1);
+            if(record.getRecordId()!=null){
+                String result = openAlexService.getConceptByWorkID(record.getRecordId());
+                JSONObject jsonObject = JSONObject.parseObject(result);
+                JSONArray jsonArray = jsonObject.getJSONArray("concepts");
+                for(int i = 0; i<jsonArray.size(); i++){
+                    if(!map.containsKey(jsonArray.getJSONObject(i).getString("display_name"))){
+                        map.put(jsonArray.getJSONObject(i).getString("display_name"),1);
+                    }else {
+                        map.put(jsonArray.getJSONObject(i).getString("display_name"),map.get(jsonArray.getJSONObject(i).getString("display_name"))+1);
+                    }
                 }
             }
         }
