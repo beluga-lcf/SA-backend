@@ -170,7 +170,8 @@ public class UserController extends BaseController {
             String jsons = openAlexService.getAuthorNameByAuthorID(u.getOpenalexid());
             JSONObject json = JSONObject.parseObject(jsons);
             String resJson = json.getString("display_name");
-            list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck(), u.getText()));
+            User user = userService.getOne(new QueryWrapper<User>().eq("userid",u.getUserId()));
+            list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck(), u.getText(),user.getNickName()));
         }
         return getSuccessResponse(list1);
     }
@@ -187,8 +188,8 @@ public class UserController extends BaseController {
             String jsons =openAlexService.getAuthorNameByAuthorID(u.getOpenalexid());
             JSONObject json = JSONObject.parseObject(jsons);
             String resJson = json.getString("display_name");
-            list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck(), u.getText())
-            );
+            User user = userService.getOne(new QueryWrapper<User>().eq("userid",u.getUserId()));
+            list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck(), u.getText(),user.getNickName()));
         }
         return getSuccessResponse(list1);
     }
@@ -202,7 +203,8 @@ public class UserController extends BaseController {
             String jsons =openAlexService.getAuthorNameByAuthorID(u.getOpenalexid());
             JSONObject json = JSONObject.parseObject(jsons);
             String resJson = json.getString("display_name");
-            list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck(),u.getText()));
+            User user = userService.getOne(new QueryWrapper<User>().eq("userid",u.getUserId()));
+            list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck(),u.getText(),user.getNickName()));
         }
         return getSuccessResponse(list1);
     }
@@ -214,8 +216,9 @@ public class UserController extends BaseController {
             String jsons =openAlexService.getAuthorNameByAuthorID(u.getOpenalexid());
             JSONObject json = JSONObject.parseObject(jsons);
             String resJson = json.getString("display_name");
+            User user = userService.getOne(new QueryWrapper<User>().eq("userid",u.getUserId()));
             if(resJson.contains(substring)){
-                list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck(),u.getText()));
+                list1.add(new approvalRelateReturn(u.getUserId(), u.getOpenalexid(),resJson,u.getTime(),u.getIscheck(),u.getText(),user.getNickName()));
             }
         }
         return getSuccessResponse(list1);
