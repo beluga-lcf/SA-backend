@@ -13,11 +13,14 @@ public class HotSpot {
     private int hotNum;
     @TableField("id")
     private String id;
+    @TableField("author")
+    private String author;
 
-    public HotSpot(String name, int hotNum, String id) {
+    public HotSpot(String name, int hotNum, String id, String author) {
         this.name = name;
         this.hotNum = hotNum;
         this.id = id;
+        this.author = author;
     }
 
     public HotSpot() {
@@ -37,5 +40,9 @@ public class HotSpot {
 
     public void addHotNum() {
         this.hotNum++;
+    }
+
+    public String getAuthor() {
+        return author;
     }
 }

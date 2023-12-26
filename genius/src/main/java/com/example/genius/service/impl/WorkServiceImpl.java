@@ -238,7 +238,7 @@ public class WorkServiceImpl implements WorkService {
             // hotField
             insertHotField(keywordsNode);
             // hotSpot
-            insertHotSpot(idNode, titleNode);
+            insertHotSpot(idNode, titleNode, authorsNode);
             return newNode;
         }
         return null;
@@ -271,19 +271,26 @@ public class WorkServiceImpl implements WorkService {
     }
 
     @Transactional
-    public void insertHotSpot(JsonNode idNodeJ, JsonNode titleNodeJ) {
-        if (idNodeJ == null || titleNodeJ == null) {
+    public void insertHotSpot(JsonNode idNodeJ, JsonNode titleNodeJ, JsonNode authorsNode) {
+        if (idNodeJ == null || titleNodeJ == null || authorsNode == null) {
             return;
         }
         String idNode = idNodeJ.asText();
         String titleNode = titleNodeJ.asText();
+        ArrayList<String> authors = new ArrayList<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayNode array = objectMapper.convertValue(authorsNode, ArrayNode.class);
+        for(JsonNode child:array){
+            authors.add(child.asText());
+        }
         // 查询，有则update，无则insert
         QueryWrapper<HotSpot> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", idNode);
         HotSpot checker = hotSpotMapper.selectOne(queryWrapper);
         if (checker == null) {
             // 未记录，增加一条1
-            checker = new HotSpot(titleNode, 1, idNode);
+            int len = authors.toString().length();
+            checker = new HotSpot(titleNode, 1, idNode, authors.toString().substring(1, len - 2));
             hotSpotMapper.insert(checker);
         }
         else {
