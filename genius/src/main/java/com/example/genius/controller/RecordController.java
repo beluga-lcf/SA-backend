@@ -187,7 +187,7 @@ public class RecordController extends BaseController{
             int mid = (max - min);
             mid = (mid == 0 ? 1 : mid);
             for (HotField hotField : hotFields) {
-                hotField.setHotNum((int) ((hotField.getHotNum() - min) / mid * 500.0 + 500));
+                hotField.setHotNum((int) ((hotField.getHotNum() - min + 0.0) / mid * 500.0 + 500));
             }
             return getSuccessResponse(hotFields);
         }
