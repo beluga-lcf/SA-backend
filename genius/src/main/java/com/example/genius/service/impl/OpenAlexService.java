@@ -222,7 +222,7 @@ public class OpenAlexService {
                     // 将作者ID添加到Set中
                     authorIdsSet.add(authorId);
                     // TODO: 删除则提升精度降低速度
-                    break;
+//                    break;
                 }
                 // TODO: 删除则提升精度降低速度
                 break;
