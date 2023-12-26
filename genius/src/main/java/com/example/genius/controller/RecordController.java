@@ -216,7 +216,7 @@ public class RecordController extends BaseController{
             int mid = (max - min);
             mid = (mid == 0 ? 1 : mid);
             for (HotSpot hotSpot : hotSpots) {
-                hotSpot.setHotNum((int) ((hotSpot.getHotNum() - min) / mid * 500.0 + 500));
+                hotSpot.setHotNum((int) ((hotSpot.getHotNum() - min + 0.0) / mid * 500.0 + 500));
             }
             return getSuccessResponse(hotSpots);
         }
