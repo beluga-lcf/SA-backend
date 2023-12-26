@@ -217,6 +217,7 @@ public class ReportController extends BaseController{
         a.setIscheck(isAgree);
         commentReportService.updateById(a);
         if(isAgree == 3){
+            commentService.deleteComment(a.getReporteeCommentId());
             emailservice.sendReportEmail(u.getEmail(),u.getNickName());
         }
         return getSuccessResponse("审批成功！");
