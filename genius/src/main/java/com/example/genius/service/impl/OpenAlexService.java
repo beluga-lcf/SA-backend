@@ -198,6 +198,7 @@ public class OpenAlexService {
     }
     public List<String> getAuthoriIdByWorkname(String username){//通过作品名字获取作者ID
         String url = "https://api.openalex.org/works?filter=title.search:"+username;
+//        String url = "https://api.openalex.org/works?search="+username;
         String jsonResponse = restTemplate.getForObject(url, String.class);
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -220,7 +221,11 @@ public class OpenAlexService {
 
                     // 将作者ID添加到Set中
                     authorIdsSet.add(authorId);
+                    // TODO: 删除则提升精度降低速度
+                    break;
                 }
+                // TODO: 删除则提升精度降低速度
+                break;
             }
         } catch (Exception e) {
             // 处理异常
