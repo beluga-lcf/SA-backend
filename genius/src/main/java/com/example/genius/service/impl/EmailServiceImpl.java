@@ -39,11 +39,11 @@ public class EmailServiceImpl implements EmailService {
         SimpleMailMessage simpleMail = new SimpleMailMessage();
         simpleMail.setFrom(sendMailer);
         simpleMail.setTo(customMail);
-        simpleMail.setSubject("注册验证");
+        simpleMail.setSubject("验证");
         simpleMail.setText("您的验证码是："+verifyCode);
         simpleMail.setSentDate(new Date());
         javaMailSender.send(simpleMail);
-        log.info("发送注册验证邮件成功:{}->{}",sendMailer,simpleMail.getTo());
+        log.info("发送验证邮件成功:{}->{}",sendMailer,simpleMail.getTo());
     }
 
 
