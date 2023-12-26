@@ -290,7 +290,7 @@ public class WorkServiceImpl implements WorkService {
         if (checker == null) {
             // 未记录，增加一条1
             int len = authors.toString().length();
-            checker = new HotSpot(titleNode, 1, idNode, authors.toString().substring(1, len - 2));
+            checker = new HotSpot(titleNode, 1, idNode, authors.toString().substring(1, len - 1));
             hotSpotMapper.insert(checker);
         }
         else {
