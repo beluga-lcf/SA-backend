@@ -52,7 +52,7 @@ public class RecordController extends BaseController{
             return getSuccessResponse(disrecords);
         }else{
             for(Record record : records){
-                if(record.getRecordId()!="null"){
+                if(!Objects.equals(record.getRecordId(), "null")){
 //                JSONObject j = new JSONObject();
 //                j.put("content",record.getRecordText());
 //                j.put("time",record.getSearchTime());
@@ -92,7 +92,7 @@ public class RecordController extends BaseController{
         List<Record> records = recordService.list(queryWrapper);
         ArrayList<Disrecord> disrecords = new ArrayList<>();
         for(Record record : records){
-            if(record.getRecordName().contains(keyword)&&record.getRecordId()!="null"){
+            if(record.getRecordName().contains(keyword)&& !Objects.equals(record.getRecordId(), "null")){
                 String result = openAlexService.getConceptByWorkID(record.getRecordId());
                 ArrayList<ConceptDis> conceptDis = new ArrayList<>();
                 JSONObject jsonObject = JSONObject.parseObject(result);
@@ -129,7 +129,7 @@ public class RecordController extends BaseController{
         List<Record> records = recordService.list(queryWrapper);
         HashMap<String,Integer> map = new HashMap<>();
         for(Record record : records){
-            if(record.getRecordId()!="null"){
+            if(!Objects.equals(record.getRecordId(), "null")){
                 String result = openAlexService.getConceptByWorkID(record.getRecordId());
                 JSONObject jsonObject = JSONObject.parseObject(result);
                 JSONArray jsonArray = jsonObject.getJSONArray("concepts");
