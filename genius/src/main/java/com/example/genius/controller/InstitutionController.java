@@ -4,9 +4,8 @@ import com.example.genius.entity.Response;
 import com.example.genius.service.InstitutionService;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -43,9 +42,9 @@ public class InstitutionController extends BaseController{
     }
 
     @GetMapping("/getInstitutionsForMainPage")
-    public Response<Object> getInstitutionsForMainPage(){
+    public JsonNode getInstitutionsForMainPage(){
         try {
-            return getSuccessResponse(institutionService.getInstitutionsForMainPage());
+            return institutionService.getInstitutionsForMainPage2();
         }
         catch (Exception e){
             e.printStackTrace();
@@ -62,6 +61,12 @@ public class InstitutionController extends BaseController{
             e.printStackTrace();
             return null;
         }
+    }
+
+    @PostMapping("/addSInstitutions")
+    public Response<Object> addSInstitutions(@RequestBody JsonNode requestBody) throws Exception {
+        institutionService.addSInstitions(requestBody);
+        return getSimpleSuccess();
     }
 
 

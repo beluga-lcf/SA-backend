@@ -9,6 +9,7 @@ public interface EmailService {
     public void sendSimpleMail(Mail mail);
 
     public void sendHtmlMail(Mail mail);
+    public void sendReportEmail(String customMail,String reporter);
 
     public void sendRegisterVerifyMail(String customMail, String verifyCode);
 }

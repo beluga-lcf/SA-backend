@@ -17,7 +17,7 @@ public class CommentReport {
     @TableField("reportee_comment_id")
     private Integer reporteeCommentId;
     @TableField("reporter_id")
-    private int reporter_id;
+    private int reporterId;
     @TableField("ischeck")
     private int ischeck;
     @TableField(value = "time",fill = FieldFill.INSERT)

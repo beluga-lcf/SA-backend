@@ -117,7 +117,9 @@ public class WorkServiceImpl implements WorkService {
                 openaelexId = null;
             }
             else {
-                openaelexId = workEntityNode.get(0).get("id").asText();
+                JsonNode node = workEntityNode.get(0);
+                if(node == null) openaelexId = null;
+                else openaelexId = node.get("id").asText();
             }
             newNode.put("openalexId", openaelexId);
             //authors

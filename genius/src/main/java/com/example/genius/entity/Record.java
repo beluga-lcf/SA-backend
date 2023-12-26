@@ -21,6 +21,8 @@ public class Record {
     private int SearchUserId;
     @TableField("record_id")
     private String RecordId;
+    @TableField("pbscholar_id")
+    private String pbscholarId;
     public Record(){
 
     }

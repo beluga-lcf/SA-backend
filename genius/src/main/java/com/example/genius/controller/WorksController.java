@@ -80,20 +80,23 @@ public class WorksController extends BaseController{
         return array.toString();
     }
 
-    public void AddRecord(String workId,String title,int UserId){
+    public void AddRecord(String workId,String title,int UserId,String pbscholarId){
         Record record = new Record();
         record.setRecordId(workId);
         record.setRecordName(title);
         record.setSearchUserId(UserId);
+        record.setPbscholarId(pbscholarId);
         recordService.save(record);
     }
     @GetMapping("/displayWorkHomePage")
-    public Response<Object> displayWorkHomePage(String workId, @RequestHeader(value = "Authorization") String token) {
+    public Response<Object> displayWorkHomePage(String workId,@RequestHeader(value = "Authorization") String token) {
         try {
             JsonNode jsonNode = workService.getWorkHomePage(workId);
             if(getIdByJwt(token)>=0){
                int userId = getIdByJwt(token);
-                AddRecord(jsonNode.get("openalexid").asText().trim(),jsonNode.get("title").asText().trim(),userId);
+               if(jsonNode.get("openalexId")!=null){
+                   AddRecord(jsonNode.get("openalexId").asText().trim(),jsonNode.get("title").asText().trim(),userId,jsonNode.get("workId").asText().trim());
+               }
             }
 
             return getSuccessResponse(jsonNode);

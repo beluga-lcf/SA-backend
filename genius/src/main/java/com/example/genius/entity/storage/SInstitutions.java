@@ -1,13 +1,15 @@
 package com.example.genius.entity.storage;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 @Data
+@TableName("sinstitutions")
 public class SInstitutions {
     // simplified
     private String id;
-    private String diplay_name;
+    private String displayName;
     private String logo;
-    private String cited_by_count;
+    private int citedByCount;
     private String concepts;
 }

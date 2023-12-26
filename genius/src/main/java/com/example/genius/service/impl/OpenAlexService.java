@@ -17,6 +17,8 @@ import org.springframework.web.client.RestTemplate;
 import springfox.documentation.spring.web.json.Json;
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.*;
 
@@ -165,7 +167,7 @@ public class OpenAlexService {
         return restTemplate.getForObject(url, String.class);
     }
     public String getWorkidByWorkname(String username){//通过作品名字获取作品ID
-        String url = "https://api.openalex.org/works?filter=title.search:"+username;
+        String url = "https://api.openalex.org/works?filter=title.search:" + URLEncoder.encode(username, StandardCharsets.UTF_8);
         return restTemplate.getForObject(url, String.class);
     }
     public String getAuthorIDByWorkID(String workid){//通过作品ID获取作品作者的ID,直接传入以HTTP为头的ID

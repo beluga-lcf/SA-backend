@@ -1,5 +1,6 @@
 package com.example.genius.controller;
 
+import cn.hutool.crypto.SecureUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.alibaba.fastjson2.JSONArray;
@@ -81,7 +82,7 @@ public class UserController extends BaseController {
         User user = new User();
         user.setNickName(nick_name);
         user.setEmail(email);
-        user.setPassword(password);
+        user.setPassword(SecureUtil.md5(password));
 
 //        if (captcha != null) {
 //            user.setPersonDescription(captcha);
@@ -112,7 +113,7 @@ public class UserController extends BaseController {
         if (checkUser == null) {
             return getErrorResponse(null, ErrorType.without_register);
         }
-        if (!checkUser.getPassword().equalsIgnoreCase(password)) {
+        if (!checkUser.getPassword().equalsIgnoreCase(SecureUtil.md5(password))) {
             return getErrorResponse(null, ErrorType.wrong_pwd);
         } else {
             String token = contextLoads(email, Math.toIntExact(checkUser.getUserId()));
@@ -383,8 +384,8 @@ public class UserController extends BaseController {
             queryWrapper.eq("userid", userid);
             User user = userService.getOne(queryWrapper);
             // 验证旧密码正确
-            if (oldPw.equals(user.getPassword())) {
-                user.setPassword(newPw);
+            if (SecureUtil.md5(oldPw).equals(user.getPassword())) {
+                user.setPassword(SecureUtil.md5(newPw));
                 userService.updateById(user);
                 log.info("已修改密码");
 //                jsonObject.put("code", 200);
@@ -404,6 +405,36 @@ public class UserController extends BaseController {
             return getErrorResponse(null, ErrorType.jwt_illegal);
         }
         return null;
+    }
+    @RequestMapping(value = "/sendForgotEmail", method = RequestMethod.GET)
+    public Response sendForgotEmail(String email){
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("email", email);
+        User check_user = userService.getOne(queryWrapper);
+        if(check_user == null){
+            return getErrorResponse(null,ErrorType.not_registerd);
+        }
+        if (redisUtils.get(email) != null) {
+            return getErrorResponse(null, ErrorType.already_send_email);
+        }
+        Random random = new Random();
+        int vrcode = random.nextInt(9000) + 1000;
+        redisUtils.set(email, String.valueOf(vrcode), 60L, TimeUnit.SECONDS);
+        emailService.sendRegisterVerifyMail(email, String.valueOf(vrcode));
+        return getSuccessResponse("验证码已发送！");
+    }
+
+    @RequestMapping(value = "/forgotPassword", method = RequestMethod.GET)
+    public Response forgetPassword(String email,String newPw,String code){
+        if(!checkVrCode(email, code)){
+            return getErrorResponse(null, ErrorType.wrong_captcha);
+        }
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("email", email);
+        User user = userService.getOne(queryWrapper);
+        user.setPassword(SecureUtil.md5(newPw));
+        userService.updateById(user);
+        return getSuccessResponse("修改密码成功");
     }
 
     @RequestMapping(value = "/getScholarInfoSelf", method = RequestMethod.GET)

@@ -16,7 +16,7 @@ public class WorkReport {
     @TableField("reportee_work")
     private String reporteeWork;
     @TableField("reporter_id")
-    private int reporter_id;
+    private int reporterId;
     @TableField("ischeck")
     private int ischeck;
     @TableField(value = "time",fill = FieldFill.INSERT)
@@ -26,5 +26,8 @@ public class WorkReport {
 
     public WorkReport(){
 
+    }
+    public int getReporter_id(){
+        return reporterId;
     }
 }

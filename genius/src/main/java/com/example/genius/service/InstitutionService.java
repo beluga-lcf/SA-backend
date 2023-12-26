@@ -8,6 +8,9 @@ public interface InstitutionService {
     public JsonNode getInstitutionWorks(String institutionId) throws Exception;
 
     public JsonNode getInstitutionsForMainPage() throws Exception;
+    public JsonNode getInstitutionsForMainPage2() throws Exception;
     public String getInstitionIdFromName(String institutionName) throws Exception;
+
+    public void addSInstitions(JsonNode requestBody) throws Exception;
 
 }
