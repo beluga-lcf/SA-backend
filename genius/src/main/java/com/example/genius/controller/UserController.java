@@ -434,6 +434,30 @@ public class UserController extends BaseController {
         return null;
     }
 
+    @RequestMapping(value = "/getScholarIdSelf", method = RequestMethod.GET)
+    public Response getScholarIdSelf(@RequestHeader(value = "Authorization") String token) {
+        // jwt解出id
+        int user_id = getIdByJwt(token);
+        if (user_id >= 0) {
+            // 查关联表
+            QueryWrapper<UseridRelatedOpenalexid> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("user_id", user_id);
+            UseridRelatedOpenalexid searchUser = uroService.getOne(queryWrapper);
+            if (searchUser == null) {
+                // 未查到对应的openalex id, 可能是openalex没收录或不是认证学者
+                // 根据认证来源判断一定是没认证
+                return getErrorResponse(null, ErrorType.not_scholar);
+            } else {
+                return getSuccessResponse(searchUser.getOpenalexid());
+            }
+        } else if (user_id == -1) {
+            return getErrorResponse(null, ErrorType.login_timeout);
+        } else if (user_id == -2) {
+            return getErrorResponse(null, ErrorType.jwt_illegal);
+        }
+        return null;
+    }
+
     @RequestMapping(value = "/getScholarInfo", method = RequestMethod.GET)
     public Response getScholarInfo(int user_id) {
         // 查关联表
@@ -760,8 +784,9 @@ public class UserController extends BaseController {
         if (userid >= 0) {
             try {
                 ThesisResult result = userId2PSTIdService.checkT(userid, thesisId);
+                System.out.println("测试" + result.getCode());
                 if (result.getCode() == 200) {
-                    return getSuccessResponse(result.getThesisList());
+                    return getSuccessResponse(result.getMessage());
                 }
                 else {
                     return getSimpleError();
@@ -788,7 +813,7 @@ public class UserController extends BaseController {
 //                log.info("    " + rePatentId);
                 RePatentResult result = userId2PSPIdService.checkP(userid, rePatentId);
                 if (result.getCode() == 200) {
-                    return getSuccessResponse(result.getPatentList());
+                    return getSuccessResponse(result.getMessage());
                 }
                 else {
                     return getSimpleError();
