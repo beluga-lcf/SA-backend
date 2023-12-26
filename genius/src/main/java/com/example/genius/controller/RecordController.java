@@ -52,6 +52,7 @@ public class RecordController extends BaseController{
             return getSuccessResponse(disrecords);
         }else{
             for(Record record : records){
+                if(record.getRecordId()!=null){
 //                JSONObject j = new JSONObject();
 //                j.put("content",record.getRecordText());
 //                j.put("time",record.getSearchTime());
@@ -65,6 +66,7 @@ public class RecordController extends BaseController{
                     conceptDis.add(new ConceptDis(jsonArray.getJSONObject(i).getString("display_name")));
                 }
                 disrecords.add(new Disrecord(record.getId(),record.getRecordId(),record.getRecordName(),record.getTime(),conceptDis,conceptDis.size(),record.getPbscholarId()));
+            }
             }
             return getSuccessResponse(disrecords);
         }
@@ -90,7 +92,7 @@ public class RecordController extends BaseController{
         List<Record> records = recordService.list(queryWrapper);
         ArrayList<Disrecord> disrecords = new ArrayList<>();
         for(Record record : records){
-            if(record.getRecordName().contains(keyword)){
+            if(record.getRecordName().contains(keyword)&&record.getRecordId()!=null){
                 String result = openAlexService.getConceptByWorkID(record.getRecordId());
                 ArrayList<ConceptDis> conceptDis = new ArrayList<>();
                 JSONObject jsonObject = JSONObject.parseObject(result);
